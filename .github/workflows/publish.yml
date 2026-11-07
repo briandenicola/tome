@@ -137,8 +137,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # No build cache: writing it (cache-to: type=gha,mode=max) took 3m10s of a 5m22s step to save about
+          # 30s of npm ci on the next run, and the next build layer changes with every commit anyway.
           # amd64 only: every host that runs Tome is x86. An arm64 build on these x86 runners runs under QEMU
           # emulation (npm ci compiling better-sqlite3 twice, then next build), which is most of the build time.
           platforms: linux/amd64
