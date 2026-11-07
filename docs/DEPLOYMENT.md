@@ -31,7 +31,9 @@ Currently, the *only way* to run Tome is through [Docker](https://www.docker.com
 
 [Install Docker Desktop](https://www.docker.com/products/docker-desktop/) and create a container using their GUI, as described in [this article](https://www.educative.io/answers/how-to-create-a-docker-container-in-docker-desktop).
 
-The image is: `ghcr.io/masonfox/tome:latest`. Fill in the volumes detailed above.
+The image is: `ghcr.io/briandenicola/tome:latest`. Fill in the volumes detailed above.
+
+**Image tags:** `latest` and the version (`0.7.0`, `0.7`) are built from `main`, for amd64 and arm64. `nightly` is built from `develop` on every push, amd64 only.
 
 ### 2. Docker CLI
 After replacing the host volume references, run this from the command line or terminal:
@@ -45,7 +47,7 @@ docker run -d \
   -e PUID=1000 \
   -e PGID=1000 \
   --restart unless-stopped \
-  ghcr.io/masonfox/tome:latest
+  ghcr.io/briandenicola/tome:latest
 ```
 
 ### 3. Preferred: Docker Compose
@@ -55,7 +57,7 @@ version: '3.8'
 
 services:
   tome:
-    image: ghcr.io/masonfox/tome:latest
+    image: ghcr.io/briandenicola/tome:latest
     container_name: tome
     ports:
       - "3000:3000"
@@ -155,7 +157,7 @@ Use the `uid` and `gid` values for PUID and PGID.
 ```yaml
 services:
   tome:
-    image: ghcr.io/masonfox/tome:latest
+    image: ghcr.io/briandenicola/tome:latest
     environment:
       - PUID=1000
       - PGID=1000
@@ -166,7 +168,7 @@ services:
 docker run -d \
   -e PUID=1000 \
   -e PGID=1000 \
-  ghcr.io/masonfox/tome:latest
+  ghcr.io/briandenicola/tome:latest
 ```
 
 ## Database Backups

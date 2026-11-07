@@ -36,7 +36,7 @@ export default function SettingsPage() {
       {/* Project Links */}
       <div className="flex items-center justify-center gap-4 text-sm text-[var(--subheading-text)] pb-4">
         <a
-          href="https://github.com/masonfox/tome"
+          href="https://github.com/briandenicola/tome"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 hover:text-[var(--foreground)] transition-colors"
@@ -46,7 +46,7 @@ export default function SettingsPage() {
         </a>
         <span aria-hidden="true">·</span>
         <a
-          href="https://github.com/masonfox/tome/issues"
+          href="https://github.com/briandenicola/tome/issues"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 hover:text-[var(--foreground)] transition-colors"

@@ -107,7 +107,7 @@ function compareVersions(current: string, latest: string): {
 async function fetchLatestRelease(): Promise<GitHubRelease | null> {
   try {
     const response = await fetch(
-      'https://api.github.com/repos/masonfox/tome/releases/latest',
+      'https://api.github.com/repos/briandenicola/tome/releases/latest',
       {
         next: { revalidate: 86400 }, // 24 hours in seconds
         headers: {
