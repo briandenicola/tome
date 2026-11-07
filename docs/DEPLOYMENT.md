@@ -33,7 +33,7 @@ Currently, the *only way* to run Tome is through [Docker](https://www.docker.com
 
 The image is: `ghcr.io/briandenicola/tome:latest`. Fill in the volumes detailed above.
 
-**Image tags:** `latest` and the version (`0.7.0`, `0.7`) are built from `main`, for amd64 and arm64.
+**Image tags:** `latest` and the version (`0.7.0`, `0.7`) are built from `main`, for amd64 (x86) only.
 
 ### 2. Docker CLI
 After replacing the host volume references, run this from the command line or terminal:
