@@ -77,6 +77,7 @@ async function main() {
         const extra: string[] = [];
         if (backup.hasWal) extra.push("+WAL");
         if (backup.hasShm) extra.push("+SHM");
+        if (backup.coverCount) extra.push(`+${backup.coverCount} covers`);
         const extraInfo = extra.length > 0 ? ` (${extra.join(", ")})` : "";
         
         console.log(`  [${index}] ${backup.dbName === "tome.db" ? "📗" : "📘"} ${backup.dbName}`);

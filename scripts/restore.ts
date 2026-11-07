@@ -86,6 +86,7 @@ async function interactiveRestore(cfg: ReturnType<typeof getBackupConfig>): Prom
     const extra: string[] = [];
     if (backup.hasWal) extra.push("+WAL");
     if (backup.hasShm) extra.push("+SHM");
+    if (backup.coverCount) extra.push(`+${backup.coverCount} covers`);
     const extraInfo = extra.length > 0 ? ` (${extra.join(", ")})` : "";
     
     console.log(`  [${i + 1}] ${backup.name} (${backup.size})`);
@@ -178,6 +179,13 @@ async function performRestore(backupPath: string, targetPath: string): Promise<v
   console.log(`   Location: ${result.restoredPath}`);
   console.log(`   Size: ${result.restoredSize}`);
   
+  if (result.coversRestored !== undefined) {
+    console.log(`   Covers: ${result.coversRestored} restored`);
+  }
+  if (result.coversSafetyPath) {
+    console.log(`📦 Covers before the restore kept in: ${result.coversSafetyPath}`);
+  }
+
   if (result.safetyBackupPath) {
     console.log("");
     console.log(`📦 Safety backup created: ${result.safetyBackupPath}`);

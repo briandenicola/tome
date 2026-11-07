@@ -9,7 +9,7 @@ Tome runs with or without a Calibre library.
 - **Without Calibre**, leave `CALIBRE_DB_PATH` unset and skip the `/calibre` volume. Add books under **Library → Add book**: a title, authors, pages and a cover (an image file or its web address). **Look up** fills the form from the book's ISBN, using Open Library; it's the only time Tome calls a service on the internet, and only when you click it. Sync Calibre and OPDS are hidden or empty.
 - **With Calibre**, its books sync as before, with covers from the library and ratings and tags written back to Calibre. You can still add books by hand beside them: they're never orphaned by a sync, and their ratings and tags stay in Tome. Edit a Calibre book's details in Calibre; edit a book added by hand from its page (**Edit details**, **Remove book**).
 
-Covers of books added by hand are kept in `covers/` next to the database (`/app/data/covers`), so back up the whole data folder, not only `tome.db`.
+Covers of books added by hand are kept in `covers/` next to the database (`/app/data/covers`). Tome's backups copy them with the database (see [Database Backups](#database-backups)).
 
 **Note**: With Calibre, Tome needs write access to sync ratings and tags back. You will need to provide an *absolute* path to your Calibre Library folder. Common Calibre library locations:
 - **Linux**: `~/Calibre Library/metadata.db`
@@ -163,7 +163,7 @@ docker exec tome npm run db:list-backups
 docker exec -it tome npm run db:restore
 ```
 
-Backups are stored in `data/backups/` inside the container (part of the `tome-data` volume). They hold the database only: covers of books added by hand are in `data/covers/`, so back that folder up too.
+Backups are stored in `data/backups/` inside the container (part of the `tome-data` volume). Each backup holds the database and, beside it as `covers.backup-<time>/`, the covers of books added by hand. Restoring a backup puts its covers back too; the covers in place before are kept in `data/backups/<date>/covers.before-restore-<time>/`. A backup made before this version has no covers with it, and restoring it leaves the current covers as they are.
 
 ## Database Migrations
 

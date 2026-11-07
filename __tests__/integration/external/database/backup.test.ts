@@ -7,6 +7,7 @@ import {
   getBackupConfig,
   validateBackup,
   restoreBackup,
+  backupCovers,
   type BackupOptions,
   type BackupConfig 
 } from "@/lib/db/backup";
@@ -1317,6 +1318,84 @@ describe("Database Backup Module", () => {
         // Second restore had existing db (from restore1), so safety backup created
         expect(restore2.safetyBackupPath).toBeDefined();
       });
+    });
+  });
+  describe("covers of books added by hand", () => {
+    const makeDb = (path: string, title: string) => {
+      const db = new Database(path);
+      db.exec("CREATE TABLE books (title TEXT)");
+      db.prepare("INSERT INTO books VALUES (?)").run(title);
+      db.close();
+    };
+    const config = (tomeDbPath: string): BackupConfig => ({ tomeDbPath, backupDir, backupCalibre: false, maxBackups: 3 });
+
+    test("are copied beside the Tome backup, under the same timestamp", async () => {
+      const tomeDbPath = join(sourceDir, "tome.db");
+      makeDb(tomeDbPath, "Piranesi");
+      mkdirSync(join(sourceDir, "covers"));
+      writeFileSync(join(sourceDir, "covers", "1-aaaa.png"), "png 1");
+      writeFileSync(join(sourceDir, "covers", "2-bbbb.jpg"), "jpg 2");
+
+      const result = await createBackups(config(tomeDbPath));
+      expect(result.covers).toMatchObject({ success: true, count: 2 });
+      const timestamp = result.tome.backupPath!.match(/backup-(\d{8}_\d{6})/)![1];
+      expect(result.covers!.path!.endsWith(`covers.backup-${timestamp}`)).toBe(true);
+      expect(readdirSync(result.covers!.path!).sort()).toEqual(["1-aaaa.png", "2-bbbb.jpg"]);
+
+      const [listed] = await listBackups(backupDir);
+      expect(listed).toMatchObject({ dbName: "tome.db", coversPath: result.covers!.path, coverCount: 2 });
+      expect(await listBackups(backupDir)).toHaveLength(1); // the covers folder isn't listed as a backup
+    });
+
+    test("with no covers, nothing extra is written", async () => {
+      const tomeDbPath = join(sourceDir, "tome.db");
+      makeDb(tomeDbPath, "Piranesi");
+      const result = await createBackups(config(tomeDbPath));
+      expect(result.covers).toEqual({ success: true, count: 0 });
+      expect(readdirSync(join(backupDir, readdirSync(backupDir)[0])).some((n) => n.startsWith("covers."))).toBe(false);
+      expect(backupCovers(tomeDbPath, backupDir, "20260101_000000")).toEqual({ success: true, count: 0 });
+    });
+
+    test("old backup folders are removed with their covers", async () => {
+      for (const day of ["2025-01-01", "2025-01-02"]) {
+        const folder = join(backupDir, day);
+        mkdirSync(join(folder, "covers.backup-20250101_000000"), { recursive: true });
+        writeFileSync(join(folder, "tome.db.backup-20250101_000000"), "db");
+        writeFileSync(join(folder, "covers.backup-20250101_000000", "1-a.png"), "png");
+      }
+      expect(await cleanupOldBackups(backupDir, "tome.db", 1)).toBe(1);
+      expect(readdirSync(backupDir)).toEqual(["2025-01-02"]);
+    });
+
+    test("a restore puts the backup's covers back and keeps the current ones aside", async () => {
+      const tomeDbPath = join(sourceDir, "tome.db");
+      makeDb(tomeDbPath, "Piranesi");
+      mkdirSync(join(sourceDir, "covers"));
+      writeFileSync(join(sourceDir, "covers", "1-old.png"), "the backed-up cover");
+      const backup = await createBackups(config(tomeDbPath));
+
+      // Later: the cover changes.
+      rmSync(join(sourceDir, "covers", "1-old.png"));
+      writeFileSync(join(sourceDir, "covers", "1-new.png"), "a newer cover");
+
+      const restored = await restoreBackup(backup.tome.backupPath!, tomeDbPath);
+      expect(restored).toMatchObject({ success: true, coversRestored: 1 });
+      expect(readdirSync(join(sourceDir, "covers"))).toEqual(["1-old.png"]);
+      expect(readFileSync(join(sourceDir, "covers", "1-old.png"), "utf8")).toBe("the backed-up cover");
+      expect(readdirSync(restored.coversSafetyPath!)).toEqual(["1-new.png"]);
+    });
+
+    test("restoring a backup made without covers leaves the current covers alone", async () => {
+      const tomeDbPath = join(sourceDir, "tome.db");
+      makeDb(tomeDbPath, "Piranesi");
+      const backup = await createBackups(config(tomeDbPath)); // no covers yet
+      mkdirSync(join(sourceDir, "covers"));
+      writeFileSync(join(sourceDir, "covers", "1-new.png"), "png");
+
+      const restored = await restoreBackup(backup.tome.backupPath!, tomeDbPath);
+      expect(restored.success).toBe(true);
+      expect(restored.coversRestored).toBeUndefined();
+      expect(readdirSync(join(sourceDir, "covers"))).toEqual(["1-new.png"]);
     });
   });
 });
