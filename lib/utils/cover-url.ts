@@ -2,9 +2,9 @@
  * Generates a cache-busted cover URL for a book
  * 
  * Appends lastSynced timestamp as query param to force browser
- * cache invalidation when covers change in Calibre
+ * cache invalidation when covers change (in Calibre, or uploaded for a book added by hand)
  * 
- * @param calibreId - Calibre book ID
+ * @param bookId - Tome book ID (not the Calibre id: books added by hand have none)
  * @param lastSynced - Last sync timestamp (optional)
  * @returns Cover URL with cache busting param
  * 
@@ -14,10 +14,10 @@
  * getCoverUrl(123, "2024-01-13T12:00:00Z") // "/api/books/123/cover?t=1705161600000"
  */
 export function getCoverUrl(
-  calibreId: number,
+  bookId: number,
   lastSynced?: Date | string | null
 ): string {
-  const baseUrl = `/api/books/${calibreId}/cover`;
+  const baseUrl = `/api/books/${bookId}/cover`;
   
   if (!lastSynced) {
     return baseUrl;

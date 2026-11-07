@@ -5,7 +5,11 @@ export const books = sqliteTable(
   "books",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    calibreId: integer("calibre_id").notNull().unique(),
+    // Set for books synced from Calibre; null for books added by hand.
+    calibreId: integer("calibre_id").unique(),
+    // Where the book came from: "calibre" (synced), "manual" (added in Tome), or the reading app it was first read in
+    // ("audiobookshelf", "grimmory"; added by Tome's source sync). Every source but Calibre is edited in Tome.
+    source: text("source", { enum: ["calibre", "manual", "audiobookshelf", "grimmory"] }).notNull().default("calibre"),
     title: text("title").notNull(),
     // Store authors as JSON array
     authors: text("authors", { mode: "json" }).$type<string[]>().notNull().default(sql`'[]'`),
@@ -21,9 +25,12 @@ export const books = sqliteTable(
     seriesIndex: real("series_index"),
     // Store tags as JSON array
     tags: text("tags", { mode: "json" }).$type<string[]>().notNull().default(sql`'[]'`),
+    // The book's folder in the Calibre library; "" for books added by hand.
     path: text("path").notNull(),
+    // For books added by hand: the cover's file name in the covers folder next to the database.
+    coverFile: text("cover_file"),
     description: text("description"),
-    rating: integer("rating"), // 1-5 stars, synced from Calibre
+    rating: integer("rating"), // 1-5 stars; synced with Calibre for Calibre books
     orphaned: integer("orphaned", { mode: "boolean" }).notNull().default(false),
     orphanedAt: integer("orphaned_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
@@ -36,4 +43,5 @@ export const books = sqliteTable(
 );
 
 export type Book = typeof books.$inferSelect;
+export type BookSource = Book["source"];
 export type NewBook = typeof books.$inferInsert;

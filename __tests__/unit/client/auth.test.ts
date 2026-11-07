@@ -88,7 +88,7 @@ describe("Authentication Utilities", () => {
       const response = createAuthResponse(mockRequest);
       const setCookieHeader = response.headers.get("set-cookie");
 
-      expect(setCookieHeader).toContain("tome-auth=authenticated");
+      expect(setCookieHeader).toMatch(/tome-auth=v1\.\d+\./);
       expect(setCookieHeader).toContain("Secure");
     });
 
@@ -104,7 +104,7 @@ describe("Authentication Utilities", () => {
       const response = createAuthResponse(mockRequest);
       const setCookieHeader = response.headers.get("set-cookie");
 
-      expect(setCookieHeader).toContain("tome-auth=authenticated");
+      expect(setCookieHeader).toMatch(/tome-auth=v1\.\d+\./);
       expect(setCookieHeader).not.toContain("Secure");
     });
 
@@ -121,7 +121,7 @@ describe("Authentication Utilities", () => {
       const response = createAuthResponse(mockRequest);
       const setCookieHeader = response.headers.get("set-cookie");
 
-      expect(setCookieHeader).toContain("tome-auth=authenticated");
+      expect(setCookieHeader).toMatch(/tome-auth=v1\.\d+\./);
       expect(setCookieHeader).toContain("Secure");
     });
 
@@ -138,7 +138,7 @@ describe("Authentication Utilities", () => {
       const response = createAuthResponse(mockRequest);
       const setCookieHeader = response.headers.get("set-cookie");
 
-      expect(setCookieHeader).toContain("tome-auth=authenticated");
+      expect(setCookieHeader).toMatch(/tome-auth=v1\.\d+\./);
       expect(setCookieHeader).not.toContain("Secure");
     });
   });

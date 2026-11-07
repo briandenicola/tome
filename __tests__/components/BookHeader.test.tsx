@@ -31,6 +31,7 @@ afterEach(() => {
 
 describe("BookHeader", () => {
   const mockBook = {
+    id: 7,
     calibreId: 1,
     totalPages: 300,
   };
@@ -289,7 +290,7 @@ describe("BookHeader", () => {
       const image = container.querySelector("img");
       expect(image).toBeInTheDocument();
       expect(image).toHaveAttribute("alt", "Book cover");
-      expect(image).toHaveAttribute("src", expect.stringContaining("/api/books/1/cover"));
+      expect(image).toHaveAttribute("src", expect.stringContaining("/api/books/7/cover"));
     });
 
     test("should show fallback icon when image error", () => {

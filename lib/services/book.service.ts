@@ -208,9 +208,9 @@ export class BookService {
       throw new Error("Book not found");
     }
 
-    // Sync to Calibre first (best effort)
+    // Sync to Calibre first (best effort); a book added by hand keeps its rating in Tome only
     try {
-      await this.syncRatingToCalibre(book.calibreId, rating);
+      if (book.calibreId !== null) await this.syncRatingToCalibre(book.calibreId, rating);
     } catch (error) {
       // Log error but continue - rating will be out of sync until next Calibre sync
       getLogger().error({ err: error }, `[BookService] Failed to sync rating to Calibre for book ${bookId}`);

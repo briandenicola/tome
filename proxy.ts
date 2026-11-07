@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { proxyAuthCheck } from "@/lib/auth";
+import { proxyAuthCheck, type TokenVerifier } from "@/lib/auth";
 import { isDemoMode } from "@/lib/demo";
 
 // HTTP methods that modify data
@@ -9,7 +9,13 @@ const MUTATION_METHODS = ["POST", "PUT", "DELETE", "PATCH"];
 // API routes allowed even in demo mode
 const DEMO_ALLOWED_ROUTES = ["/api/auth/login", "/api/auth/logout", "/api/auth/status"];
 
-export function proxy(request: NextRequest) {
+/** Checks an API token against the database, loaded only when a request carries one. */
+const verifyToken: TokenVerifier = async (token) => {
+  const { apiTokenService } = await import("@/lib/services/api-token.service");
+  return apiTokenService.verify(token);
+};
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip static assets - anything with a file extension except .json
@@ -39,7 +45,7 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  const authResult = proxyAuthCheck(request);
+  const authResult = await proxyAuthCheck(request, verifyToken);
   if (authResult) {
     return authResult;
   }

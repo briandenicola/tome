@@ -12,3 +12,4 @@ export * from "./series.service";
 export * from "./reading-goals.service";
 export * from "./reading-stats.service";
 export * from "./tag.service";
+export * from "./api-token.service";

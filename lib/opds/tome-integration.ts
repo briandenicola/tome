@@ -10,8 +10,7 @@
  * Rationale:
  * - OPDS is explicitly a Calibre-specific integration bridge
  * - Queries here combine Tome DB (sessions/shelves) with Calibre DB (metadata/files)
- * - Issue #185 (Calibre-independent reading) will require architectural changes here
- * - When #185 lands, this module will need filtering by `calibreId IS NOT NULL`
+ * - Books added by hand (calibreId null) have no files, so every query here filters `calibreId IS NOT NULL`
  * - Adding repository methods now would create technical debt that needs removal later
  * 
  * This is an intentional architectural decision, not an oversight. When Issue #185
@@ -23,7 +22,7 @@
  * - #341: OPDS Repository Pattern architectural review
  */
 
-import { eq, and, sql, desc } from 'drizzle-orm';
+import { eq, and, sql, desc, isNotNull } from 'drizzle-orm';
 import { getDatabase } from '@/lib/db/context';
 import { readingSessions } from '@/lib/db/schema/reading-sessions';
 import { books } from '@/lib/db/schema/books';
@@ -64,11 +63,13 @@ export async function getBooksByStatus(
     .where(
       // For "read" status, include all sessions (archived + active)
       // For other statuses, only include active sessions
+      // Books added by hand have no Calibre files to serve, so they're left out.
       status === 'read'
-        ? eq(readingSessions.status, status)
+        ? and(eq(readingSessions.status, status), isNotNull(books.calibreId))
         : and(
             eq(readingSessions.status, status),
-            eq(readingSessions.isActive, true)
+            eq(readingSessions.isActive, true),
+            isNotNull(books.calibreId)
           )
     );
 
@@ -143,7 +144,8 @@ export async function getBooksByShelf(
     })
     .from(bookShelves)
     .innerJoin(books, eq(bookShelves.bookId, books.id))
-    .where(eq(bookShelves.shelfId, shelfId))
+    // OPDS serves Calibre's files; books added by hand have none.
+    .where(and(eq(bookShelves.shelfId, shelfId), isNotNull(books.calibreId)))
     .orderBy(bookShelves.sortOrder)
     .all();
 
@@ -155,6 +157,7 @@ export async function getBooksByShelf(
   // Fetch full Calibre book data for paginated IDs
   const calibreBooks: CalibreBook[] = [];
   for (const shelfBook of paginatedBooks) {
+    if (shelfBook.calibreId === null) continue;
     const book = getBookById(shelfBook.calibreId);
     if (book) {
       calibreBooks.push(book);

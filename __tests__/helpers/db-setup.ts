@@ -135,6 +135,8 @@ export async function clearTestDatabase(dbInstanceOrPath: TestDatabaseInstance |
   // Use raw SQL DELETE statements to ensure they execute synchronously
   // Delete in order that respects foreign key constraints (children first, then parents)
   try {
+    rawDb.prepare("DELETE FROM source_links").run();
+    rawDb.prepare("DELETE FROM source_syncs").run();
     const progressResult = rawDb.prepare("DELETE FROM progress_logs").run();
     const sessionsResult = rawDb.prepare("DELETE FROM reading_sessions").run();
     const bookShelvesResult = rawDb.prepare("DELETE FROM book_shelves").run();
@@ -142,6 +144,7 @@ export async function clearTestDatabase(dbInstanceOrPath: TestDatabaseInstance |
     const booksResult = rawDb.prepare("DELETE FROM books").run();
     const streaksResult = rawDb.prepare("DELETE FROM streaks").run();
     const goalsResult = rawDb.prepare("DELETE FROM reading_goals").run();
+    rawDb.prepare("DELETE FROM api_tokens").run();
 
     // console.log(
     //   `[clearTestDatabase] Deleted: ${progressResult.changes} progress, ` +

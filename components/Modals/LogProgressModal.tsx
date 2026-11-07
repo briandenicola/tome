@@ -23,7 +23,7 @@ interface LogProgressModalProps {
   onClose: () => void;
   book: {
     id: number;
-    calibreId: number;
+    calibreId: number | null;
     title: string;
     authors: string[];
     totalPages?: number;

@@ -9,13 +9,14 @@
  * - Stores backups in date-based folders for organization
  * - Implements retention policy (keeps last N backups)
  * - Supports both Tome and Calibre databases
+ * - Copies the covers of books added by hand (the `covers` folder next to Tome's database) beside each Tome backup
  * - Graceful error handling with detailed logging
  * 
  * @module lib/db/backup
  */
 
 import { getLogger } from "@/lib/logger";
-import { existsSync, statSync, accessSync, constants, mkdirSync, copyFileSync, readdirSync, unlinkSync, rmdirSync } from "fs";
+import { existsSync, statSync, accessSync, constants, mkdirSync, copyFileSync, readdirSync, rmSync, cpSync } from "fs";
 import { dirname, join, basename } from "path";
 
 // Lazy environment configuration - read at function call time to ensure .env is loaded
@@ -105,6 +106,24 @@ export interface BackupInfo {
   hasShm: boolean;
   /** Date folder name */
   folder: string;
+  /** For a Tome backup: the covers copied with it (covers.backup-<timestamp>), if any */
+  coversPath?: string;
+  /** How many covers are in it */
+  coverCount?: number;
+}
+
+/**
+ * Result of copying the covers of books added by hand
+ */
+export interface CoversBackupResult {
+  /** Whether the copy succeeded (true, with count 0, when there were no covers) */
+  success: boolean;
+  /** How many cover files were copied */
+  count: number;
+  /** Folder they were copied to (when count > 0) */
+  path?: string;
+  /** Error message (if failed) */
+  error?: string;
 }
 
 /**
@@ -115,6 +134,8 @@ export interface BackupsResult {
   tome: BackupResult;
   /** Result of Calibre database backup (if attempted) */
   calibre?: BackupResult;
+  /** Result of copying the covers of books added by hand (when the Tome backup succeeded) */
+  covers?: CoversBackupResult;
 }
 
 /**
@@ -192,6 +213,43 @@ function formatTimestamp(timestamp: string): string {
   const seconds = timePart.substring(4, 6);
   
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+/** The covers folder that sits next to a Tome database. */
+export function coversDirFor(tomeDbPath: string): string {
+  return join(dirname(tomeDbPath), "covers");
+}
+
+function countFiles(dir: string): number {
+  try {
+    return readdirSync(dir, { withFileTypes: true }).filter((d) => d.isFile()).length;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Copy the covers of books added by hand into a backup's date folder, as covers.backup-<timestamp>.
+ * Cover files are never changed in place (a new cover gets a new name), so copying while Tome runs is safe.
+ *
+ * @param tomeDbPath - Path to Tome's database; the covers are in `covers/` beside it
+ * @param backupFolder - The date folder the Tome backup was written to
+ * @param timestamp - The Tome backup's timestamp, so the two are matched on restore
+ */
+export function backupCovers(tomeDbPath: string, backupFolder: string, timestamp: string): CoversBackupResult {
+  const log = getLoggerSafe();
+  const source = coversDirFor(tomeDbPath);
+  const count = countFiles(source);
+  if (count === 0) return { success: true, count: 0 };
+  const destination = join(backupFolder, `covers.backup-${timestamp}`);
+  try {
+    cpSync(source, destination, { recursive: true });
+    log.info({ destination, count }, `Covers backed up: ${count} file(s)`);
+    return { success: true, count, path: destination };
+  } catch (error: any) {
+    log.error({ source, destination, error: error.message }, "Failed to back up covers");
+    return { success: false, count: 0, error: `Failed to back up covers: ${error.message}` };
+  }
 }
 
 /**
@@ -348,17 +406,8 @@ export async function cleanupOldBackups(
       try {
         log.debug({ folder: folder.path }, "Deleting old backup folder");
 
-        // Delete all files in folder
-        const files = readdirSync(folder.path, { withFileTypes: true });
-        for (const file of files) {
-          if (file.isFile()) {
-            unlinkSync(join(folder.path, file.name));
-            log.debug({ file: file.name }, "Deleted backup file");
-          }
-        }
-
-        // Delete the folder itself
-        rmdirSync(folder.path);
+        // Delete the folder with everything in it (database files and covers.backup-* folders)
+        rmSync(folder.path, { recursive: true, force: true });
         log.debug({ folder: folder.name }, "Deleted backup folder");
 
         deletedCount++;
@@ -421,6 +470,9 @@ export async function listBackups(backupDir: string): Promise<BackupInfo[]> {
         const hasWal = existsSync(`${fullPath}-wal`);
         const hasShm = existsSync(`${fullPath}-shm`);
         
+        const coversPath = join(folder.path, `covers.backup-${timestamp}`);
+        const hasCovers = dbName === "tome.db" && existsSync(coversPath);
+
         backups.push({
           path: fullPath,
           name: file.name,
@@ -431,7 +483,8 @@ export async function listBackups(backupDir: string): Promise<BackupInfo[]> {
           sizeBytes: stats.size,
           hasWal,
           hasShm,
-          folder: folder.name
+          folder: folder.name,
+          ...(hasCovers && { coversPath, coverCount: countFiles(coversPath) })
         });
       }
     }
@@ -500,6 +553,12 @@ export async function createBackups(config?: BackupConfig): Promise<BackupsResul
     return { tome: tomeResult };
   }
   
+  // 1b. Covers of books added by hand, beside the Tome backup (a failure here doesn't undo the database backup)
+  const covers = backupCovers(cfg.tomeDbPath, dirname(tomeResult.backupPath!), timestamp);
+  if (!covers.success) {
+    log.warn({ error: covers.error }, "Covers backup failed, but the Tome database backup succeeded");
+  }
+
   // 2. Backup Calibre database (optional)
   let calibreResult: BackupResult | undefined;
   
@@ -538,7 +597,8 @@ export async function createBackups(config?: BackupConfig): Promise<BackupsResul
   
   return {
     tome: tomeResult,
-    calibre: calibreResult
+    calibre: calibreResult,
+    covers
   };
 }
 
@@ -552,6 +612,10 @@ export interface RestoreResult {
   restoredPath?: string;
   /** Human-readable size of restored database (if successful) */
   restoredSize?: string;
+  /** How many covers were restored (when the backup had covers with it) */
+  coversRestored?: number;
+  /** Where the covers in place before the restore were kept (when there were any) */
+  coversSafetyPath?: string;
   /** Path to safety backup created before restore (if successful) */
   safetyBackupPath?: string;
   /** Error message (if failed) */
@@ -711,6 +775,35 @@ export async function restoreBackup(backupPath: string, targetPath: string): Pro
       };
     }
     
+    // 6. Covers of books added by hand: restore the ones taken with this backup, keeping the current ones aside.
+    //    A backup made before covers were backed up has none; the current covers are then left as they are.
+    let coversRestored: number | undefined;
+    let coversSafetyPath: string | undefined;
+    const timestamp = parseTimestamp(basename(backupPath));
+    const coversBackup = timestamp ? join(dirname(backupPath), `covers.backup-${timestamp}`) : null;
+    if (coversBackup && basename(backupPath).startsWith("tome.db") && existsSync(coversBackup)) {
+      const coversTarget = coversDirFor(targetPath);
+      try {
+        if (countFiles(coversTarget) > 0) {
+          coversSafetyPath = join(dirname(targetPath), "backups", generateDateFolder(), `covers.before-restore-${generateTimestamp()}`);
+          cpSync(coversTarget, coversSafetyPath, { recursive: true });
+        }
+        rmSync(coversTarget, { recursive: true, force: true });
+        cpSync(coversBackup, coversTarget, { recursive: true });
+        coversRestored = countFiles(coversTarget);
+        log.info({ coversBackup, coversTarget, coversRestored, coversSafetyPath }, "Covers restored");
+      } catch (error: any) {
+        log.error({ coversBackup, coversTarget, error: error.message }, "Failed to restore covers");
+        return {
+          success: false,
+          error: `The database was restored, but its covers weren't: ${error.message}. Copy ${coversBackup} to ${coversTarget} by hand.`,
+          restoredPath: targetPath,
+          safetyBackupPath,
+          coversSafetyPath
+        };
+      }
+    }
+
     // Get restored database size
     const stats = statSync(targetPath);
     const restoredSize = formatSize(stats.size);
@@ -726,7 +819,9 @@ export async function restoreBackup(backupPath: string, targetPath: string): Pro
       success: true,
       restoredPath: targetPath,
       restoredSize,
-      safetyBackupPath
+      safetyBackupPath,
+      coversRestored,
+      coversSafetyPath
     };
   } catch (error: any) {
     log.error({ backupPath, targetPath, error: error.message, stack: error.stack }, 'Restore failed');
@@ -757,12 +852,17 @@ if (isMainModule) {
           console.log(`   Size: ${result.tome.backupSize}`);
           if (result.tome.hasWal) console.log(`   + WAL file`);
           if (result.tome.hasShm) console.log(`   + SHM file`);
+          if (result.covers?.count) console.log(`   + ${result.covers.count} cover(s) of books added by hand`);
         } else {
           console.log(`Tome backup created: ${result.tome.backupSize}`);
         }
       } else {
         console.error(`❌ Tome database backup failed: ${result.tome.error}`);
         process.exit(1);
+      }
+
+      if (result.covers && !result.covers.success) {
+        console.warn(`⚠️  Covers backup failed: ${result.covers.error}`);
       }
       
       if (result.calibre) {

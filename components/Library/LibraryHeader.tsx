@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, Library as LibraryIcon } from "lucide-react";
+import { RefreshCw, Library as LibraryIcon, Plus } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/Utilities/Button";
 
@@ -8,10 +8,21 @@ interface LibraryHeaderProps {
   totalBooks: number;
   syncing: boolean;
   onSync: () => void;
+  /** Opens the form to add a book by hand. */
+  onAddBook?: () => void;
+  /** Whether a Calibre library is set up; the sync button only shows when it is. */
+  calibreConfigured?: boolean;
   loading?: boolean;
 }
 
-export function LibraryHeader({ totalBooks, syncing, onSync, loading = false }: LibraryHeaderProps) {
+export function LibraryHeader({
+  totalBooks,
+  syncing,
+  onSync,
+  onAddBook,
+  calibreConfigured = true,
+  loading = false,
+}: LibraryHeaderProps) {
   return (
     <div className="flex items-start justify-between border-b border-[var(--border-color)] pb-6">
       <div>
@@ -30,19 +41,31 @@ export function LibraryHeader({ totalBooks, syncing, onSync, loading = false }: 
         )}
       </div>
 
-      <Button
-        onClick={onSync}
-        disabled={syncing}
-        variant="primary"
-        size="xl"
-        icon={<RefreshCw className={cn("w-4 h-4", syncing && "animate-spin")} />}
-        className="mt-3 sm:mt-2"
-        title={syncing ? "Syncing..." : "Sync Calibre"}
-      >
-        <span className="hidden sm:inline">
-          {syncing ? "Syncing..." : "Sync Calibre"}
-        </span>
-      </Button>
+      <div className="flex gap-2 mt-3 sm:mt-2">
+        {onAddBook && (
+          <Button
+            onClick={onAddBook}
+            variant={calibreConfigured ? "secondary" : "primary"}
+            size="xl"
+            icon={<Plus className="w-4 h-4" />}
+            title="Add a book that isn't in Calibre"
+          >
+            <span className="hidden sm:inline">Add book</span>
+          </Button>
+        )}
+        {calibreConfigured && (
+          <Button
+            onClick={onSync}
+            disabled={syncing}
+            variant="primary"
+            size="xl"
+            icon={<RefreshCw className={cn("w-4 h-4", syncing && "animate-spin")} />}
+            title={syncing ? "Syncing..." : "Sync Calibre"}
+          >
+            <span className="hidden sm:inline">{syncing ? "Syncing..." : "Sync Calibre"}</span>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

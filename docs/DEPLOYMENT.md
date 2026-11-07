@@ -2,20 +2,26 @@
 
 This guide covers deploying Tome using Docker, including configuration, volume management, and production best practices.
 
-## Calibre Path
-**Note**: Tome requires write access to sync data back to Calibre. You will need to provide an *absolute* path to your Calibre Library folder. Common Calibre library locations:
+## Calibre (optional)
+
+Tome runs with or without a Calibre library.
+
+- **Without Calibre**, leave `CALIBRE_DB_PATH` unset and skip the `/calibre` volume. Add books under **Library → Add book**: a title, authors, pages and a cover (an image file or its web address). **Look up** fills the form from the book's ISBN, using Open Library; it's the only time Tome calls a service on the internet, and only when you click it. Sync Calibre and OPDS are hidden or empty.
+- **With Calibre**, its books sync as before, with covers from the library and ratings and tags written back to Calibre. You can still add books by hand beside them: they're never orphaned by a sync, and their ratings and tags stay in Tome. Edit a Calibre book's details in Calibre; edit a book added by hand from its page (**Edit details**, **Remove book**).
+
+Covers of books added by hand are kept in `covers/` next to the database (`/app/data/covers`). Tome's backups copy them with the database (see [Database Backups](#database-backups)).
+
+**Note**: With Calibre, Tome needs write access to sync ratings and tags back. You will need to provide an *absolute* path to your Calibre Library folder. Common Calibre library locations:
 - **Linux**: `~/Calibre Library/metadata.db`
 - **macOS**: `~/Documents/Calibre Library/metadata.db`
 - **Windows**: `C:\Users\<username>\Calibre Library\metadata.db`
 
 ## Volumes
 
-Tome requires two volume mounts for persistent data and Calibre integration:
-
 | Volume Mount | Container Path | Purpose | Required |
 |-------------|----------------|---------|----------|
-| `/path/to/storage` | `/app/data` | Tome SQLite database, backups, logs | Yes |
-| `/path/to/calibre/library` | `/calibre` | Location of your Calibre library | Yes |
+| `/path/to/storage` | `/app/data` | Tome SQLite database, covers of books added by hand, backups, logs | Yes |
+| `/path/to/calibre/library` | `/calibre` | Location of your Calibre library | Only with Calibre |
 
 ## Docker Deployment Options
 
@@ -74,12 +80,47 @@ services:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NODE_ENV` | `production` | Runtime environment |
-| `AUTH_PASSWORD` | (none) | Enables authentication when set. Example: `helloworld` |
-| `CALIBRE_DB_PATH` | (none) | Path to Calibre metadata.db inside container. Recommended: `/calibre/metadata.db` |
+| `AUTH_PASSWORD` | (none) | Enables authentication when set. Example: `helloworld`. Every page and `/api` route then needs a sign-in or an API token; see [Authentication](#authentication) |
+| `AUTH_SECRET` | (made for you) | The secret sign-ins are signed with. Unset, Tome makes one and keeps it in `.auth-secret` next to the database. Changing it, or the password, signs everyone out |
+| `CALIBRE_DB_PATH` | (none) | Path to Calibre metadata.db inside container. Recommended: `/calibre/metadata.db`. Leave unset to run without Calibre |
+| `AUDIOBOOKSHELF_URL` | (none) | Audiobookshelf's address, e.g. `http://audiobookshelf:80`. With `AUDIOBOOKSHELF_API_KEY`, turns on progress sync from it; see [Reading apps](#reading-apps) |
+| `AUDIOBOOKSHELF_API_KEY` | (none) | An API key (or API token) of your Audiobookshelf user |
+| `GRIMMORY_URL` | (none) | Grimmory's address, e.g. `http://grimmory:6060`. With the two below, turns on progress sync from it (Kobo progress included) |
+| `GRIMMORY_USERNAME` | (none) | Your Grimmory username |
+| `GRIMMORY_PASSWORD` | (none) | Your Grimmory password (Grimmory has no API keys) |
+| `SOURCE_SYNC_MINUTES` | `15` | How often Tome reads progress from those apps |
 | `PORT` | `3000` | Application port |
 | `DATABASE_PATH` | `/app/data/tome.db` | Path to Tome's SQLite database |
 | `PUID` | `1001` | User ID to run as (for fixing volume permissions) |
 | `PGID` | `1001` | Group ID to run as (for fixing volume permissions) |
+
+## Reading apps
+
+Tome can log your progress from the apps you read in, so you don't type it in: **Audiobookshelf** for audiobooks (and its ebooks), and **Grimmory** for ebooks, which includes what your Kobo syncs to it. Set the variables above and restart Tome; **Settings → Reading apps** shows each app, its last sync, and a **Sync now** button.
+
+- **The first sync** only notes where every book is. Nothing from before is logged, so history you logged by hand isn't doubled. After that, every sync logs the reading since the last one, as a percentage, with the note "Synced from Audiobookshelf" (or Grimmory). Several syncs on one day move that day's entry on rather than adding more.
+- **Matching.** Each app book is matched to a Tome book by ISBN, else by title and an author's surname. A book Tome doesn't have is added, with its cover, once there's new reading on it. **Settings → Reading apps** lists every match; **Change** points one at another Tome book or adds it as a new book.
+- **Finished** in the app marks the book read in Tome, on the day it was finished. Reading it again in the app starts a re-read.
+- **Never backwards.** If Tome is already further on (you logged by hand, or the other app is ahead), nothing is logged.
+- **Page counts.** Tome needs a book's page count to start it. Grimmory's books bring theirs; audiobooks don't, so an audiobook waits ("needs a page count" in Settings) until you set one on its page. Its reading is logged on the next sync.
+- Physical books in Grimmory, podcasts, and books marked DNF in Tome are left alone.
+
+Grimmory has no API keys, so Tome signs in as you with `GRIMMORY_USERNAME` and `GRIMMORY_PASSWORD`, keeps the token in memory, and signs in again only when it expires.
+
+## Life store
+
+The [life store](https://github.com/briandenicola/lifestore) reads Tome through `GET /api/lifestore/records`: every book with reading on it (books only on the to-read pile are left out), each with its reads, review, rating and the progress logged in them, a page at a time (`?page=<token>&limit=<1-500>`, answering `{ records, next }`). In Tome, make a token under **Settings → API tokens** with access **Read**, and paste it into the life store's Tome integration. Nothing in Tome is changed by it.
+
+## Authentication
+
+With `AUTH_PASSWORD` set:
+
+- **Signing in** sets a session that lasts 30 days. It is signed with `AUTH_SECRET` (or the secret Tome keeps next to its database) and your password, so it can't be forged, and changing the password signs everyone out.
+- **Every page and every `/api` route** needs a signed-in session. The exceptions are signing in and out, and OPDS, which asks e-readers for user `tome` and your password (HTTP Basic auth).
+- **Other apps** (the life store, an AI assistant, scripts) use an **API token** from **Settings → API tokens**, sent as `Authorization: Bearer <token>`. A read token can only read (`GET`); a write token can do anything the app can. Tokens can't make or revoke tokens. A token is shown once, when it's made; revoke it there when it's no longer needed.
+- **After five wrong passwords** from one address, sign-in waits a minute. Behind a reverse proxy, make sure it sends `X-Forwarded-For`, or every client counts as one.
+
+Without `AUTH_PASSWORD`, Tome asks for no sign-in at all. Don't expose it to the internet that way.
 
 ## PUID/PGID Support
 
@@ -145,7 +186,7 @@ docker exec tome npm run db:list-backups
 docker exec -it tome npm run db:restore
 ```
 
-Backups are stored in `data/backups/` inside the container (part of the `tome-data` volume).
+Backups are stored in `data/backups/` inside the container (part of the `tome-data` volume). Each backup holds the database and, beside it as `covers.backup-<time>/`, the covers of books added by hand. Restoring a backup puts its covers back too; the covers in place before are kept in `data/backups/<date>/covers.before-restore-<time>/`. A backup made before this version has no covers with it, and restoring it leaves the current covers as they are.
 
 ## Database Migrations
 

@@ -98,10 +98,10 @@ export class ShelfRepository extends BaseRepository<
     const result: ShelfWithBookCountAndCovers[] = [];
     
     for (const shelf of shelvesWithCounts) {
-      // Get up to 12 calibreIds for books on this shelf
+      // Get up to 12 book ids (for covers) on this shelf
       const booksOnShelf = await this.getDatabase()
         .select({
-          calibreId: books.calibreId,
+          id: books.id,
         })
         .from(bookShelves)
         .innerJoin(books, eq(bookShelves.bookId, books.id))
@@ -112,7 +112,7 @@ export class ShelfRepository extends BaseRepository<
       
       result.push({
         ...shelf,
-        bookCoverIds: booksOnShelf.map(b => b.calibreId),
+        bookCoverIds: booksOnShelf.map(b => b.id),
       });
     }
     

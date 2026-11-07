@@ -8,7 +8,8 @@ import { getCoverUrl } from "@/lib/utils/cover-url";
 
 interface BookHeaderProps {
   book: {
-    calibreId: number;
+    id: number;
+    calibreId: number | null;
     totalPages?: number;
     lastSynced?: Date | string | null;
   };
@@ -125,7 +126,7 @@ export default function BookHeader({
       <div className="relative aspect-[2/3] bg-[var(--light-accent)]/30 rounded border border-[var(--border-color)] overflow-hidden flex items-center justify-center shadow-lg">
         {!imageError ? (
           <Image
-              src={getCoverUrl(book.calibreId, book.lastSynced)}
+              src={getCoverUrl(book.id, book.lastSynced)}
             alt="Book cover"
             fill
             sizes="(max-width: 768px) 220px, 250px"

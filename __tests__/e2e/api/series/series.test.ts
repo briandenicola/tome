@@ -151,8 +151,9 @@ describe("GET /api/series", () => {
 
     test("should limit bookCoverIds to first 3 books", async () => {
       // Arrange: Create series with 5 books
+      const ids: number[] = [];
       for (let i = 1; i <= 5; i++) {
-        await bookRepository.create({
+        const { id } = await bookRepository.create({
           calibreId: i,
           path: `Author/Book${i} (${i})`,
           title: `Book ${i}`,
@@ -161,6 +162,7 @@ describe("GET /api/series", () => {
           series: "Long Series",
           seriesIndex: i,
         });
+        ids.push(id);
       }
 
       // Act
@@ -172,14 +174,14 @@ describe("GET /api/series", () => {
       expect(data).toHaveLength(1);
       expect(data[0].bookCount).toBe(5);
       expect(data[0].bookCoverIds).toHaveLength(5); // Now returns up to 12 covers
-      expect(data[0].bookCoverIds).toEqual([1, 2, 3, 4, 5]);
+      expect(data[0].bookCoverIds).toEqual(ids); // Tome book ids, in series order
     });
   });
 
   describe("Orphaned Books", () => {
     test("should exclude orphaned books from series counts", async () => {
       // Arrange: Create series with mix of normal and orphaned books
-      await bookRepository.create({
+      const book1 = await bookRepository.create({
         calibreId: 1,
         path: "Author/Book1 (1)",
         title: "Book 1",
@@ -201,7 +203,7 @@ describe("GET /api/series", () => {
         orphaned: true,
       });
 
-      await bookRepository.create({
+      const book3 = await bookRepository.create({
         calibreId: 3,
         path: "Author/Book3 (3)",
         title: "Book 3",
@@ -220,7 +222,7 @@ describe("GET /api/series", () => {
       expect(response.status).toBe(200);
       expect(data).toHaveLength(1);
       expect(data[0].bookCount).toBe(2); // Only non-orphaned books
-      expect(data[0].bookCoverIds).toEqual([1, 3]); // Should not include calibreId 2
+      expect(data[0].bookCoverIds).toEqual([book1.id, book3.id]); // Not the orphaned book 2
     });
 
     test("should not return series that only contain orphaned books", async () => {

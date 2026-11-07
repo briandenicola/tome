@@ -345,7 +345,8 @@ export async function syncCalibreLibrary(
 
       // SAFETY CHECK: Prevent mass orphaning (>10% of library)
       if (removedBooks.length > 0) {
-        const totalBooksInDb = await bookRepository.count();
+        // Only Calibre books can be orphaned, so the safety check measures against those.
+        const totalBooksInDb = await bookRepository.countFromCalibre();
         const orphanPercentage = (removedBooks.length / totalBooksInDb) * 100;
         
         logger.warn(

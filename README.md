@@ -58,13 +58,16 @@
 
 ## What is Tome?
 
-Tome is a local-first book tracking application that gives you durable ownership of your reading history. It seamlessly integrates with your existing Calibre library to track reading progress, sessions, and streaks—without disrupting your workflow or requiring cloud services.
+Tome is a local-first book tracking application that gives you durable ownership of your reading history. It tracks reading progress, sessions, and streaks for books in your Calibre library, books you add by hand (on an e-reader, an audiobook, or on the shelf), or both—without requiring cloud services.
 
 Your reading data lives locally, under your control, and survives platform changes forever.
 
 ## Features
 
-- 🔗 **Calibre Integration**: Integrates directly with Calibre, automatically syncing your library
+- 🔗 **Calibre Integration (optional)**: Integrates directly with Calibre, automatically syncing your library
+- 🔎 **Life store feed**: a read-only feed of your reading for the [life store](https://github.com/briandenicola/lifestore)
+- 🎧 **Progress from your reading apps**: Audiobookshelf and Grimmory (with its Kobo sync) progress is logged for you
+- ➕ **Books without Calibre**: Add books by hand with a cover upload or URL; fill the details from an ISBN with one click (Open Library)
 - 📖 **Reading Progress Tracking**: Track page-based or percentage-based progress with history
 - 📈 **Enhanced Reading Streaks**: Daily streak tracking with configurable goals and analytics
 - ▶️ **Book Status Management**: Organize books by reading status (To Read, Read Next, Reading, Read, and DNF). Supports rereads while preserving previous reading sessions.
@@ -88,7 +91,7 @@ bun install
 
 # Configure environment
 cp .env.example .env
-# Edit .env and set CALIBRE_DB_PATH to your Calibre library
+# Edit .env: set CALIBRE_DB_PATH to your Calibre library, or remove it to run without Calibre
 
 # Run database migrations
 npm run db:migrate

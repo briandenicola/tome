@@ -420,7 +420,7 @@ export default function JournalPage() {
                     >
                       <div className="w-24 h-36 bg-[var(--light-accent)]/30 rounded overflow-hidden relative">
                         <Image
-                          src={getCoverUrl(bookGroup.bookCalibreId, bookGroup.bookLastSynced)}
+                          src={getCoverUrl(bookGroup.bookId, bookGroup.bookLastSynced)}
                           alt={bookGroup.bookTitle}
                           fill
                           className="object-cover"

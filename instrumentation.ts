@@ -24,6 +24,14 @@ export async function register() {
       log('warn', "CALIBRE_DB_PATH not configured. Automatic sync is disabled.");
     }
 
+    // Progress from reading apps (Audiobookshelf, Grimmory), when any is set up
+    try {
+      const { startSourceSync } = await import("./lib/sources/scheduler");
+      await startSourceSync();
+    } catch (error) {
+      log('error', `Couldn't start progress sync: ${error instanceof Error ? error.message : error}`);
+    }
+
     // Cleanup on shutdown - only register once to prevent memory leak warnings
     if (!cleanupListenersRegistered) {
       process.on("SIGTERM", () => {
