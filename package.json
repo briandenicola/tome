@@ -1,8 +1,8 @@
 {
   "name": "tome",
-  "version": "0.6.9",
+  "version": "0.7.0",
   "description": "A Calibre-integrated book tracker",
-  "homepage": "https://github.com/masonfox/tome",
+  "homepage": "https://github.com/briandenicola/tome",
   "author": "Mason Fox <masonfox22@gmail.com> (https://github.com/masonfox)",
   "funding": "https://www.buymeacoffee.com/masonfox",
   "keywords": [

@@ -328,7 +328,7 @@ describe("Version API - GET /api/version", () => {
     await GET();
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://api.github.com/repos/masonfox/tome/releases/latest',
+      'https://api.github.com/repos/briandenicola/tome/releases/latest',
       expect.objectContaining({
         headers: expect.objectContaining({
           'User-Agent': 'Tome-App',

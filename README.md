@@ -1,7 +1,5 @@
-> [!IMPORTANT]
-> **Maintainers wanted**
->
-> Active development on Tome has stalled, and the current maintainer does not anticipate returning to active feature development. If you're passionate about Tome and interested in taking on maintainer responsibilities, please [join the discussion in issue #423](https://github.com/masonfox/tome/issues/423) and introduce yourself. See [the maintainer's update](https://github.com/masonfox/tome/issues/423#issuecomment-6633065779) for context and discuss the project's future and a possible handover in that issue.
+> [!NOTE]
+> **A fork of [masonfox/tome](https://github.com/masonfox/tome)**, by Mason Fox. It adds a signed-in API with API tokens, books without Calibre, progress from Audiobookshelf and Grimmory (Kobo), and a feed for the [life store](https://github.com/briandenicola/lifestore). The image is `ghcr.io/briandenicola/tome`.
 
 <div align="center">
 
@@ -9,7 +7,7 @@
 
 **Tome** is a self-hosted book tracking web application that integrates directly with Calibre's database to provide reading progress tracking, status management, and streak functionality.
 
-[🚀 Get Started](#get-started) • [🎮 Try Demo](https://demo.tomeapp.dev) • [💬 Community](https://github.com/masonfox/tome/discussions)
+[🚀 Get Started](#get-started) • [📦 Original project](https://github.com/masonfox/tome)
 
 <p align="center">
   <img src="./docs/assets/dashboard.png" alt="BookLore Demo" width="800px" style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
@@ -48,9 +46,9 @@
 
 <br>
 
-[![Release](https://img.shields.io/github/v/release/masonfox/tome?color=4c6ef5&style=for-the-badge&logo=github)](https://github.com/masonfox/tome/releases) [![License](https://img.shields.io/github/license/masonfox/tome?color=fab005&style=for-the-badge)](LICENSE) [![Stars](https://img.shields.io/github/stars/masonfox/tome?style=for-the-badge&color=ffd43b)](https://github.com/masonfox/tome/stargazers) [![Codecov](https://img.shields.io/codecov/c/github/masonfox/tome?style=for-the-badge)](https://codecov.io/gh/masonfox/tome) [![GitHub Sponsors](https://img.shields.io/github/sponsors/masonfox?style=for-the-badge)](https://github.com/sponsors/masonfox)
+[![Release](https://img.shields.io/github/v/release/briandenicola/tome?color=4c6ef5&style=for-the-badge&logo=github)](https://github.com/briandenicola/tome/releases) [![License](https://img.shields.io/github/license/briandenicola/tome?color=fab005&style=for-the-badge)](LICENSE)
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/masonfox)
+Tome was written by [Mason Fox](https://github.com/masonfox); support the original work [here](https://www.buymeacoffee.com/masonfox).
 
 ---
 
@@ -110,9 +108,7 @@ Visit [http://localhost:3000](http://localhost:3000) and sync your Calibre libra
 Tome reads from and writes to Calibre's `metadata.db`. **Concurrent writes** (for example, editing tags or ratings in Tome while Calibre is running) can lead to database locks or unpredictable results. **Read-only access is safe!**
 
 ## Roadmap
-Active development can be viewed [here](https://github.com/users/masonfox/projects/2/views/6), representing the upcoming release. Additionally, checkout repo [discussions](https://github.com/masonfox/tome/discussions) for [release](https://github.com/masonfox/tome/discussions?discussions_q=is%3Aopen+label%3ARelease) and [feature](https://github.com/masonfox/tome/discussions?discussions_q=is%3Aopen+label%3Afeature) announcements and more!
-
-You're **highly encouraged** to create [issues](https://github.com/masonfox/tome/issues) and create [discussions](https://github.com/masonfox/tome/discussions)! 🙏
+This fork's changes are in its [releases](https://github.com/briandenicola/tome/releases) and pull requests. Report problems with it as [issues here](https://github.com/briandenicola/tome/issues), not upstream. The original project's roadmap and discussions are at [masonfox/tome](https://github.com/masonfox/tome).
 
 ## Documentation
 
