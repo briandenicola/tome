@@ -1,6 +1,6 @@
 # Tome Constitution
 
-**Version**: | 1.1.0 | **Ratified**: 2025-11-24 | **Last Amended**: 2026-02-02
+**Version**: | 2.0.0 | **Ratified**: 2025-11-24 | **Last Amended**: 2026-11-07
 
 ---
 
@@ -8,7 +8,7 @@
 
 Tome exists to give readers durable, local ownership of their reading history.
 
-Most book tracking happens in cloud services that can disappear, change terms, or lock users out. Tome pulls tracking closer to where books already live—in personal Calibre libraries—and provides clean, permanent records of reading journeys that users fully control.
+Most book tracking happens in cloud services that can disappear, change terms, or lock users out. Tome pulls tracking closer to where books already live—in a personal Calibre library, on an e-reader, in an audiobook server or on a shelf—and provides clean, permanent records of reading journeys that users fully control.
 
 ---
 
@@ -17,10 +17,10 @@ Most book tracking happens in cloud services that can disappear, change terms, o
 Tome commits to:
 
 - **Tracking reading history locally** with complete fidelity and zero data loss
-- **Integrating seamlessly with Calibre** without disrupting existing workflows
+- **Integrating seamlessly with Calibre** when it is used, without disrupting existing workflows, and working just as well without it
 - **Preserving every reading session** so users can see their full journey with each book
 - **Enabling self-hosting** without complex infrastructure or maintenance burden
-- **Protecting user data** with limits writes and read-primary Calibre access and bulletproof local storage
+- **Protecting user data** with limited, read-primary Calibre access and bulletproof local storage
 
 ---
 
@@ -49,15 +49,16 @@ User data is irreplaceable. Reading history represents time, memories, and perso
 
 ---
 
-### II. Respect Calibre as Source of Truth
+### II. Calibre Is Optional; Where It's Used, It's the Source of Truth
 
-Calibre is the user's primary book library. Tome tracks reading; Calibre manages books.
+A book comes from Calibre or is added by hand. Tome tracks reading for both the same way. For a Calibre book, Calibre manages the book; for a book added by hand, Tome keeps the few details it needs (title, authors, pages, cover).
 
-**Decision Filter**: Would this feature compete with, duplicate, or modify Calibre's or Calibre Web's core responsibilities? If yes, don't build it.
+**Decision Filter**: For a Calibre book, would this compete with, duplicate, or modify Calibre's or Calibre Web's core responsibilities? If yes, don't build it. Would this feature only work when Calibre is set up, where it needn't? If yes, make it work without.
 
 **Examples**:
-- Never edit book metadata, authors, series, or tags in Calibre
-- Sync ratings bidirectionally (Calibre expects this)
+- Never edit book metadata, authors or series in Calibre
+- Sync ratings and tags with Calibre for Calibre books; keep them in Tome for books added by hand
+- Never remove or orphan a book added by hand because of a Calibre sync
 
 ---
 
@@ -107,14 +108,14 @@ These constraints define Tome's identity. Violating them means building a differ
 1. **Local-First Architecture**
    All user data lives locally. No cloud sync, no mandatory accounts, no server-side storage.
 
-2. **Calibre Integration**
-   Tome reads from Calibre's library. Breaking this integration breaks Tome's core value proposition.
+2. **Calibre Integration, Optional**
+   Tome reads from Calibre's library when one is configured, and runs fully without one. Breaking either way of running breaks Tome.
 
 3. **Self-Hostable**
    Users deploy Tome on their own infrastructure. No SaaS version, no vendor lock-in.
 
 4. **Zero External Service Dependencies**
-   Tome must run in complete isolation. No Redis, no cloud APIs, no message queues.
+   Tome must run in complete isolation. No Redis, no cloud APIs, no message queues. A lookup a person asks for by clicking (like filling a book's details from its ISBN) may call a public service; nothing calls out on its own, and everything works when that service is unreachable.
 
 5. **Reading History Preservation**
    Reading history is durable and permanent. Sessions can be archived, hidden, or marked inactive by the system. Users may permanently delete sessions via explicit action with confirmation, but deletion is never automatic or implicit.
@@ -131,7 +132,9 @@ Tome uses these terms consistently across code, docs, and UI:
 
 - **Re-reading**: Starting a new session for a book with existing sessions. Previous sessions are archived and preserved.
 
-- **Calibre Sync**: Bidirectional rating synchronization between Tome and Calibre. Tome writes ratings to Calibre; Calibre remains the source of truth for book metadata.
+- **Calibre Sync**: For Calibre books, bidirectional rating and tag synchronization between Tome and Calibre. Calibre remains the source of truth for their metadata.
+
+- **Source**: Where a book came from: `calibre` (synced from a Calibre library) or `manual` (added by hand in Tome).
 
 - **Reading Streak**: Consecutive days with at least one progress entry. Breaks on missed days; resets on new streaks.
 
@@ -146,10 +149,10 @@ Tome is focused. These are out of scope permanently:
 ### What Tome Will NOT Do
 
 1. **Replace Calibre**
-   Calibre manage books, metadata, and libraries. Tome tracks reading. They complement each other.
+   Calibre manages books, metadata and ebook files. Tome tracks reading, and keeps only the details it needs for a book added by hand. It doesn't store ebook files, convert formats or manage a library.
 
 2. **Discover or Recommend Books**
-   No algorithmic recommendations, trending lists, or discovery features. Users know what they want to read; it's their Calibre library.
+   No algorithmic recommendations, trending lists, or discovery features. Users know what they want to read.
 
 3. **Provide Social Features**
    No followers, likes, comments, or sharing. Tome is personal, not social.
@@ -157,8 +160,8 @@ Tome is focused. These are out of scope permanently:
 4. **Operate as a Cloud Service**
    No SaaS version, no hosted offering. Tome is self-hosted only.
 
-5. **Edit Book Metadata**
-   Calibre owns title, author, series, tags, and cover images. Tome respects that boundary.
+5. **Edit Calibre Book Metadata**
+   For a Calibre book, Calibre owns title, author, series and cover image. Tome respects that boundary. Books added by hand are edited in Tome.
 
 ---
 
@@ -194,6 +197,14 @@ Constitution follows semantic versioning:
 ---
 
 ## Change Log
+
+**v2.0.0** (2026-11-07)
+- MAJOR: Redefined Principle II and Non-Negotiable #2: Calibre is optional. Books come from Calibre or are added by hand (title, authors, pages, cover upload or URL); Tome tracks both the same way.
+- Amended Non-Negotiable #4: a lookup the user starts by clicking (ISBN lookup from Open Library) may call a public service; nothing calls out on its own.
+- Narrowed Scope #1 and #5 to Calibre books.
+- Rationale: readers who use a Kobo, Audiobookshelf or physical books want Tome's history and stats without running Calibre.
+- Impact: `books.calibre_id` is nullable and each book has a `source`; covers are served by Tome book id; Calibre sync and orphan detection ignore books added by hand; ratings and tags of books added by hand stay in Tome.
+- Migration: existing books keep their Calibre ids and get `source = 'calibre'`.
 
 **v1.1.0** (2026-02-02)
 - MINOR: Amended Non-Negotiable #5 to allow explicit user-initiated session deletion with confirmation

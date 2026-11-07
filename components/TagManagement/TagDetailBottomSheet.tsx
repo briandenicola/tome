@@ -12,7 +12,7 @@ export interface Book {
   id: number;
   title: string;
   authors?: string[];
-  calibreId: number;
+  calibreId: number | null;
   lastSynced?: Date | string | null;
 }
 
@@ -82,7 +82,7 @@ const BookCardSimple = memo(function BookCardSimple({
             <div className="aspect-[2/3] bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden relative">
               {!imageError ? (
                 <Image
-                  src={getCoverUrl(book.calibreId, book.lastSynced)}
+                  src={getCoverUrl(book.id, book.lastSynced)}
                   alt={book.title}
                   fill
                   loading="lazy"

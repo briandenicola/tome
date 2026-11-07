@@ -2,20 +2,26 @@
 
 This guide covers deploying Tome using Docker, including configuration, volume management, and production best practices.
 
-## Calibre Path
-**Note**: Tome requires write access to sync data back to Calibre. You will need to provide an *absolute* path to your Calibre Library folder. Common Calibre library locations:
+## Calibre (optional)
+
+Tome runs with or without a Calibre library.
+
+- **Without Calibre**, leave `CALIBRE_DB_PATH` unset and skip the `/calibre` volume. Add books under **Library → Add book**: a title, authors, pages and a cover (an image file or its web address). **Look up** fills the form from the book's ISBN, using Open Library; it's the only time Tome calls a service on the internet, and only when you click it. Sync Calibre and OPDS are hidden or empty.
+- **With Calibre**, its books sync as before, with covers from the library and ratings and tags written back to Calibre. You can still add books by hand beside them: they're never orphaned by a sync, and their ratings and tags stay in Tome. Edit a Calibre book's details in Calibre; edit a book added by hand from its page (**Edit details**, **Remove book**).
+
+Covers of books added by hand are kept in `covers/` next to the database (`/app/data/covers`), so back up the whole data folder, not only `tome.db`.
+
+**Note**: With Calibre, Tome needs write access to sync ratings and tags back. You will need to provide an *absolute* path to your Calibre Library folder. Common Calibre library locations:
 - **Linux**: `~/Calibre Library/metadata.db`
 - **macOS**: `~/Documents/Calibre Library/metadata.db`
 - **Windows**: `C:\Users\<username>\Calibre Library\metadata.db`
 
 ## Volumes
 
-Tome requires two volume mounts for persistent data and Calibre integration:
-
 | Volume Mount | Container Path | Purpose | Required |
 |-------------|----------------|---------|----------|
-| `/path/to/storage` | `/app/data` | Tome SQLite database, backups, logs | Yes |
-| `/path/to/calibre/library` | `/calibre` | Location of your Calibre library | Yes |
+| `/path/to/storage` | `/app/data` | Tome SQLite database, covers of books added by hand, backups, logs | Yes |
+| `/path/to/calibre/library` | `/calibre` | Location of your Calibre library | Only with Calibre |
 
 ## Docker Deployment Options
 
@@ -76,7 +82,7 @@ services:
 | `NODE_ENV` | `production` | Runtime environment |
 | `AUTH_PASSWORD` | (none) | Enables authentication when set. Example: `helloworld`. Every page and `/api` route then needs a sign-in or an API token; see [Authentication](#authentication) |
 | `AUTH_SECRET` | (made for you) | The secret sign-ins are signed with. Unset, Tome makes one and keeps it in `.auth-secret` next to the database. Changing it, or the password, signs everyone out |
-| `CALIBRE_DB_PATH` | (none) | Path to Calibre metadata.db inside container. Recommended: `/calibre/metadata.db` |
+| `CALIBRE_DB_PATH` | (none) | Path to Calibre metadata.db inside container. Recommended: `/calibre/metadata.db`. Leave unset to run without Calibre |
 | `PORT` | `3000` | Application port |
 | `DATABASE_PATH` | `/app/data/tome.db` | Path to Tome's SQLite database |
 | `PUID` | `1001` | User ID to run as (for fixing volume permissions) |
@@ -157,7 +163,7 @@ docker exec tome npm run db:list-backups
 docker exec -it tome npm run db:restore
 ```
 
-Backups are stored in `data/backups/` inside the container (part of the `tome-data` volume).
+Backups are stored in `data/backups/` inside the container (part of the `tome-data` volume). They hold the database only: covers of books added by hand are in `data/covers/`, so back that folder up too.
 
 ## Database Migrations
 

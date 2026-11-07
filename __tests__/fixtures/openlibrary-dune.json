@@ -1,0 +1,18 @@
+{
+  "ISBN:9780441013593": {
+    "url": "http://openlibrary.org/books/OL62694654M/Dune",
+    "key": "/books/OL62694654M",
+    "title": "Dune",
+    "authors": [{ "url": "http://openlibrary.org/authors/OL79034A/Frank_Herbert", "name": "Frank Herbert" }],
+    "number_of_pages": 896,
+    "weight": "459 grams",
+    "identifiers": { "isbn_13": ["9780441013593"], "openlibrary": ["OL62694654M"] },
+    "publishers": [{ "name": "Ace" }],
+    "publish_date": "2005",
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/15265842-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/15265842-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/15265842-L.jpg"
+    }
+  }
+}

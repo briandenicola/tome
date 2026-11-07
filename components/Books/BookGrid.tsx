@@ -6,7 +6,7 @@ import { BookCardSkeleton } from "@/components/Books/BookCardSkeleton";
 interface BookGridProps {
   books: Array<{
     id: number;
-    calibreId: number;
+    calibreId: number | null;
     title: string;
     authors: string[];
     coverPath?: string;
@@ -38,7 +38,6 @@ export function BookGrid({ books, loading = false, loadingMore = false, skeleton
                 id={book.id.toString()}
                 title={book.title}
                 authors={book.authors}
-                calibreId={book.calibreId}
                 status={book.status}
                 lastSynced={book.lastSynced}
               />
@@ -58,7 +57,7 @@ export function BookGrid({ books, loading = false, loadingMore = false, skeleton
       ) : (
         <div className="bg-[var(--card-bg)] border border-[var(--border-color)] p-12 text-center">
           <p className="text-[var(--foreground)]/70 font-medium">
-            No books found. Try syncing with Calibre or adjusting your filters.
+            No books found. Add a book, sync with Calibre, or change your filters.
           </p>
         </div>
       )}

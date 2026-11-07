@@ -1,4 +1,4 @@
-import { eq, and, or, sql, like, inArray, desc, asc, SQL } from "drizzle-orm";
+import { eq, and, or, sql, like, inArray, desc, asc, SQL, isNotNull } from "drizzle-orm";
 import { BaseRepository } from "./base.repository";
 import { books, Book, NewBook } from "@/lib/db/schema/books";
 import { readingSessions } from "@/lib/db/schema/reading-sessions";
@@ -109,7 +109,7 @@ export class BookRepository extends BaseRepository<Book, NewBook, typeof books> 
     // Build map: calibreId -> Book
     const booksMap = new Map<number, Book>();
     for (const book of results) {
-      booksMap.set(book.calibreId, book);
+      if (book.calibreId !== null) booksMap.set(book.calibreId, book);
     }
 
     return booksMap;
@@ -152,7 +152,9 @@ export class BookRepository extends BaseRepository<Book, NewBook, typeof books> 
         series: books.series,
         seriesIndex: books.seriesIndex,
         tags: books.tags,
+        source: books.source,
         path: books.path,
+        coverFile: books.coverFile,
         description: books.description,
         rating: books.rating,
         orphaned: books.orphaned,
@@ -259,6 +261,7 @@ export class BookRepository extends BaseRepository<Book, NewBook, typeof books> 
     const book: Book = {
       id: result.bookId,
       calibreId: result.calibreId,
+      source: result.source,
       title: result.title,
       authors: result.authors,
       authorSort: result.authorSort,
@@ -272,6 +275,7 @@ export class BookRepository extends BaseRepository<Book, NewBook, typeof books> 
       seriesIndex: result.seriesIndex,
       tags: result.tags,
       path: result.path,
+      coverFile: result.coverFile,
       description: result.description,
       rating: result.rating,
       orphaned: result.orphaned,
@@ -619,11 +623,23 @@ export class BookRepository extends BaseRepository<Book, NewBook, typeof books> 
       .from(books)
       .where(
         and(
+          // Books added by hand have no Calibre id and are never orphaned by a sync.
+          isNotNull(books.calibreId),
           sql`${books.calibreId} NOT IN ${sql.raw(`(${calibreIds.join(",")})`)}`,
           isNotOrphaned()
         )
       )
       .all();
+  }
+
+  /** How many books came from Calibre (books added by hand don't count). */
+  async countFromCalibre(): Promise<number> {
+    const row = this.getDatabase()
+      .select({ count: sql<number>`count(*)` })
+      .from(books)
+      .where(isNotNull(books.calibreId))
+      .get();
+    return row?.count ?? 0;
   }
 
   /**

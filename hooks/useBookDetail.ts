@@ -6,7 +6,12 @@ import { queryKeys } from "@/lib/query-keys";
 
 export interface Book {
   id: number;
-  calibreId: number;
+  calibreId: number | null;
+  /** "calibre" for a synced book, "manual" for one added by hand. */
+  source?: "calibre" | "manual";
+  isbn?: string | null;
+  coverFile?: string | null;
+  lastSynced?: string | Date | null;
   title: string;
   authors: string[];
   totalPages?: number;

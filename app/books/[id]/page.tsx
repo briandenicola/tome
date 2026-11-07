@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { toast } from "@/utils/toast";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
@@ -17,6 +18,9 @@ import ProgressEditModal from "@/components/Modals/ProgressEditModal";
 import RereadConfirmModal from "@/components/Modals/RereadConfirmModal";
 import ArchiveSessionModal from "@/components/Modals/ArchiveSessionModal";
 import PageCountEditModal from "@/components/Modals/PageCountEditModal";
+import ManualBookModal from "@/components/Modals/ManualBookModal";
+import RemoveBookModal from "@/components/Modals/RemoveBookModal";
+import { manualBookApi } from "@/lib/api";
 import TagEditor from "@/components/BookDetail/TagEditor";
 import ShelfEditor from "@/components/BookDetail/ShelfEditor";
 import BookHeader from "@/components/BookDetail/BookHeader";
@@ -44,6 +48,8 @@ export default function BookDetailPage() {
   const bookId = params?.id as string;
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [editingBook, setEditingBook] = useState(false);
+  const [removingBook, setRemovingBook] = useState(false);
 
   // Custom hooks encapsulate all business logic
   const {
@@ -474,6 +480,20 @@ export default function BookDetailPage() {
               ))}
             </div>
 
+            {book.source === "manual" && (
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs md:text-sm font-medium mb-3 text-[var(--subheading-text)]">
+                <span>Added by hand</span>
+                <span className="text-[var(--border-color)]">•</span>
+                <button type="button" onClick={() => setEditingBook(true)} className="text-[var(--accent)] hover:underline font-semibold">
+                  Edit details
+                </button>
+                <span className="text-[var(--border-color)]">•</span>
+                <button type="button" onClick={() => setRemovingBook(true)} className="text-red-600 dark:text-red-500 hover:underline font-semibold">
+                  Remove book
+                </button>
+              </div>
+            )}
+
             {/* Metadata */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-3 text-xs md:text-sm font-medium">
               {book.totalReads !== undefined && book.totalReads > 0 && (
@@ -747,6 +767,36 @@ export default function BookDetailPage() {
         bookTitle={book.title}
         pendingStatus={pendingStatusChange}
       />
+
+      {book.source === "manual" && (
+        <>
+          <ManualBookModal
+            isOpen={editingBook}
+            onClose={() => setEditingBook(false)}
+            book={{ ...book, totalPages: book.totalPages ?? null }}
+            onSaved={() => {
+              setImageError(false);
+              invalidateBookQueries(queryClient, bookId);
+            }}
+          />
+          <RemoveBookModal
+            isOpen={removingBook}
+            onClose={() => setRemovingBook(false)}
+            bookTitle={book.title}
+            totalReads={book.totalReads ?? 0}
+            onConfirm={async () => {
+              try {
+                await manualBookApi.remove(book.id);
+                toast.success(`Removed "${book.title}".`);
+                queryClient.invalidateQueries();
+                router.push("/library");
+              } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Couldn't remove the book.");
+              }
+            }}
+          />
+        </>
+      )}
 
       <PageCountEditModal
         isOpen={showPageCountModal}

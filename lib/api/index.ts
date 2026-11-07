@@ -41,3 +41,5 @@ export type * from "./domains/tag";
 export type * from "./domains/journal";
 export type * from "./domains/shelf";
 export { tokenApi } from "./domains/token";
+export { manualBookApi } from "./domains/manual-book";
+export type { ManualBookRequest } from "./domains/manual-book";

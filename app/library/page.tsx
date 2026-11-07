@@ -10,6 +10,7 @@ import { BookGrid } from "@/components/Books/BookGrid";
 import { ScrollToTopButton } from "@/components/Layout/ScrollToTopButton";
 import { toast } from "@/utils/toast";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
+import ManualBookModal from "@/components/Modals/ManualBookModal";
 
 function LibraryPageContent() {
   usePageTitle("Library");
@@ -17,6 +18,15 @@ function LibraryPageContent() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [addingBook, setAddingBook] = useState(false);
+  const [calibreConfigured, setCalibreConfigured] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/calibre/status")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => s && setCalibreConfigured(!!s.configured))
+      .catch(() => {});
+  }, []);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [loadingTags, setLoadingTags] = useState(true);
   const [availableShelves, setAvailableShelves] = useState<Array<{ id: number; name: string; color: string | null }>>([]);
@@ -506,7 +516,15 @@ function LibraryPageContent() {
         totalBooks={total}
         syncing={syncing}
         onSync={handleSync}
+        onAddBook={() => setAddingBook(true)}
+        calibreConfigured={calibreConfigured}
         loading={isInitialLoading}
+      />
+
+      <ManualBookModal
+        isOpen={addingBook}
+        onClose={() => setAddingBook(false)}
+        onSaved={(bookId) => router.push(`/books/${bookId}`)}
       />
 
       <LibraryFilters

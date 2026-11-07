@@ -49,6 +49,10 @@ export class CoverCache {
     });
   }
 
+  delete(bookId: number): void {
+    this.cache.delete(bookId);
+  }
+
   clear(): void {
     this.cache.clear();
   }
