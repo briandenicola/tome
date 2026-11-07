@@ -83,10 +83,29 @@ services:
 | `AUTH_PASSWORD` | (none) | Enables authentication when set. Example: `helloworld`. Every page and `/api` route then needs a sign-in or an API token; see [Authentication](#authentication) |
 | `AUTH_SECRET` | (made for you) | The secret sign-ins are signed with. Unset, Tome makes one and keeps it in `.auth-secret` next to the database. Changing it, or the password, signs everyone out |
 | `CALIBRE_DB_PATH` | (none) | Path to Calibre metadata.db inside container. Recommended: `/calibre/metadata.db`. Leave unset to run without Calibre |
+| `AUDIOBOOKSHELF_URL` | (none) | Audiobookshelf's address, e.g. `http://audiobookshelf:80`. With `AUDIOBOOKSHELF_API_KEY`, turns on progress sync from it; see [Reading apps](#reading-apps) |
+| `AUDIOBOOKSHELF_API_KEY` | (none) | An API key (or API token) of your Audiobookshelf user |
+| `GRIMMORY_URL` | (none) | Grimmory's address, e.g. `http://grimmory:6060`. With the two below, turns on progress sync from it (Kobo progress included) |
+| `GRIMMORY_USERNAME` | (none) | Your Grimmory username |
+| `GRIMMORY_PASSWORD` | (none) | Your Grimmory password (Grimmory has no API keys) |
+| `SOURCE_SYNC_MINUTES` | `15` | How often Tome reads progress from those apps |
 | `PORT` | `3000` | Application port |
 | `DATABASE_PATH` | `/app/data/tome.db` | Path to Tome's SQLite database |
 | `PUID` | `1001` | User ID to run as (for fixing volume permissions) |
 | `PGID` | `1001` | Group ID to run as (for fixing volume permissions) |
+
+## Reading apps
+
+Tome can log your progress from the apps you read in, so you don't type it in: **Audiobookshelf** for audiobooks (and its ebooks), and **Grimmory** for ebooks, which includes what your Kobo syncs to it. Set the variables above and restart Tome; **Settings → Reading apps** shows each app, its last sync, and a **Sync now** button.
+
+- **The first sync** only notes where every book is. Nothing from before is logged, so history you logged by hand isn't doubled. After that, every sync logs the reading since the last one, as a percentage, with the note "Synced from Audiobookshelf" (or Grimmory). Several syncs on one day move that day's entry on rather than adding more.
+- **Matching.** Each app book is matched to a Tome book by ISBN, else by title and an author's surname. A book Tome doesn't have is added, with its cover, once there's new reading on it. **Settings → Reading apps** lists every match; **Change** points one at another Tome book or adds it as a new book.
+- **Finished** in the app marks the book read in Tome, on the day it was finished. Reading it again in the app starts a re-read.
+- **Never backwards.** If Tome is already further on (you logged by hand, or the other app is ahead), nothing is logged.
+- **Page counts.** Tome needs a book's page count to start it. Grimmory's books bring theirs; audiobooks don't, so an audiobook waits ("needs a page count" in Settings) until you set one on its page. Its reading is logged on the next sync.
+- Physical books in Grimmory, podcasts, and books marked DNF in Tome are left alone.
+
+Grimmory has no API keys, so Tome signs in as you with `GRIMMORY_USERNAME` and `GRIMMORY_PASSWORD`, keeps the token in memory, and signs in again only when it expires.
 
 ## Authentication
 

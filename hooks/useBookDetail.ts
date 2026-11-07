@@ -8,7 +8,7 @@ export interface Book {
   id: number;
   calibreId: number | null;
   /** "calibre" for a synced book, "manual" for one added by hand. */
-  source?: "calibre" | "manual";
+  source?: "calibre" | "manual" | "audiobookshelf" | "grimmory";
   isbn?: string | null;
   coverFile?: string | null;
   lastSynced?: string | Date | null;

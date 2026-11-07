@@ -7,8 +7,9 @@ export const books = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
     // Set for books synced from Calibre; null for books added by hand.
     calibreId: integer("calibre_id").unique(),
-    // Where the book came from: "calibre" (synced) or "manual" (added in Tome).
-    source: text("source", { enum: ["calibre", "manual"] }).notNull().default("calibre"),
+    // Where the book came from: "calibre" (synced), "manual" (added in Tome), or the reading app it was first read in
+    // ("audiobookshelf", "grimmory"; added by Tome's source sync). Every source but Calibre is edited in Tome.
+    source: text("source", { enum: ["calibre", "manual", "audiobookshelf", "grimmory"] }).notNull().default("calibre"),
     title: text("title").notNull(),
     // Store authors as JSON array
     authors: text("authors", { mode: "json" }).$type<string[]>().notNull().default(sql`'[]'`),

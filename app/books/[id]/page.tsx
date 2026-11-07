@@ -21,6 +21,12 @@ import PageCountEditModal from "@/components/Modals/PageCountEditModal";
 import ManualBookModal from "@/components/Modals/ManualBookModal";
 import RemoveBookModal from "@/components/Modals/RemoveBookModal";
 import { manualBookApi } from "@/lib/api";
+
+const SOURCE_LABELS: Record<string, string> = {
+  manual: "Added by hand",
+  audiobookshelf: "Added from Audiobookshelf",
+  grimmory: "Added from Grimmory",
+};
 import TagEditor from "@/components/BookDetail/TagEditor";
 import ShelfEditor from "@/components/BookDetail/ShelfEditor";
 import BookHeader from "@/components/BookDetail/BookHeader";
@@ -480,9 +486,9 @@ export default function BookDetailPage() {
               ))}
             </div>
 
-            {book.source === "manual" && (
+            {book.source && book.source !== "calibre" && (
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs md:text-sm font-medium mb-3 text-[var(--subheading-text)]">
-                <span>Added by hand</span>
+                <span>{SOURCE_LABELS[book.source] ?? "Added by hand"}</span>
                 <span className="text-[var(--border-color)]">•</span>
                 <button type="button" onClick={() => setEditingBook(true)} className="text-[var(--accent)] hover:underline font-semibold">
                   Edit details
@@ -768,7 +774,7 @@ export default function BookDetailPage() {
         pendingStatus={pendingStatusChange}
       />
 
-      {book.source === "manual" && (
+      {book.source && book.source !== "calibre" && (
         <>
           <ManualBookModal
             isOpen={editingBook}

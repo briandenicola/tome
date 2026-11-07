@@ -7,8 +7,8 @@ import { getLogger } from "@/lib/logger";
 
 /**
  * Books added by hand: for a Kobo, an audiobook or a book on the shelf, with no Calibre library behind it. Tome keeps
- * their details and cover; their reading is tracked exactly like a Calibre book's. Calibre books are edited in
- * Calibre, so everything here refuses them.
+ * their details and cover; their reading is tracked exactly like a Calibre book's. Books the source sync added from a
+ * reading app are kept the same way. Calibre books are edited in Calibre, so everything here refuses them.
  */
 
 /** A book's details as the add and edit forms send them. */
@@ -120,7 +120,7 @@ function parse(input: ManualBookInput, partial: boolean) {
 async function manualBook(id: number): Promise<Book> {
   const book = await bookRepository.findById(id);
   if (!book) throw new ManualBookError("That book isn't in Tome any more.", 404);
-  if (book.source !== "manual") {
+  if (book.source === "calibre") {
     throw new ManualBookError("This book comes from Calibre. Change its details in Calibre; Tome picks them up on the next sync.", 409);
   }
   return book;

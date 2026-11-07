@@ -207,7 +207,7 @@ export interface CompleteBookResponse {
 export interface BookDetail {
   id: number;
   calibreId: number | null;
-  source?: "calibre" | "manual";
+  source?: "calibre" | "manual" | "audiobookshelf" | "grimmory";
   title: string;
   authors: string[];
   totalPages?: number;

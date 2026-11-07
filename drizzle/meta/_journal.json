@@ -169,6 +169,13 @@
       "when": 1794061797044,
       "tag": "0023_modern_vector",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1794063535204,
+      "tag": "0024_flat_ser_duncan",
+      "breakpoints": true
     }
   ]
 }

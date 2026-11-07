@@ -65,6 +65,7 @@ Your reading data lives locally, under your control, and survives platform chang
 ## Features
 
 - 🔗 **Calibre Integration (optional)**: Integrates directly with Calibre, automatically syncing your library
+- 🎧 **Progress from your reading apps**: Audiobookshelf and Grimmory (with its Kobo sync) progress is logged for you
 - ➕ **Books without Calibre**: Add books by hand with a cover upload or URL; fill the details from an ISBN with one click (Open Library)
 - 📖 **Reading Progress Tracking**: Track page-based or percentage-based progress with history
 - 📈 **Enhanced Reading Streaks**: Daily streak tracking with configurable goals and analytics

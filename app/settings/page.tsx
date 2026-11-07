@@ -6,6 +6,7 @@ import { TimezoneSettings } from "@/components/Settings/TimezoneSettings";
 import { PageHeader } from "@/components/Layout/PageHeader";
 import { VersionSettings } from "@/components/Settings/VersionSettings";
 import { ApiTokenSettings } from "@/components/Settings/ApiTokenSettings";
+import { ReadingSourcesSettings } from "@/components/Settings/ReadingSourcesSettings";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
 
 export default function SettingsPage() {
@@ -26,6 +27,7 @@ export default function SettingsPage() {
       <TimezoneSettings />
 
       {/* API tokens for other apps */}
+      <ReadingSourcesSettings />
       <ApiTokenSettings />
 
             {/* Version Information */}

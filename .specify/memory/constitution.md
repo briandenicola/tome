@@ -1,6 +1,6 @@
 # Tome Constitution
 
-**Version**: | 2.0.0 | **Ratified**: 2025-11-24 | **Last Amended**: 2026-11-07
+**Version**: | 2.0.1 | **Ratified**: 2025-11-24 | **Last Amended**: 2026-11-07
 
 ---
 
@@ -115,7 +115,7 @@ These constraints define Tome's identity. Violating them means building a differ
    Users deploy Tome on their own infrastructure. No SaaS version, no vendor lock-in.
 
 4. **Zero External Service Dependencies**
-   Tome must run in complete isolation. No Redis, no cloud APIs, no message queues. A lookup a person asks for by clicking (like filling a book's details from its ISBN) may call a public service; nothing calls out on its own, and everything works when that service is unreachable.
+   Tome must run in complete isolation. No Redis, no cloud APIs, no message queues. A lookup a person asks for by clicking (like filling a book's details from its ISBN) may call a public service; nothing calls out on its own, and everything works when that service is unreachable. Tome may read from the person's own self-hosted apps they set up for it (Calibre, Audiobookshelf, Grimmory); each is optional, and Tome runs without any of them.
 
 5. **Reading History Preservation**
    Reading history is durable and permanent. Sessions can be archived, hidden, or marked inactive by the system. Users may permanently delete sessions via explicit action with confirmation, but deletion is never automatic or implicit.
@@ -197,6 +197,10 @@ Constitution follows semantic versioning:
 ---
 
 ## Change Log
+
+**v2.0.1** (2026-11-07)
+- PATCH: Clarified Non-Negotiable #4: optional reading from the person's own self-hosted apps (Audiobookshelf, Grimmory) is allowed, as Calibre already was.
+- Impact: progress sync from those apps, set up through environment variables; off when they're unset.
 
 **v2.0.0** (2026-11-07)
 - MAJOR: Redefined Principle II and Non-Negotiable #2: Calibre is optional. Books come from Calibre or are added by hand (title, authors, pages, cover upload or URL); Tome tracks both the same way.
