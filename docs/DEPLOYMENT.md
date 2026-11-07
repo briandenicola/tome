@@ -107,6 +107,10 @@ Tome can log your progress from the apps you read in, so you don't type it in: *
 
 Grimmory has no API keys, so Tome signs in as you with `GRIMMORY_USERNAME` and `GRIMMORY_PASSWORD`, keeps the token in memory, and signs in again only when it expires.
 
+## Life store
+
+The [life store](https://github.com/briandenicola/lifestore) reads Tome through `GET /api/lifestore/records`: every book with reading on it (books only on the to-read pile are left out), each with its reads, review, rating and the progress logged in them, a page at a time (`?page=<token>&limit=<1-500>`, answering `{ records, next }`). In Tome, make a token under **Settings → API tokens** with access **Read**, and paste it into the life store's Tome integration. Nothing in Tome is changed by it.
+
 ## Authentication
 
 With `AUTH_PASSWORD` set:
