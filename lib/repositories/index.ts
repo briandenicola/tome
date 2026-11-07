@@ -6,3 +6,4 @@ export * from "./progress.repository";
 export * from "./streak.repository";
 export * from "./series.repository";
 export * from "./reading-goals.repository";
+export * from "./api-token.repository";

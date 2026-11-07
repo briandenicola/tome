@@ -74,12 +74,24 @@ services:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NODE_ENV` | `production` | Runtime environment |
-| `AUTH_PASSWORD` | (none) | Enables authentication when set. Example: `helloworld` |
+| `AUTH_PASSWORD` | (none) | Enables authentication when set. Example: `helloworld`. Every page and `/api` route then needs a sign-in or an API token; see [Authentication](#authentication) |
+| `AUTH_SECRET` | (made for you) | The secret sign-ins are signed with. Unset, Tome makes one and keeps it in `.auth-secret` next to the database. Changing it, or the password, signs everyone out |
 | `CALIBRE_DB_PATH` | (none) | Path to Calibre metadata.db inside container. Recommended: `/calibre/metadata.db` |
 | `PORT` | `3000` | Application port |
 | `DATABASE_PATH` | `/app/data/tome.db` | Path to Tome's SQLite database |
 | `PUID` | `1001` | User ID to run as (for fixing volume permissions) |
 | `PGID` | `1001` | Group ID to run as (for fixing volume permissions) |
+
+## Authentication
+
+With `AUTH_PASSWORD` set:
+
+- **Signing in** sets a session that lasts 30 days. It is signed with `AUTH_SECRET` (or the secret Tome keeps next to its database) and your password, so it can't be forged, and changing the password signs everyone out.
+- **Every page and every `/api` route** needs a signed-in session. The exceptions are signing in and out, and OPDS, which asks e-readers for user `tome` and your password (HTTP Basic auth).
+- **Other apps** (the life store, an AI assistant, scripts) use an **API token** from **Settings → API tokens**, sent as `Authorization: Bearer <token>`. A read token can only read (`GET`); a write token can do anything the app can. Tokens can't make or revoke tokens. A token is shown once, when it's made; revoke it there when it's no longer needed.
+- **After five wrong passwords** from one address, sign-in waits a minute. Behind a reverse proxy, make sure it sends `X-Forwarded-For`, or every client counts as one.
+
+Without `AUTH_PASSWORD`, Tome asks for no sign-in at all. Don't expose it to the internet that way.
 
 ## PUID/PGID Support
 

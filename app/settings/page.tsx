@@ -5,6 +5,7 @@ import { ThemeSettings } from "@/components/Settings/ThemeSettings";
 import { TimezoneSettings } from "@/components/Settings/TimezoneSettings";
 import { PageHeader } from "@/components/Layout/PageHeader";
 import { VersionSettings } from "@/components/Settings/VersionSettings";
+import { ApiTokenSettings } from "@/components/Settings/ApiTokenSettings";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
 
 export default function SettingsPage() {
@@ -24,7 +25,10 @@ export default function SettingsPage() {
       {/* Timezone Settings */}
       <TimezoneSettings />
 
-      {/* Version Information */}
+      {/* API tokens for other apps */}
+      <ApiTokenSettings />
+
+            {/* Version Information */}
       <VersionSettings />
 
       {/* Project Links */}

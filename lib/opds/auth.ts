@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { safeEqual } from '@/lib/auth';
 import { getLogger } from '@/lib/logger';
 
 /**
@@ -66,8 +67,8 @@ export function validateOPDSAuth(request: NextRequest): boolean {
     return false;
   }
 
-  // Password must match AUTH_PASSWORD
-  if (credentials.password !== AUTH_PASSWORD) {
+  // Password must match AUTH_PASSWORD (compared in constant time)
+  if (!safeEqual(credentials.password, AUTH_PASSWORD)) {
     getLogger().warn('OPDS auth failed: Invalid password');
     return false;
   }

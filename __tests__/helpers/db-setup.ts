@@ -142,6 +142,7 @@ export async function clearTestDatabase(dbInstanceOrPath: TestDatabaseInstance |
     const booksResult = rawDb.prepare("DELETE FROM books").run();
     const streaksResult = rawDb.prepare("DELETE FROM streaks").run();
     const goalsResult = rawDb.prepare("DELETE FROM reading_goals").run();
+    rawDb.prepare("DELETE FROM api_tokens").run();
 
     // console.log(
     //   `[clearTestDatabase] Deleted: ${progressResult.changes} progress, ` +
