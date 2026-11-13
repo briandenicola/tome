@@ -112,8 +112,8 @@ Contains:
 6. **Follow the Database Factory Pattern** (never import SQLite drivers directly)
 7. **Update docs** when making architectural or pattern changes
 8. **Ask for clarification** when documentation is unclear
-9. **Always branch off develop** before starting work (never commit directly to develop or main)
-10. **Create PRs to develop branch** (use `gh pr create --base develop`)
+9. **Always branch off main** before starting work (never commit directly to main)
+10. **Create PRs to main** (use `gh pr create --base main`). This fork has no `develop` branch
 
 ### ❌ DON'T
 
@@ -124,8 +124,8 @@ Contains:
 5. **Create new markdown files** without explicit user request
 6. **Skip documentation** before making architectural changes
 7. **Bypass the Repository Pattern** (violates constitution)
-8. **Commit directly to main or develop** (always use feature branches and PRs)
-9. **Create PRs to main** (always target develop branch with `--base develop`)
+8. **Commit directly to main** (always use feature branches and PRs)
+9. **Target a `develop` branch** (it doesn't exist in this fork; PRs go to `main`)
 
 ---
 
@@ -250,12 +250,12 @@ Additional notes:
 
 ### Branching Policy
 
-**NEVER commit directly to main or develop.** Always work on feature branches:
+**NEVER commit directly to main.** Always work on feature branches:
 
 1. **Starting Work:**
-   - Create a new branch from develop: `git checkout -b feature/descriptive-name`
+   - Create a new branch from main: `git checkout -b feature/descriptive-name`
    - Branch naming conventions: `feature/`, `fix/`, `docs/`, `refactor/`, `hotfix`
-   - Always branch off develop, never off main or other feature branches
+   - Always branch off main, never off other feature branches
 
 2. **During Development:**
    - Commit regularly as you complete phases of work
@@ -265,9 +265,9 @@ Additional notes:
 
 3. **Completing Work:**
    - Push branch to remote: `git push -u origin branch-name`
-   - Create pull request to merge into **develop** (use `gh pr create --base develop`)
-   - Never merge directly to develop or main without PR
-   - All PRs must target the `develop` branch
+   - Create pull request to merge into **main** (use `gh pr create --base main`)
+   - Never merge directly to main without PR
+   - All PRs must target the `main` branch
 
 ### Commit Guidelines
 
@@ -295,7 +295,7 @@ When user asks for PR:
 2. Analyze ALL commits (not just latest) on the branch
 3. Draft PR title and summary covering all changes
 4. Push with `-u` if needed
-5. Use `gh pr create --base develop` with title and body (HEREDOC format)
+5. Use `gh pr create --base main` with title and body (HEREDOC format)
 6. Return PR URL to user
 
 ---

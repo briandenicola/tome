@@ -72,7 +72,7 @@ Shows:
 ```bash
 # 1. Create PR from your feature branch
 git checkout feature/my-feature
-gh pr create --base develop --title "Add new feature"
+gh pr create --base main --title "Add new feature"
 
 # 2. Run automated review loop
 /review-loop
@@ -221,7 +221,7 @@ This complements your existing SpecKit workflow:
 
 # New: Automated review
 git push
-gh pr create --base develop
+gh pr create --base main
 /review-loop
 
 # Existing: Merge when ready
