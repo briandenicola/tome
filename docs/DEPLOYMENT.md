@@ -113,6 +113,26 @@ Grimmory has no API keys, so Tome signs in as you with `GRIMMORY_USERNAME` and `
 
 The [life store](https://github.com/briandenicola/lifestore) reads Tome through `GET /api/lifestore/records`: every book with reading on it (books only on the to-read pile are left out), each with its reads, review, rating and the progress logged in them, a page at a time (`?page=<token>&limit=<1-500>`, answering `{ records, next }`). In Tome, make a token under **Settings → API tokens** with access **Read**, and paste it into the life store's Tome integration. Nothing in Tome is changed by it.
 
+## AI agents (MCP)
+
+Tome is an [MCP](https://modelcontextprotocol.io) server at `/api/mcp`, so an AI assistant or your own agent can manage your backlog. Its tools:
+
+| Tool | Does | Needs |
+|------|------|-------|
+| `search_books` | Finds books already in Tome (Calibre's included) by title, author or ISBN, with their status | read |
+| `list_backlog` | The read-next queue in order, then the to-read pile | read |
+| `lookup_isbn` | A book's details from Open Library, ready for `add_book` | read |
+| `add_book` | Adds a book to to-read (or `status: "read-next"`), with an optional cover URL. If Tome already has a book with that ISBN, or that title by that author, it adds nothing and returns the matches | write |
+| `queue_book` | Puts a book Tome has into to-read or read-next. Books being read, finished or dropped are left alone; change those in Tome | write |
+
+Make a token under **Settings → API tokens** (Write to add books, Read to only look) and give the client the URL and the header. For Claude Code:
+
+```bash
+claude mcp add --transport http tome https://tome.example.com/api/mcp --header "Authorization: Bearer tome_..."
+```
+
+Any client that speaks Streamable HTTP and can send a header works the same way. The server answers each request with JSON (no streaming, no sessions). Clients that only sign in with OAuth, such as custom connectors on claude.ai, can't use it yet.
+
 ## Authentication
 
 With `AUTH_PASSWORD` set:

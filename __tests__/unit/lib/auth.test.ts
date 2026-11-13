@@ -390,6 +390,16 @@ describe('Auth Module', () => {
         }
       });
 
+      test('a read token reaches the MCP endpoint, which checks each tool itself, but no other POST', async () => {
+        const { proxyAuthCheck } = await import('@/lib/auth');
+        const post = (path: string, token = 'tome_reader') =>
+          new NextRequest(`http://localhost${path}`, { method: 'POST', headers: { authorization: `Bearer ${token}` } });
+
+        expect(await proxyAuthCheck(post('/api/mcp'), verify)).toBeNull();
+        expect((await proxyAuthCheck(post('/api/mcp/x'), verify))?.status).toBe(403);
+        expect((await proxyAuthCheck(post('/api/mcp', 'tome_nope'), verify))?.status).toBe(401);
+      });
+
       test('a write token can change things', async () => {
         const { proxyAuthCheck } = await import('@/lib/auth');
 

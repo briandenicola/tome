@@ -71,6 +71,20 @@ export class BookRepository extends BaseRepository<Book, NewBook, typeof books> 
   }
 
   /**
+   * Books with this ISBN, compared without hyphens, spaces or case (Calibre keeps ISBNs as they were typed).
+   * Orphaned books are left out.
+   */
+  async findByIsbn(isbn: string): Promise<Book[]> {
+    const digits = isbn.replace(/[\s-]/g, "").toUpperCase();
+    if (!digits) return [];
+    return this.getDatabase()
+      .select()
+      .from(books)
+      .where(and(sql`replace(replace(upper(${books.isbn}), '-', ''), ' ', '') = ${digits}`, isNotOrphaned()))
+      .all();
+  }
+
+  /**
    * Find multiple books by IDs
    */
   async findByIds(bookIds: number[]): Promise<Book[]> {

@@ -196,13 +196,16 @@ const PUBLIC_API = ["/api/auth/login", "/api/auth/logout", "/api/auth/status"];
 /** Routes only a signed-in person may call, never a token: making and revoking tokens. */
 const SESSION_ONLY_API = ["/api/tokens"];
 const READ_METHODS = ["GET", "HEAD", "OPTIONS"];
+/** Routes a read token may POST to: they check access themselves (MCP sends everything, reads too, as a POST). */
+const READ_TOKEN_POST_API = ["/api/mcp"];
 
 const unauthorized = (message: string, status = 401) => NextResponse.json({ error: message }, { status });
 
 /**
  * Whether a request may go on: null when it may, otherwise the response to send. Pages need a signed-in session and
  * go to /login without one. API routes need a session or an API token, except signing in and OPDS, which checks its
- * own HTTP Basic auth. A read token can only read, and no token can manage tokens.
+ * own HTTP Basic auth. A read token can only read, and no token can manage tokens. The MCP endpoint takes a read
+ * token's POSTs and refuses its tools that write.
  */
 export async function proxyAuthCheck(request: NextRequest, verifyToken?: TokenVerifier): Promise<NextResponse | null> {
   const { pathname } = request.nextUrl;
@@ -230,7 +233,7 @@ export async function proxyAuthCheck(request: NextRequest, verifyToken?: TokenVe
     if (SESSION_ONLY_API.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
       return unauthorized("API tokens can't manage tokens. Sign in to Tome to do that.", 403);
     }
-    if (access === "read" && !READ_METHODS.includes(request.method)) {
+    if (access === "read" && !READ_METHODS.includes(request.method) && !READ_TOKEN_POST_API.includes(pathname)) {
       return unauthorized("This API token can only read. Make one with write access to change anything.", 403);
     }
     return null;

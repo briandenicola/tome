@@ -64,6 +64,7 @@ Your reading data lives locally, under your control, and survives platform chang
 
 - 🔗 **Calibre Integration (optional)**: Integrates directly with Calibre, automatically syncing your library
 - 🔎 **Life store feed**: a read-only feed of your reading for the [life store](https://github.com/briandenicola/lifestore)
+- 🤖 **MCP server for AI agents**: agents can search your library, add books to your backlog and queue them ([docs](docs/DEPLOYMENT.md#ai-agents-mcp))
 - 🎧 **Progress from your reading apps**: Audiobookshelf and Grimmory (with its Kobo sync) progress is logged for you
 - ➕ **Books without Calibre**: Add books by hand with a cover upload or URL; fill the details from an ISBN with one click (Open Library)
 - 📖 **Reading Progress Tracking**: Track page-based or percentage-based progress with history
