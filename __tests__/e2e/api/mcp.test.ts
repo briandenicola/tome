@@ -5,6 +5,7 @@ import { bookRepository, sessionRepository, progressRepository, sourceLinkReposi
 import { apiTokenService } from "@/lib/services/api-token.service";
 import { POST, GET } from "@/app/api/mcp/route";
 import { sameSite } from "@/lib/mcp/server";
+import { progressService } from "@/lib/services/progress.service";
 
 /**
  * The MCP endpoint: JSON-RPC over POST, with the backlog tools. Agents find books, add them, and queue them; a read
@@ -112,6 +113,40 @@ describe("reading progress", () => {
     const [found] = (await call("list_reading")).data.books;
     expect(found).toMatchObject({ id: book.id, status: "reading", progress: null, appProgress: [{ source: "audiobookshelf", percentage: 42.5, finished: false }] });
     expect(found.appProgress[0].seenAt).toEqual(expect.any(String));
+  });
+
+  test("an ebook logged by page, then by percentage, shows its latest entry with both", async () => {
+    const book = await bookRepository.create({ source: "manual", path: "x", title: "Piranesi", authors: ["Susanna Clarke"], totalPages: 272 });
+    await sessionRepository.create({ bookId: book.id, status: "reading", sessionNumber: 1, isActive: true, startedDate: "2026-11-01" });
+    await progressService.logProgress(book.id, { currentPage: 50, progressDate: "2026-11-05" });
+    await progressService.logProgress(book.id, { currentPercentage: 50, progressDate: "2026-11-10" });
+
+    const [found] = (await call("search_books", { query: "Piranesi" })).data.books;
+    expect(found.progress).toEqual({ percentage: 50, currentPage: 136, date: "2026-11-10" });
+  });
+
+  test("an ebook synced from Grimmory shows Tome's progress and Grimmory's report", async () => {
+    const book = await bookRepository.create({ source: "grimmory", path: "x", title: "Hyperion", authors: ["Dan Simmons"], totalPages: 482 });
+    await sessionRepository.create({ bookId: book.id, status: "reading", sessionNumber: 1, isActive: true, startedDate: "2026-11-02" });
+    await progressService.logProgress(book.id, { currentPercentage: 25, progressDate: "2026-11-14" });
+    await sourceLinkRepository.create({ source: "grimmory", externalId: "g_9", bookId: book.id, title: "Hyperion", lastProgress: 25 });
+
+    const [found] = (await call("list_reading")).data.books;
+    expect(found).toMatchObject({
+      status: "reading",
+      progress: { percentage: 25, currentPage: expect.any(Number), date: "2026-11-14" },
+      appProgress: [{ source: "grimmory", percentage: 25, finished: false }],
+    });
+  });
+
+  test("a re-read shows the new read's progress, not the last one's", async () => {
+    const book = await bookRepository.create({ calibreId: 5, source: "calibre", path: "x", title: "Dune", authors: ["Frank Herbert"], totalPages: 600 });
+    const first = await sessionRepository.create({ bookId: book.id, status: "read", sessionNumber: 1, isActive: false, startedDate: "2025-01-01", completedDate: "2025-02-01" });
+    await progressRepository.create({ bookId: book.id, sessionId: first.id, currentPage: 600, currentPercentage: 100, progressDate: "2025-02-01", pagesRead: 600 });
+    await sessionRepository.create({ bookId: book.id, status: "reading", sessionNumber: 2, isActive: true, startedDate: "2026-11-12" });
+
+    const [found] = (await call("search_books", { query: "Dune" })).data.books;
+    expect(found).toMatchObject({ status: "reading", startedDate: "2026-11-12", progress: null });
   });
 
   test("books not being read carry no progress", async () => {
