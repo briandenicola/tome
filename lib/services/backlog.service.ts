@@ -1,5 +1,6 @@
-import { bookRepository, sessionRepository } from "@/lib/repositories";
+import { bookRepository, sessionRepository, progressRepository, sourceLinkRepository } from "@/lib/repositories";
 import type { Book } from "@/lib/db/schema/books";
+import type { ReadingSession } from "@/lib/db/schema/reading-sessions";
 import { manualBookService, ManualBookError, type ManualBookInput } from "@/lib/services/manual-book.service";
 import { sessionService } from "@/lib/services/session.service";
 import { getLogger } from "@/lib/logger";
@@ -27,6 +28,33 @@ export interface BacklogBook {
   seriesIndex?: number | null;
   /** Place in the read-next queue, from 1. Only on read-next books. */
   position?: number;
+  /** When the current read began (YYYY-MM-DD). Only on books being read, finished or dropped. */
+  startedDate?: string | null;
+  /** Where the current read is, as last logged in Tome. Null when nothing is logged yet. Only on books being read. */
+  progress?: BookProgress | null;
+  /**
+   * What reading apps (Audiobookshelf, Grimmory) last reported for this book. Tome logs app progress only once a book
+   * has a page count, so an audiobook without one shows its listening progress here and nowhere else.
+   */
+  appProgress?: AppProgress[];
+}
+
+export interface BookProgress {
+  /** 0 to 100. */
+  percentage: number;
+  /** Left out when the book has no page count, as audiobooks often don't. */
+  currentPage?: number;
+  /** The day it was logged, YYYY-MM-DD. */
+  date: string;
+}
+
+export interface AppProgress {
+  source: string;
+  /** 0 to 100. */
+  percentage: number;
+  finished: boolean;
+  /** When Tome last saw the item in the app, ISO 8601. */
+  seenAt: string;
 }
 
 /** What adding a book did: either the book, or the books already in Tome that look like it. */
@@ -73,10 +101,36 @@ function view(book: Book, status: string | null): BacklogBook {
   };
 }
 
-async function statusOf(bookId: number): Promise<string | null> {
-  const active = await sessionRepository.findActiveByBookId(bookId);
-  if (active) return active.status;
-  return (await sessionRepository.findLatestByBookId(bookId))?.status ?? null;
+async function sessionOf(bookId: number): Promise<ReadingSession | undefined> {
+  return (await sessionRepository.findActiveByBookId(bookId)) ?? (await sessionRepository.findLatestByBookId(bookId));
+}
+
+/** A book with its status and, for one being read, where the reading is: what an agent needs to answer "how far am I?". */
+async function describe(book: Book, session?: ReadingSession | null): Promise<BacklogBook> {
+  const s = session === undefined ? await sessionOf(book.id) : session ?? undefined;
+  const out = view(book, s?.status ?? null);
+  if (!s) return out;
+  if (s.status === "reading" || s.status === "read" || s.status === "dnf") out.startedDate = s.startedDate ?? null;
+  if (s.status === "reading") {
+    const latest = await progressRepository.findLatestBySessionId(s.id);
+    out.progress = latest
+      ? {
+          percentage: latest.currentPercentage,
+          ...(book.totalPages ? { currentPage: latest.currentPage } : {}),
+          date: latest.progressDate,
+        }
+      : null;
+  }
+  const links = await sourceLinkRepository.findByBookId(book.id);
+  if (links.length > 0) {
+    out.appProgress = links.map((l) => ({
+      source: l.source,
+      percentage: l.lastProgress,
+      finished: l.lastFinished,
+      seenAt: l.lastSeenAt.toISOString(),
+    }));
+  }
+  return out;
 }
 
 export class BacklogService {
@@ -95,7 +149,7 @@ export class BacklogService {
     for (const b of await bookRepository.findByIds(ids)) found.set(b.id, b);
 
     const out: BacklogBook[] = [];
-    for (const b of [...found.values()].slice(0, n)) out.push(view(b, await statusOf(b.id)));
+    for (const b of [...found.values()].slice(0, n)) out.push(await describe(b));
     return out;
   }
 
@@ -134,7 +188,7 @@ export class BacklogService {
       const duplicates = await this.findDuplicates(input);
       if (duplicates.length > 0) {
         const views: BacklogBook[] = [];
-        for (const b of duplicates) views.push(view(b, await statusOf(b.id)));
+        for (const b of duplicates) views.push(await describe(b));
         return {
           added: false,
           duplicates: views,
@@ -183,6 +237,19 @@ export class BacklogService {
     }
     if (current !== status) await sessionService.updateStatus(bookId, { status });
     return view(book, status);
+  }
+
+  /** The books being read now, most recently touched first, each with where the reading is. */
+  async reading(limit: unknown = 50): Promise<BacklogBook[]> {
+    const n = typeof limit === "number" && Number.isInteger(limit) ? Math.min(Math.max(limit, 1), 200) : 50;
+    const sessions = await sessionRepository.findByStatus("reading", true, n);
+    const books = new Map((await bookRepository.findByIds(sessions.map((s) => s.bookId))).map((b) => [b.id, b]));
+    const out: BacklogBook[] = [];
+    for (const s of sessions) {
+      const b = books.get(s.bookId);
+      if (b) out.push(await describe(b, s));
+    }
+    return out;
   }
 
   /** The backlog: the read-next queue in order, then the to-read pile newest first. */

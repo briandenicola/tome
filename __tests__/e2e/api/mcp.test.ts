@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { setupTestDatabase, teardownTestDatabase, clearTestDatabase } from "../../helpers/db-setup";
-import { bookRepository, sessionRepository, progressRepository } from "@/lib/repositories";
+import { bookRepository, sessionRepository, progressRepository, sourceLinkRepository } from "@/lib/repositories";
 import { apiTokenService } from "@/lib/services/api-token.service";
 import { POST, GET } from "@/app/api/mcp/route";
 import { sameSite } from "@/lib/mcp/server";
@@ -73,7 +73,7 @@ describe("the MCP handshake", () => {
   test("lists the backlog tools, marking which ones only read", async () => {
     const { body } = await rpc("tools/list");
     const tools = Object.fromEntries(body.result.tools.map((t: { name: string; annotations: { readOnlyHint: boolean } }) => [t.name, t.annotations.readOnlyHint]));
-    expect(tools).toEqual({ search_books: true, list_backlog: true, lookup_isbn: true, add_book: false, queue_book: false });
+    expect(tools).toEqual({ search_books: true, list_backlog: true, list_reading: true, lookup_isbn: true, add_book: false, queue_book: false });
   });
 
   test("unknown methods, bad JSON and GET are refused", async () => {
@@ -90,6 +90,36 @@ describe("the MCP handshake", () => {
     expect(sameSite("https://tome.example.com", "tome:3000", "tome.example.com")).toBe(true);
     expect(sameSite("https://evil.example", "tome.lan")).toBe(false);
     expect(sameSite("null", "tome.lan")).toBe(false);
+  });
+});
+
+describe("reading progress", () => {
+  test("search_books and list_reading show where a book being read is, with its start date", async () => {
+    const book = await bookRepository.create({ calibreId: 712, source: "calibre", path: "x", title: "Ravenna", authors: ["Judith Herrin"], totalPages: 608 });
+    const session = await sessionRepository.create({ bookId: book.id, status: "reading", sessionNumber: 1, isActive: true, startedDate: "2026-11-01" });
+    await progressRepository.create({ bookId: book.id, sessionId: session.id, currentPage: 44, currentPercentage: 7.4, progressDate: "2026-11-15", pagesRead: 44 });
+
+    const expected = { id: book.id, status: "reading", startedDate: "2026-11-01", progress: { percentage: 7.4, currentPage: 44, date: "2026-11-15" } };
+    expect((await call("search_books", { query: "Ravenna" })).data.books).toEqual([expect.objectContaining(expected)]);
+    expect((await call("list_reading")).data.books).toEqual([expect.objectContaining(expected)]);
+  });
+
+  test("an audiobook shows a percentage without a page, and what Audiobookshelf last reported", async () => {
+    const book = await bookRepository.create({ source: "audiobookshelf", path: "x", title: "The Rest Is History", authors: ["Someone"], totalPages: null });
+    await sessionRepository.create({ bookId: book.id, status: "reading", sessionNumber: 1, isActive: true, startedDate: "2026-11-10" });
+    await sourceLinkRepository.create({ source: "audiobookshelf", externalId: "li_1", bookId: book.id, title: "The Rest Is History", lastProgress: 42.5 });
+
+    const [found] = (await call("list_reading")).data.books;
+    expect(found).toMatchObject({ id: book.id, status: "reading", progress: null, appProgress: [{ source: "audiobookshelf", percentage: 42.5, finished: false }] });
+    expect(found.appProgress[0].seenAt).toEqual(expect.any(String));
+  });
+
+  test("books not being read carry no progress", async () => {
+    await calibreBook("Dune", ["Frank Herbert"]);
+    const [dune] = (await call("search_books", { query: "Dune" })).data.books;
+    expect(dune.progress).toBeUndefined();
+    expect(dune.startedDate).toBeUndefined();
+    expect((await call("list_reading")).data.books).toEqual([]);
   });
 });
 

@@ -16,7 +16,8 @@ const INSTRUCTIONS =
   "Tome tracks the books a person reads. Use these tools to manage their backlog: books waiting to be read, either " +
   '"to-read" (the pile) or "read-next" (the ordered queue of what is next). Before adding a book, search_books to see ' +
   "whether Tome already has it (Calibre books are in Tome already); if it does, queue_book it instead of adding a copy. " +
-  "lookup_isbn fills in a book's details from Open Library.";
+  "lookup_isbn fills in a book's details from Open Library. list_reading shows what is being read now and how far " +
+  "along each book is; search_books shows the same progress for any book being read.";
 
 type Json = Record<string, unknown>;
 
@@ -40,7 +41,7 @@ const TOOLS: Tool[] = [
     name: "search_books",
     title: "Search books",
     description:
-      "Finds books already in Tome, from Calibre or added by hand, by title, author or ISBN. Shows each book's id and reading status.",
+      "Finds books already in Tome, from Calibre, reading apps or added by hand, by title, author or ISBN. Shows each book's id and reading status; for a book being read, its progress (percentage, page, date) and what Audiobookshelf or Grimmory last reported.",
     inputSchema: {
       type: "object",
       properties: {
@@ -65,6 +66,20 @@ const TOOLS: Tool[] = [
     },
     write: false,
     run: async (a) => ({ books: await backlogService.list(a.status, a.limit) }),
+  },
+  {
+    name: "list_reading",
+    title: "List what's being read",
+    description:
+      "Lists the books being read now, most recently updated first, with each one's start date, progress (percentage, and page when the book has a page count) and what reading apps such as Audiobookshelf last reported.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        limit: { type: "integer", minimum: 1, maximum: 200, description: "How many books at most (default 50)." },
+      },
+    },
+    write: false,
+    run: async (a) => ({ books: await backlogService.reading(a.limit) }),
   },
   {
     name: "lookup_isbn",

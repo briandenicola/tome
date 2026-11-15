@@ -119,8 +119,9 @@ Tome is an [MCP](https://modelcontextprotocol.io) server at `/api/mcp`, so an AI
 
 | Tool | Does | Needs |
 |------|------|-------|
-| `search_books` | Finds books already in Tome (Calibre's included) by title, author or ISBN, with their status | read |
+| `search_books` | Finds books already in Tome (Calibre's included) by title, author or ISBN, with their status and, for books being read, their progress | read |
 | `list_backlog` | The read-next queue in order, then the to-read pile | read |
+| `list_reading` | The books being read now, with start date, progress (percentage, and page when the book has a page count) and what Audiobookshelf or Grimmory last reported | read |
 | `lookup_isbn` | A book's details from Open Library, ready for `add_book` | read |
 | `add_book` | Adds a book to to-read (or `status: "read-next"`), with an optional cover URL. If Tome already has a book with that ISBN, or that title by that author, it adds nothing and returns the matches | write |
 | `queue_book` | Puts a book Tome has into to-read or read-next. Books being read, finished or dropped are left alone; change those in Tome | write |

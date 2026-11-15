@@ -20,6 +20,11 @@ export class SourceLinkRepository extends BaseRepository<SourceLink, NewSourceLi
       .get();
   }
 
+  /** The app items that count toward a Tome book. */
+  async findByBookId(bookId: number): Promise<SourceLink[]> {
+    return this.getDatabase().select().from(sourceLinks).where(eq(sourceLinks.bookId, bookId)).orderBy(asc(sourceLinks.id)).all();
+  }
+
   async getSync(source: ReadingSourceId): Promise<SourceSync | undefined> {
     return this.getDatabase().select().from(sourceSyncs).where(eq(sourceSyncs.source, source)).get();
   }
