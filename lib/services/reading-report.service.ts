@@ -27,6 +27,8 @@ export interface ReportRow {
   reread: boolean;
   /** How it was read: as recorded, else as the book's source says. Null when unknown. */
   format: ReadingFormat | null;
+  /** When the book's metadata last changed, ISO 8601: the cover's cache key. */
+  lastSynced: string | null;
 }
 
 export interface ReadingReport {
@@ -72,6 +74,7 @@ export async function buildReadingReport(year: number): Promise<ReadingReport> {
       pages: b.totalPages ?? null,
       reread: (b.sessionNumber ?? 1) > 1,
       format: effectiveFormat(b.format, b.source),
+      lastSynced: b.lastSynced ? new Date(b.lastSynced).toISOString() : null,
     }))
     // Oldest first: a report reads as the year went.
     .sort((x, y) => x.finishedDate.localeCompare(y.finishedDate) || x.title.localeCompare(y.title));
