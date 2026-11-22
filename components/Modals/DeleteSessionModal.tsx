@@ -64,7 +64,7 @@ export default function DeleteSessionModal({
           </div>
           <button
             onClick={onClose}
-            className="text-[var(--foreground)]/50 hover:text-[var(--foreground)] transition-colors"
+            className="text-foreground/50 hover:text-[var(--foreground)] transition-colors"
             aria-label="Close"
             disabled={submitting}
           >
@@ -87,7 +87,7 @@ export default function DeleteSessionModal({
               </li>
               <li>All reading history for this session</li>
               {isActive && (
-                <li className="text-[var(--foreground)]/80">
+                <li className="text-foreground/80">
                   A new "Want to Read" session will be created
                 </li>
               )}

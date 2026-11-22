@@ -57,14 +57,14 @@ export function RemoveTagFromBookModal({
         <div className="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
           <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-[var(--foreground)]/70">
+            <p className="text-sm text-foreground/70">
               Remove the tag <span className="font-semibold">&quot;{tagName}&quot;</span> from{" "}
               <span className="font-semibold">&quot;{bookTitle}&quot;</span>?
             </p>
           </div>
         </div>
 
-        <p className="text-xs text-[var(--foreground)]/50">
+        <p className="text-xs text-foreground/50">
           You can still add the tag back by going to the book&apos;s detail page.
         </p>
       </div>

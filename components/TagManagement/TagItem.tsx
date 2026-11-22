@@ -54,8 +54,8 @@ export const TagItem = memo(function TagItem({
         "group flex items-center gap-3 p-3 rounded-lg border transition-all shadow-sm",
         isCheckboxMode ? "" : "cursor-pointer",
         isSelected
-          ? "bg-[var(--accent)]/10 border-[var(--accent)] shadow-md"
-          : "bg-[var(--background)] border-[var(--border-color)] hover:border-[var(--accent)]/50 hover:shadow-md"
+          ? "bg-accent/10 border-[var(--accent)] shadow-md"
+          : "bg-[var(--background)] border-[var(--border-color)] hover:border-accent/50 hover:shadow-md"
       )}
     >
       {isCheckboxMode && (
@@ -94,7 +94,7 @@ export const TagItem = memo(function TagItem({
             "text-sm font-medium px-2 py-1 rounded-full flex-shrink-0",
             isSelected
               ? "bg-[var(--accent)] text-white"
-              : "bg-[var(--foreground)]/10 text-[var(--subheading-text)]"
+              : "bg-foreground/10 text-[var(--subheading-text)]"
           )}
         >
           {tag.bookCount}
@@ -105,7 +105,7 @@ export const TagItem = memo(function TagItem({
         <div className="flex items-center gap-1">
           <button
             onClick={handleRenameClick}
-            className="p-1.5 rounded hover:bg-[var(--foreground)]/10 transition-colors"
+            className="p-1.5 rounded hover:bg-foreground/10 transition-colors"
             title="Rename tag"
           >
             <Pencil className="w-4 h-4 text-[var(--subheading-text)]" />

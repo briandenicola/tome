@@ -60,7 +60,7 @@ export function TimezoneSettings() {
         <div className="flex-1">
           <label
             htmlFor="timezone"
-            className="block text-sm font-semibold text-[var(--foreground)]/70 mb-2"
+            className="block text-sm font-semibold text-foreground/70 mb-2"
           >
             Your timezone
           </label>

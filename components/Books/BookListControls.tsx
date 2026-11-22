@@ -64,7 +64,7 @@ export function BookListControls({
       {/* Filter Input with Select Button */}
       <div className="flex gap-3 mb-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
           <input
             type="text"
             placeholder={filterPlaceholder}
@@ -72,7 +72,7 @@ export function BookListControls({
             onChange={(e) => onFilterChange(e.target.value)}
             className={cn(
               "w-full pl-10 py-2 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg",
-              "text-[var(--foreground)] placeholder:text-[var(--foreground)]/50",
+              "text-[var(--foreground)] placeholder:text-foreground/50",
               "focus:outline-none focus:ring-2 focus:ring-[var(--accent)]",
               filterText ? "pr-10" : "pr-4"
             )}
@@ -81,7 +81,7 @@ export function BookListControls({
             <button
               type="button"
               onClick={onClearFilter}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-[var(--foreground)] transition-colors"
               aria-label="Clear filter"
             >
               <X className="w-5 h-5" />
@@ -134,7 +134,7 @@ export function BookListControls({
 
       {/* Filter Results Count */}
       {filterText && (
-        <p className="text-sm text-[var(--foreground)]/60 mt-2">
+        <p className="text-sm text-foreground/60 mt-2">
           Showing {filteredCount} of {totalCount} {itemWord}
         </p>
       )}

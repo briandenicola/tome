@@ -81,7 +81,7 @@ export function StreakEditModal({
         <div>
           <label
             htmlFor="daily-threshold"
-            className="block text-sm font-semibold text-[var(--foreground)]/70 mb-2"
+            className="block text-sm font-semibold text-foreground/70 mb-2"
           >
             Pages per day
           </label>

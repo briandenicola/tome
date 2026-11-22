@@ -21,7 +21,7 @@ export function BookCardSkeleton({ variant = 'simple' }: BookCardSkeletonProps) 
       {/* Cover skeleton - maintains 2:3 aspect ratio */}
       <div className="aspect-[2/3] bg-[var(--card-bg-emphasis)] flex items-center justify-center">
         {/* Book icon placeholder in cover area */}
-        <div className="w-20 h-20 bg-[var(--foreground)]/15 rounded-lg" />
+        <div className="w-20 h-20 bg-foreground/15 rounded-lg" />
       </div>
 
       {/* Content section skeleton */}
@@ -51,8 +51,8 @@ export function BookCardSkeleton({ variant = 'simple' }: BookCardSkeletonProps) 
               <div className="h-4 bg-[var(--card-bg-emphasis)] rounded w-12" />
             </div>
             {/* Progress bar */}
-            <div className="w-full bg-[var(--card-bg-emphasis)] rounded-full h-2.5 shadow-inner border border-[var(--border-color)]/50">
-              <div className="h-2.5 bg-[var(--foreground)]/15 rounded-full w-1/3" />
+            <div className="w-full bg-[var(--card-bg-emphasis)] rounded-full h-2.5 shadow-inner border border-border/50">
+              <div className="h-2.5 bg-foreground/15 rounded-full w-1/3" />
             </div>
           </div>
         )}

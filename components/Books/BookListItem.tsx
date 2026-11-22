@@ -90,7 +90,7 @@ export const BookListItem = memo(function BookListItem({
       className={cn(
         "bg-[var(--card-bg)] border rounded-lg p-4 transition-all",
         isSelectMode && "cursor-pointer hover:shadow-md",
-        isSelected && "border-[var(--accent)] bg-[var(--accent)]/10",
+        isSelected && "border-[var(--accent)] bg-accent/10",
         !isSelected && "border-[var(--border-color)]",
         !isSelectMode && onClick && "cursor-pointer hover:shadow-md",
         className
@@ -120,7 +120,7 @@ export const BookListItem = memo(function BookListItem({
           className="flex-shrink-0"
           onClick={(e) => isSelectMode && e.preventDefault()}
         >
-          <div className="w-16 h-24 bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden rounded relative shadow-lg">
+          <div className="w-16 h-24 bg-light-accent/30 flex items-center justify-center overflow-hidden rounded relative shadow-lg">
             {!imageError ? (
               <Image
                 src={getCoverUrl(book.id, book.lastSynced)}
@@ -131,7 +131,7 @@ export const BookListItem = memo(function BookListItem({
                 onError={() => setImageError(true)}
               />
             ) : (
-              <BookOpen className="w-8 h-8 text-[var(--accent)]/40" />
+              <BookOpen className="w-8 h-8 text-accent/40" />
             )}
           </div>
         </Link>
@@ -185,7 +185,7 @@ export const BookListItem = memo(function BookListItem({
                     </span>
                   ))
                 ) : (
-                  <span className="text-[var(--foreground)]/40">Unknown Author</span>
+                  <span className="text-foreground/40">Unknown Author</span>
                 )}
               </div>
 

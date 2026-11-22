@@ -42,7 +42,7 @@ export function BulkDeleteBooksModal({ isOpen, onClose, bookCount, deleting, onC
             progress, shelf places and covers. This can&apos;t be undone.
           </p>
         </div>
-        <p className="text-sm text-[var(--foreground)]/70">
+        <p className="text-sm text-foreground/70">
           Calibre books are skipped: Tome doesn&apos;t change your Calibre library, and a Calibre book removed here would
           come back on the next sync without its reading history. Remove those in Calibre.
         </p>

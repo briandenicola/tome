@@ -129,7 +129,7 @@ export function StreakPagePanel() {
   if (!analytics) {
     return (
       <div className="bg-[var(--card-bg)] border border-[var(--border-color)] p-8 text-center rounded-md">
-        <p className="text-[var(--foreground)]/70 font-medium">
+        <p className="text-foreground/70 font-medium">
           Unable to load streak analytics. Please try again later.
         </p>
       </div>

@@ -32,7 +32,7 @@ export function TagManagementHeader({
           </h1>
           {loading ? (
             <p className="text-[var(--subheading-text)] mt-2 font-medium">
-              <span className="inline-block h-[1.25rem] w-48 bg-[var(--foreground)]/10 rounded animate-pulse align-middle" />
+              <span className="inline-block h-[1.25rem] w-48 bg-foreground/10 rounded animate-pulse align-middle" />
             </p>
           ) : (
             <p className="text-[var(--subheading-text)] mt-2 font-medium">
@@ -57,7 +57,7 @@ export function TagManagementHeader({
 
       {/* Settings row */}
       <div className="flex items-center gap-2">
-        <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--foreground)]/70 hover:text-[var(--foreground)] transition-colors">
+        <label className="flex items-center gap-2 cursor-pointer text-sm text-foreground/70 hover:text-[var(--foreground)] transition-colors">
           <input
             type="checkbox"
             checked={confirmRemoval}

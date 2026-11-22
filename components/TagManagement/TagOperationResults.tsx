@@ -208,7 +208,7 @@ export function TagOperationResults({ operation, result, operationDetails }: Tag
               {/* Copy Error Report Button */}
               <button
                 onClick={copyErrorReport}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-[var(--foreground)]/10 rounded-md transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--foreground)] hover:bg-foreground/10 rounded-md transition-colors"
               >
                 <Copy className="w-4 h-4" />
                 Copy Error Report
@@ -221,7 +221,7 @@ export function TagOperationResults({ operation, result, operationDetails }: Tag
       {/* Info Box */}
       {hasFailures && result.successCount > 0 && (
         <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <p className="text-sm text-[var(--foreground)]/70">
+          <p className="text-sm text-foreground/70">
             <span className="font-medium">Note:</span> {result.successCount} books were successfully updated. 
             The failed books were not modified and retain their original tags.
           </p>

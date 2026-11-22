@@ -100,8 +100,8 @@ export function StreakChartSection({
         </div>
       ) : !isLoading && data && data.length === 0 ? (
         <div className="bg-[var(--card-bg)] border border-[var(--border-color)] p-8 text-center rounded-md">
-          <TrendingUp className="w-12 h-12 text-[var(--accent)]/40 mx-auto mb-3" />
-          <p className="text-[var(--foreground)]/70 font-medium">
+          <TrendingUp className="w-12 h-12 text-accent/40 mx-auto mb-3" />
+          <p className="text-foreground/70 font-medium">
             No reading data available for this period.
           </p>
         </div>

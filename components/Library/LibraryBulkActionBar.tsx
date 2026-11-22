@@ -62,7 +62,7 @@ export function LibraryBulkActionBar({
               type="button"
               onClick={onClearSelection}
               disabled={loading}
-              className="text-[var(--foreground)]/70 hover:underline disabled:opacity-50"
+              className="text-foreground/70 hover:underline disabled:opacity-50"
             >
               Clear
             </button>

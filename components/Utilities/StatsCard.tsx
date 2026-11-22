@@ -25,20 +25,20 @@ export function StatsCard({
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold">
+          <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold">
             {title}
           </p>
           <p className="text-4xl font-serif font-bold text-[var(--heading-text)] mt-3">
             {value}
           </p>
           {subtitle && (
-            <p className="text-xs text-[var(--foreground)]/60 mt-2 font-medium">
+            <p className="text-xs text-foreground/60 mt-2 font-medium">
               {subtitle}
             </p>
           )}
         </div>
         {icon && (
-          <div className="text-[var(--accent)]/60">{icon}</div>
+          <div className="text-accent/60">{icon}</div>
         )}
       </div>
     </div>

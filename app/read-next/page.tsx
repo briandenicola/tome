@@ -183,13 +183,13 @@ export default function ReadNextPage() {
         ) : sessions.length === 0 ? (
           // Empty state
           <div className="text-center py-16">
-            <div className="text-[var(--foreground)]/40 mb-4">
+            <div className="text-foreground/40 mb-4">
               <Clock className="w-24 h-24 mx-auto" />
             </div>
             <h2 className="text-xl font-semibold text-[var(--heading-text)] mb-2">
               Your read-next queue is empty
             </h2>
-            <p className="text-[var(--foreground)]/60 mb-6">
+            <p className="text-foreground/60 mb-6">
               Add books from your library to start building your reading queue
             </p>
             <Link
@@ -202,7 +202,7 @@ export default function ReadNextPage() {
         ) : listView.filteredBooks.length === 0 ? (
           // No search results
           <div className="text-center py-16">
-            <p className="text-[var(--foreground)]/60">
+            <p className="text-foreground/60">
               No books found matching &quot;{listView.filterText}&quot;
             </p>
           </div>

@@ -77,7 +77,7 @@ export default function BookProgress({
       <form id={formId} onSubmit={onSubmit} className="space-y-4">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1 min-w-0">
-                <label className="block text-xs uppercase tracking-wide text-[var(--foreground)]/60 mb-2 font-semibold">
+                <label className="block text-xs uppercase tracking-wide text-foreground/60 mb-2 font-semibold">
                   Progress
                 </label>
                 <div className="flex gap-2">
@@ -132,7 +132,7 @@ export default function BookProgress({
                           className={cn(
                             "w-full px-4 py-2.5 text-left flex items-center justify-between transition-colors",
                             progressInputMode === "page"
-                              ? "bg-[var(--accent)]/10"
+                              ? "bg-accent/10"
                               : "hover:bg-[var(--background)]"
                           )}
                         >
@@ -150,7 +150,7 @@ export default function BookProgress({
                           className={cn(
                             "w-full px-4 py-2.5 text-left flex items-center justify-between transition-colors",
                             progressInputMode === "percentage"
-                              ? "bg-[var(--accent)]/10"
+                              ? "bg-accent/10"
                               : "hover:bg-[var(--background)]"
                           )}
                         >
@@ -166,7 +166,7 @@ export default function BookProgress({
               </div>
 
               <div className="md:w-48 md:shrink-0">
-                <label className="block text-xs uppercase tracking-wide text-[var(--foreground)]/60 mb-2 font-semibold">
+                <label className="block text-xs uppercase tracking-wide text-foreground/60 mb-2 font-semibold">
                   Date
                 </label>
                 <input
@@ -180,7 +180,7 @@ export default function BookProgress({
             </div>
 
               <div>
-              <label className="block text-xs uppercase tracking-wide text-[var(--foreground)]/60 mb-2 font-semibold">
+              <label className="block text-xs uppercase tracking-wide text-foreground/60 mb-2 font-semibold">
                 Notes
               </label>
               <MarkdownEditor

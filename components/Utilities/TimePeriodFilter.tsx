@@ -34,7 +34,7 @@ export function TimePeriodFilter({
     <div className="flex items-center gap-3">
       <label
         htmlFor="timeframe-filter"
-        className="text-sm font-semibold text-[var(--foreground)]/80 whitespace-nowrap"
+        className="text-sm font-semibold text-foreground/80 whitespace-nowrap"
       >
         Timeframe:
       </label>
@@ -71,7 +71,7 @@ export function TimePeriodFilter({
         <ChevronDown
           className={cn(
             "absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4",
-            "text-[var(--foreground)]/60 pointer-events-none",
+            "text-foreground/60 pointer-events-none",
             disabled && "opacity-50"
           )}
         />

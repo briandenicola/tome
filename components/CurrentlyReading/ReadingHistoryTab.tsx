@@ -172,12 +172,12 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
           >
               <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-[var(--accent)]/60" />
+                <BookOpen className="w-5 h-5 text-accent/60" />
                 <h3 className="text-lg font-semibold text-[var(--heading-text)]">
                   Read #{session.displayNumber ?? session.sessionNumber}
                 </h3>
                 {isReadingFormat(session.format) && (
-                  <span className="px-2 py-0.5 text-xs font-semibold bg-[var(--accent)]/15 text-[var(--accent)] rounded-full border border-[var(--accent)]/30">
+                  <span className="px-2 py-0.5 text-xs font-semibold bg-accent/15 text-[var(--accent)] rounded-full border border-accent/30">
                     {FORMAT_LABELS[session.format]}
                   </span>
                 )}
@@ -203,7 +203,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
             {/* Dates */}
             <div className="space-y-2 mb-4">
               {session.startedDate && (
-                <div className="flex items-center gap-2 text-sm text-[var(--foreground)]/70 font-medium">
+                <div className="flex items-center gap-2 text-sm text-foreground/70 font-medium">
                   <Calendar className="w-4 h-4" />
                   <span>
                     Started: {formatDate(session.startedDate)}
@@ -212,7 +212,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
               )}
               {(session.completedDate) && (
                 <div className={`flex items-center gap-2 text-sm font-medium ${
-                  session.status === 'dnf' ? 'text-red-600 dark:text-red-400' : 'text-[var(--foreground)]/70'
+                  session.status === 'dnf' ? 'text-red-600 dark:text-red-400' : 'text-foreground/70'
                 }`}>
                   <Calendar className="w-4 h-4" />
                   <span>
@@ -233,11 +233,11 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
                   sessionNumber: session.sessionNumber,
                   displayNumber: session.displayNumber,
                 })}
-                className="w-full grid grid-cols-2 gap-4 mb-4 p-3 bg-[var(--card-bg)] rounded border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/5 transition-colors duration-200 cursor-pointer group"
+                className="w-full grid grid-cols-2 gap-4 mb-4 p-3 bg-[var(--card-bg)] rounded border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-accent/5 transition-colors duration-200 cursor-pointer group"
                 aria-label={`View progress logs for Read #${session.displayNumber ?? session.sessionNumber}`}
               >
                 <div className="text-left">
-                  <p className="text-xs text-[var(--foreground)]/60 font-semibold uppercase tracking-wide mb-1">
+                  <p className="text-xs text-foreground/60 font-semibold uppercase tracking-wide mb-1">
                     Progress Logs
                   </p>
                   <p className="text-lg font-mono font-bold text-[var(--foreground)]">
@@ -245,7 +245,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
                   </p>
                 </div>
                 <div className="text-left">
-                  <p className="text-xs text-[var(--foreground)]/60 font-semibold uppercase tracking-wide mb-1">
+                  <p className="text-xs text-foreground/60 font-semibold uppercase tracking-wide mb-1">
                     Pages Read
                   </p>
                   <p className="text-lg font-mono font-bold text-[var(--foreground)]">
@@ -260,7 +260,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
 
             {/* Final Progress */}
             {session.progressSummary.latestProgress && (
-              <div className="text-sm text-[var(--foreground)]/70 font-medium mb-4">
+              <div className="text-sm text-foreground/70 font-medium mb-4">
                 Final progress: <span className="font-mono font-semibold">
                   {Math.round(session.progressSummary.latestProgress.currentPercentage)}%
                 </span>
@@ -270,7 +270,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
             {/* Review */}
             {session.review && (
               <div className="mt-4 p-4 bg-[var(--card-bg)] rounded border border-[var(--border-color)]">
-                <p className="text-xs text-[var(--foreground)]/60 font-semibold uppercase tracking-wide mb-2">
+                <p className="text-xs text-foreground/60 font-semibold uppercase tracking-wide mb-2">
                   Review
                 </p>
                 <MarkdownRenderer content={session.review} />

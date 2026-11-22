@@ -160,7 +160,7 @@ export function ShelfSelectionModal({
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
         <input
           type="text"
           placeholder="Search shelves by name..."
@@ -168,7 +168,7 @@ export function ShelfSelectionModal({
           onChange={(e) => setSearch(e.target.value)}
           disabled={submitting}
           autoFocus
-          className={`w-full pl-10 py-2.5 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder:text-[var(--foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 ${
+          className={`w-full pl-10 py-2.5 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder:text-foreground/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 ${
             search ? "pr-10" : "pr-4"
           }`}
         />
@@ -177,7 +177,7 @@ export function ShelfSelectionModal({
             type="button"
             onClick={() => setSearch("")}
             disabled={submitting}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-[var(--foreground)] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -192,7 +192,7 @@ export function ShelfSelectionModal({
             <h3 className="text-lg font-semibold text-[var(--heading-text)] mb-2">
               Error Loading Shelves
             </h3>
-            <p className="text-sm text-[var(--foreground)]/60 mb-4">
+            <p className="text-sm text-foreground/60 mb-4">
               {error}
             </p>
             <Button
@@ -206,15 +206,15 @@ export function ShelfSelectionModal({
         ) : loading ? (
           <div className="text-center py-16">
             <Spinner size="md" />
-            <p className="mt-4 text-sm text-[var(--foreground)]/60">Loading shelves...</p>
+            <p className="mt-4 text-sm text-foreground/60">Loading shelves...</p>
           </div>
         ) : filteredShelves.length === 0 ? (
           <div className="text-center py-16">
-            <LibraryIcon className="w-16 h-16 mx-auto text-[var(--foreground)]/30 mb-4" />
+            <LibraryIcon className="w-16 h-16 mx-auto text-foreground/30 mb-4" />
             <h3 className="text-lg font-semibold text-[var(--heading-text)] mb-2">
               {shelves.length === 0 ? "No Other Shelves" : "No Shelves Found"}
             </h3>
-            <p className="text-sm text-[var(--foreground)]/60">
+            <p className="text-sm text-foreground/60">
               {shelves.length === 0
                 ? "Create another shelf to use this feature."
                 : "No shelves match your search. Try different keywords."}
@@ -224,7 +224,7 @@ export function ShelfSelectionModal({
           <>
             {/* Count */}
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-[var(--foreground)]/60">
+              <span className="text-sm text-foreground/60">
                 {filteredShelves.length} {filteredShelves.length === 1 ? "shelf" : "shelves"}
               </span>
             </div>
@@ -244,7 +244,7 @@ export function ShelfSelectionModal({
                       "w-full p-3 rounded-lg border-2 text-left transition-all disabled:opacity-50 shadow-sm",
                       isSelected
                         ? "border-[var(--accent)] shadow-md"
-                        : "border-[var(--border-color)] bg-[var(--background)] hover:border-[var(--accent)]/50 hover:shadow-md"
+                        : "border-[var(--border-color)] bg-[var(--background)] hover:border-accent/50 hover:shadow-md"
                     )}
                   >
                     <div className="flex items-center gap-3">
@@ -349,7 +349,7 @@ export function ShelfSelectionModal({
       >
         {/* Subtitle */}
         <div className="mb-4">
-          <p className="text-sm text-[var(--foreground)]/70">
+          <p className="text-sm text-foreground/70">
             Select a destination shelf
           </p>
         </div>

@@ -431,7 +431,7 @@ export default function BookDetailPage() {
   if (!book) {
     return (
       <div className="text-center py-12">
-        <p className="text-[var(--foreground)]/60 font-medium">Book not found</p>
+        <p className="text-foreground/60 font-medium">Book not found</p>
       </div>
     );
   }
@@ -576,7 +576,7 @@ export default function BookDetailPage() {
               {/* Progress Bar */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm font-semibold">
-                  <span className="text-[var(--foreground)]/60">Progress</span>
+                  <span className="text-foreground/60">Progress</span>
                   <span className="text-[var(--foreground)]">
                     {bookProgressHook.progress.length > 0 ? (
                       <>
@@ -633,7 +633,7 @@ export default function BookDetailPage() {
           {/* Description */}
           {book.description && (
             <div>
-              <p className="text-sm text-[var(--foreground)]/80 leading-relaxed font-medium">
+              <p className="text-sm text-foreground/80 leading-relaxed font-medium">
                 {book.description.replace(/<[^>]*>/g, "")}
               </p>
             </div>
@@ -642,7 +642,7 @@ export default function BookDetailPage() {
           {/* Tags */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="block text-xs uppercase tracking-wide text-[var(--foreground)]/60 font-semibold">
+              <label className="block text-xs uppercase tracking-wide text-foreground/60 font-semibold">
                 Tags
               </label>
               <button
@@ -659,14 +659,14 @@ export default function BookDetailPage() {
                   <Link
                     key={tag}
                     href={`/library?tags=${encodeURIComponent(tag)}`}
-                    className="px-3 py-1 bg-[var(--card-bg)] text-[var(--foreground)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 rounded text-sm transition-colors font-medium"
+                    className="px-3 py-1 bg-[var(--card-bg)] text-[var(--foreground)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-accent/10 rounded text-sm transition-colors font-medium"
                   >
                     {tag}
                   </Link>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[var(--foreground)]/50">
+              <p className="text-sm text-foreground/50">
                 No tags yet. Click Edit to add some!
               </p>
             )}
@@ -675,7 +675,7 @@ export default function BookDetailPage() {
           {/* Shelves */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="block text-xs uppercase tracking-wide text-[var(--foreground)]/60 font-semibold">
+              <label className="block text-xs uppercase tracking-wide text-foreground/60 font-semibold">
                 Shelves
               </label>
               <button
@@ -694,7 +694,7 @@ export default function BookDetailPage() {
                     <Link
                       key={shelf.id}
                       href={`/shelves/${shelf.id}`}
-                      className="px-3 py-2 bg-[var(--card-bg)] text-[var(--foreground)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-[var(--accent)]/10 rounded text-sm transition-colors font-medium flex items-center gap-2"
+                      className="px-3 py-2 bg-[var(--card-bg)] text-[var(--foreground)] border border-[var(--border-color)] hover:border-[var(--accent)] hover:bg-accent/10 rounded text-sm transition-colors font-medium flex items-center gap-2"
                     >
                       <ShelfAvatar
                         color={shelf.color}
@@ -707,7 +707,7 @@ export default function BookDetailPage() {
                 })}
               </div>
             ) : (
-              <p className="text-sm text-[var(--foreground)]/50">
+              <p className="text-sm text-foreground/50">
                 Not on any shelves. Click Edit to add to shelves!
               </p>
             )}

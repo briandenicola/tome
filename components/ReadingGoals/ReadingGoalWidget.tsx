@@ -174,7 +174,7 @@ export function ReadingGoalWidget({ goalData, onEditClick }: ReadingGoalWidgetPr
           {/* Stats Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[var(--card-bg-emphasis)] rounded-md p-4 border-l-[3px] border-[var(--accent)]">
-              <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold mb-2">
+              <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold mb-2">
                 Books Read
               </p>
               <p className="text-5xl font-serif font-bold text-[var(--heading-text)]">
@@ -183,7 +183,7 @@ export function ReadingGoalWidget({ goalData, onEditClick }: ReadingGoalWidgetPr
             </div>
             {!isExceeded && booksRemaining > 0 && (
               <div className={`bg-[var(--card-bg-emphasis)] rounded-md p-4 border-l-[3px] ${statusColors.border}`}>
-                <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold mb-2">
+                <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold mb-2">
                   Fell Short By
                 </p>
                 <p className="text-5xl font-serif font-bold text-[var(--heading-text)]">
@@ -193,7 +193,7 @@ export function ReadingGoalWidget({ goalData, onEditClick }: ReadingGoalWidgetPr
             )}
             {isExceeded && (
               <div className={`bg-[var(--card-bg-emphasis)] rounded-md p-4 border-l-[3px] ${statusColors.border}`}>
-                <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold mb-2">
+                <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold mb-2">
                   Exceeded By
                 </p>
                 <p className="text-5xl font-serif font-bold text-[var(--heading-text)]">
@@ -203,7 +203,7 @@ export function ReadingGoalWidget({ goalData, onEditClick }: ReadingGoalWidgetPr
             )}
             {!isExceeded && booksRemaining === 0 && (
               <div className={`bg-[var(--card-bg-emphasis)] rounded-md p-4 border-l-[3px] ${statusColors.border}`}>
-                <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold mb-2">
+                <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold mb-2">
                   Goal
                 </p>
                 <p className="text-5xl font-serif font-bold text-[var(--heading-text)]">
@@ -315,7 +315,7 @@ export function ReadingGoalWidget({ goalData, onEditClick }: ReadingGoalWidgetPr
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-[var(--card-bg-emphasis)] rounded-md p-4 border-l-[3px] border-[var(--accent)]">
-            <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold mb-2">
+            <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold mb-2">
               Completed
             </p>
             <p className="text-5xl font-serif font-bold text-[var(--heading-text)]">
@@ -323,7 +323,7 @@ export function ReadingGoalWidget({ goalData, onEditClick }: ReadingGoalWidgetPr
             </p>
           </div>
           <div className="bg-[var(--card-bg-emphasis)] rounded-md p-4 border-l-[3px] border-[var(--border-color)]">
-            <p className="text-xs uppercase tracking-wide text-[var(--foreground)]/70 font-semibold mb-2">
+            <p className="text-xs uppercase tracking-wide text-foreground/70 font-semibold mb-2">
               Remaining
             </p>
             <p className="text-5xl font-serif font-bold text-[var(--heading-text)]">

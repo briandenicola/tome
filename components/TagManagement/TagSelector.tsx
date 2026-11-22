@@ -139,7 +139,7 @@ export function TagSelector({
     <div className="relative" ref={dropdownRef}>
       {/* Input Field */}
       <div className="relative">
-        <TagIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 pointer-events-none z-10" />
+        <TagIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 pointer-events-none z-10" />
         <input
           ref={inputRef}
           type="text"
@@ -149,7 +149,7 @@ export function TagSelector({
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
           disabled={disabled}
-          className="w-full pl-10 pr-4 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-md text-[var(--foreground)] placeholder-[var(--foreground)]/50 focus:outline-none focus:border-[var(--accent)] transition-colors disabled:opacity-50"
+          className="w-full pl-10 pr-4 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-md text-[var(--foreground)] placeholder-foreground/50 focus:outline-none focus:border-[var(--accent)] transition-colors disabled:opacity-50"
         />
       </div>
 
@@ -157,7 +157,7 @@ export function TagSelector({
       {showDropdown && !disabled && (
         <div className="absolute z-[60] w-full mt-1 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md shadow-xl max-h-60 overflow-y-auto">
           {showEmptyMessage ? (
-            <div className="px-4 py-6 text-center text-sm text-[var(--foreground)]/50">
+            <div className="px-4 py-6 text-center text-sm text-foreground/50">
               {emptyMessage}
             </div>
           ) : (

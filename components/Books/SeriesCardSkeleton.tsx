@@ -22,12 +22,12 @@ export default function SeriesCardSkeleton() {
       <div className="p-4 space-y-3">
         {/* Series name skeleton - 2 lines */}
         <div className="space-y-2">
-          <div className="h-5 bg-[var(--foreground)]/10 rounded w-3/4" />
-          <div className="h-5 bg-[var(--foreground)]/10 rounded w-1/2" />
+          <div className="h-5 bg-foreground/10 rounded w-3/4" />
+          <div className="h-5 bg-foreground/10 rounded w-1/2" />
         </div>
         
         {/* Book count skeleton */}
-        <div className="h-4 bg-[var(--foreground)]/10 rounded w-20" />
+        <div className="h-4 bg-foreground/10 rounded w-20" />
       </div>
     </div>
   );

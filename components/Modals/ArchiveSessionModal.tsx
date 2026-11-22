@@ -43,10 +43,10 @@ export default function ArchiveSessionModal({
       }
     >
       <div className="space-y-4">
-        <p className="text-[var(--foreground)]/70 font-medium">
+        <p className="text-foreground/70 font-medium">
           You have logged progress for this book. Changing the status will:
         </p>
-        <ul className="list-disc list-inside text-[var(--foreground)]/70 ml-3 space-y-1">
+        <ul className="list-disc list-inside text-foreground/70 ml-3 space-y-1">
           <li>Archive your current reading session with its progress</li>
           <li>Start a fresh session with {statusText} status</li>
           <li>Preserve your reading history (viewable in Reading History)</li>

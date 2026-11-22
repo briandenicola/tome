@@ -73,11 +73,11 @@ export default function ShelvesPage() {
         {/* Empty State */}
         {!loading && shelves.length === 0 && (
           <div className="bg-[var(--card-bg)] border border-[var(--border-color)] p-16 text-center rounded-lg">
-            <Library className="w-16 h-16 text-[var(--accent)]/40 mx-auto mb-4" />
+            <Library className="w-16 h-16 text-accent/40 mx-auto mb-4" />
             <h3 className="text-xl font-serif font-semibold text-[var(--heading-text)] mb-2">
               No shelves yet
             </h3>
-            <p className="text-[var(--foreground)]/70 mb-6">
+            <p className="text-foreground/70 mb-6">
               Create your first shelf to start organizing your books
             </p>
             <Button
@@ -169,7 +169,7 @@ export default function ShelvesPage() {
           This will remove the shelf, but your books will not be deleted. You can always create a new shelf later.
         </p>
         {deletingShelf && deletingShelf.bookCount > 0 && (
-          <p className="text-[var(--foreground)]/70 mt-3">
+          <p className="text-foreground/70 mt-3">
             This shelf contains <span className="font-semibold">{deletingShelf.bookCount}</span>{" "}
             {deletingShelf.bookCount === 1 ? "book" : "books"}.
           </p>

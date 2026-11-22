@@ -44,22 +44,22 @@ export default function SessionProgressModal({
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="space-y-3">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-[var(--foreground)]/10 rounded" />
-            <div className="h-5 bg-[var(--foreground)]/10 rounded w-32" />
+            <div className="w-5 h-5 bg-foreground/10 rounded" />
+            <div className="h-5 bg-foreground/10 rounded w-32" />
           </div>
           <div className="ml-7 p-4 bg-[var(--background)] border border-[var(--border-color)] rounded-lg">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <div className="h-3 bg-[var(--foreground)]/10 rounded w-16" />
-                <div className="h-4 bg-[var(--foreground)]/10 rounded w-12" />
+                <div className="h-3 bg-foreground/10 rounded w-16" />
+                <div className="h-4 bg-foreground/10 rounded w-12" />
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-[var(--foreground)]/10 rounded w-16" />
-                <div className="h-4 bg-[var(--foreground)]/10 rounded w-12" />
+                <div className="h-3 bg-foreground/10 rounded w-16" />
+                <div className="h-4 bg-foreground/10 rounded w-12" />
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-[var(--foreground)]/10 rounded w-16" />
-                <div className="h-4 bg-[var(--foreground)]/10 rounded w-12" />
+                <div className="h-3 bg-foreground/10 rounded w-16" />
+                <div className="h-4 bg-foreground/10 rounded w-12" />
               </div>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function SessionProgressModal({
   // Error state
   const ErrorState = () => (
     <div className="text-center py-8">
-      <p className="text-[var(--foreground)]/60 mb-4">Failed to load progress logs</p>
+      <p className="text-foreground/60 mb-4">Failed to load progress logs</p>
       <Button
         variant="primary"
         onClick={() => window.location.reload()}
@@ -84,8 +84,8 @@ export default function SessionProgressModal({
   // Empty state
   const EmptyState = () => (
     <div className="text-center py-8">
-      <BookOpen className="w-12 h-12 mx-auto mb-3 text-[var(--foreground)]/30" />
-      <p className="text-[var(--foreground)]/60">No progress logs recorded for this session</p>
+      <BookOpen className="w-12 h-12 mx-auto mb-3 text-foreground/30" />
+      <p className="text-foreground/60">No progress logs recorded for this session</p>
     </div>
   );
 

@@ -17,9 +17,9 @@ export function ReadingGoalChartSkeleton() {
           return (
             <div key={i} className="flex-1 flex flex-col items-center gap-2">
               {/* Bar */}
-              <div className={`w-full bg-[var(--foreground)]/10 rounded-t ${heights[i]}`} />
+              <div className={`w-full bg-foreground/10 rounded-t ${heights[i]}`} />
               {/* Month label */}
-              <div className="h-3 w-6 bg-[var(--foreground)]/10 rounded" />
+              <div className="h-3 w-6 bg-foreground/10 rounded" />
             </div>
           );
         })}

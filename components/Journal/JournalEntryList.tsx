@@ -67,7 +67,7 @@ export function JournalEntryList({
       )}
 
       {entries.length === 0 ? (
-        <p className="text-sm text-[var(--foreground)]/60 italic">
+        <p className="text-sm text-foreground/60 italic">
           {emptyMessage}
         </p>
       ) : (
@@ -129,11 +129,11 @@ interface JournalEntryCardProps {
 export function JournalEntryCard({ entry, index, totalEntries, onEdit }: JournalEntryCardProps) {
   return (
     <div
-      className="relative p-4 xl:p-5 bg-[var(--background)] border border-[var(--border-color)] rounded-lg transition-all duration-200 hover:shadow-md hover:border-[var(--accent)]/30"
+      className="relative p-4 xl:p-5 bg-[var(--background)] border border-[var(--border-color)] rounded-lg transition-all duration-200 hover:shadow-md hover:border-accent/30"
     >
       {/* Entry number badge (only show if multiple entries on same day) */}
       {totalEntries > 1 && (
-        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--accent)]/10 flex items-center justify-center">
+        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center">
           <span className="text-xs font-bold text-[var(--subheading-text)]">
             {index + 1}
           </span>
@@ -144,7 +144,7 @@ export function JournalEntryCard({ entry, index, totalEntries, onEdit }: Journal
       {onEdit && (
         <button
           onClick={() => onEdit(entry)}
-          className={`absolute top-2 ${totalEntries > 1 ? 'right-10' : 'right-2'} p-1.5 text-[var(--accent)] hover:bg-[var(--accent)]/5 rounded transition-colors`}
+          className={`absolute top-2 ${totalEntries > 1 ? 'right-10' : 'right-2'} p-1.5 text-[var(--accent)] hover:bg-accent/5 rounded transition-colors`}
           title="Edit progress entry"
         >
           <Pencil className="w-4 h-4" />
@@ -155,7 +155,7 @@ export function JournalEntryCard({ entry, index, totalEntries, onEdit }: Journal
       <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 md:divide-x divide-[var(--border-color)] ${entry.notes ? 'mb-4 pb-4 border-b border-[var(--border-color)]' : ''}`}>
         {/* Percentage */}
         <div className="flex items-center gap-2 md:justify-center md:pr-4">
-          <div className="w-8 h-8 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-4 h-4 text-[var(--accent)]" />
           </div>
           <div className="min-w-0">
@@ -168,7 +168,7 @@ export function JournalEntryCard({ entry, index, totalEntries, onEdit }: Journal
 
         {/* Current Page */}
         <div className="flex items-center gap-2 md:justify-center md:px-4">
-          <div className="w-8 h-8 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
             <FileText className="w-4 h-4 text-[var(--accent)]" />
           </div>
           <div className="min-w-0">
@@ -182,7 +182,7 @@ export function JournalEntryCard({ entry, index, totalEntries, onEdit }: Journal
         {/* Pages Read */}
         {entry.pagesRead > 0 && (
           <div className="flex items-center gap-2 md:justify-center md:pl-4">
-            <div className="w-8 h-8 rounded-full bg-[var(--accent)]/10 flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
               <Plus className="w-4 h-4 text-[var(--accent)]" />
             </div>
             <div className="min-w-0">

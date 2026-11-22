@@ -12,13 +12,13 @@ export function TagListSkeleton() {
       {/* Search and controls skeletons */}
       <div className="space-y-3 mb-4">
         {/* Search bar skeleton */}
-        <div className="h-10 bg-[var(--foreground)]/10 rounded-lg animate-pulse" />
+        <div className="h-10 bg-foreground/10 rounded-lg animate-pulse" />
         
         {/* Sort dropdown skeleton */}
-        <div className="h-10 bg-[var(--foreground)]/10 rounded-lg animate-pulse" />
+        <div className="h-10 bg-foreground/10 rounded-lg animate-pulse" />
         
         {/* Select Multiple button skeleton */}
-        <div className="h-10 bg-[var(--foreground)]/10 rounded-lg animate-pulse" />
+        <div className="h-10 bg-foreground/10 rounded-lg animate-pulse" />
       </div>
 
       {/* Tags list skeleton */}

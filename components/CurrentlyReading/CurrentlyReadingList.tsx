@@ -144,7 +144,7 @@ export default function CurrentlyReadingList({
               <div className="flex gap-4 items-center">
                 {/* Book Cover Thumbnail */}
                 <Link href={`/books/${book.id}`} className="flex-shrink-0">
-                  <div className="w-16 h-24 bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden rounded relative shadow-md group-hover:shadow-lg transition-shadow">
+                  <div className="w-16 h-24 bg-light-accent/30 flex items-center justify-center overflow-hidden rounded relative shadow-md group-hover:shadow-lg transition-shadow">
                     {!hasImageError ? (
                       <Image
                         src={getCoverUrl(book.id, book.lastSynced)}
@@ -155,7 +155,7 @@ export default function CurrentlyReadingList({
                         onError={() => handleImageError(book.id)}
                       />
                     ) : (
-                      <BookOpen className="w-8 h-8 text-[var(--accent)]/40" />
+                      <BookOpen className="w-8 h-8 text-accent/40" />
                     )}
                   </div>
                 </Link>
