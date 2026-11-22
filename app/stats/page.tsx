@@ -30,7 +30,7 @@ export default function StatsPage() {
         actions={
           <Link
             href={`/stats/review?year=${new Date().getFullYear()}`}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] text-white font-semibold shadow-md hover:bg-[var(--dark-accent)] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] text-[var(--accent-ink)] font-semibold shadow-md hover:bg-[var(--dark-accent)] transition-colors"
           >
             <PartyPopper className="w-4 h-4" />
             Year in review

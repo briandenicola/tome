@@ -535,7 +535,7 @@ function PageButton({
       className={cn(
         "min-w-[2rem] h-8 px-2 inline-flex items-center justify-center rounded-md text-sm font-semibold transition-colors",
         current
-          ? "bg-[var(--accent)] text-white shadow-sm"
+          ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-sm"
           : "text-[var(--foreground)] hover:bg-[var(--card-bg)] border border-transparent hover:border-[var(--border-color)]",
         "disabled:opacity-35 disabled:pointer-events-none"
       )}

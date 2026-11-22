@@ -2,35 +2,44 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
+import {
+  THEMES,
+  THEME_STORAGE_KEY,
+  applyTheme,
+  isThemePreference,
+  resolveTheme,
+  type ThemeId,
+  type ThemeMode,
+  type ThemePreference,
+} from "@/lib/themes";
 
-export type ThemePreference = "light" | "dark" | "auto";
-export type Theme = "light" | "dark";
+export type { ThemePreference, ThemeId };
+/** Light or dark: the mode of the theme being shown. */
+export type Theme = ThemeMode;
 
 export function useTheme() {
   const [preference, setPreference] = useState<ThemePreference>("auto");
   const [systemPrefersDark, setSystemPrefersDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Computed effective theme
-  const effectiveTheme: Theme = 
-    preference === "auto" 
-      ? (systemPrefersDark ? "dark" : "light")
-      : preference;
+  // The theme being shown, and whether it is light or dark
+  const themeId: ThemeId = resolveTheme(preference, systemPrefersDark);
+  const effectiveTheme: Theme = THEMES[themeId].mode;
 
   // Initialize from localStorage with migration
   useEffect(() => {
     setMounted(true);
     
-    const savedPreference = localStorage.getItem("themePreference");
+    const savedPreference = localStorage.getItem(THEME_STORAGE_KEY);
     const oldSavedMode = localStorage.getItem("darkMode");
     
-    if (savedPreference && ["light", "dark", "auto"].includes(savedPreference)) {
-      setPreference(savedPreference as ThemePreference);
+    if (isThemePreference(savedPreference)) {
+      setPreference(savedPreference);
     } else if (oldSavedMode !== null) {
       // Migrate from old boolean format
       const migratedPreference: ThemePreference = oldSavedMode === "true" ? "dark" : "light";
       setPreference(migratedPreference);
-      localStorage.setItem("themePreference", migratedPreference);
+      localStorage.setItem(THEME_STORAGE_KEY, migratedPreference);
       localStorage.removeItem("darkMode");
     }
     // else: keep default "auto"
@@ -53,19 +62,17 @@ export function useTheme() {
   useEffect(() => {
     if (!mounted) return;
     
-    const html = document.documentElement;
-    html.setAttribute("data-theme", effectiveTheme);
-    html.setAttribute("data-color-mode", effectiveTheme);
-  }, [effectiveTheme, mounted]);
+    applyTheme(document.documentElement, themeId);
+  }, [themeId, mounted]);
 
   // Cross-tab sync via storage events
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       // Only handle themePreference changes from other tabs
-      if (e.key === "themePreference") {
-        if (e.newValue && ["light", "dark", "auto"].includes(e.newValue)) {
+      if (e.key === THEME_STORAGE_KEY) {
+        if (isThemePreference(e.newValue)) {
           // Valid new preference - update state
-          setPreference(e.newValue as ThemePreference);
+          setPreference(e.newValue);
         } else if (e.newValue === null) {
           // Key was deleted - revert to default
           setPreference("auto");
@@ -86,12 +93,13 @@ export function useTheme() {
   // Update preference
   const setThemePreference = useCallback((newPreference: ThemePreference) => {
     setPreference(newPreference);
-    localStorage.setItem("themePreference", newPreference);
+    localStorage.setItem(THEME_STORAGE_KEY, newPreference);
   }, []);
 
   return { 
     preference, 
     effectiveTheme,
+    themeId,
     setThemePreference,
     mounted 
   };

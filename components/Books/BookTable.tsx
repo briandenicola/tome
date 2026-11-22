@@ -130,7 +130,7 @@ export function BookTable({
         </p>
         <Link
           href="/library"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-white rounded-md hover:bg-[var(--light-accent)] transition-colors font-medium"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] text-[var(--accent-ink)] rounded-md hover:bg-[var(--light-accent)] transition-colors font-medium"
         >
           Go to Library
         </Link>

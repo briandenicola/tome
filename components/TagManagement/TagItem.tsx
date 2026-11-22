@@ -93,7 +93,7 @@ export const TagItem = memo(function TagItem({
           className={cn(
             "text-sm font-medium px-2 py-1 rounded-full flex-shrink-0",
             isSelected
-              ? "bg-[var(--accent)] text-white"
+              ? "bg-[var(--accent)] text-[var(--accent-ink)]"
               : "bg-foreground/10 text-[var(--subheading-text)]"
           )}
         >

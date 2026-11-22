@@ -504,7 +504,7 @@ export default function JournalPage() {
       {/* Mobile/Tablet Archive Button - Floating Action Button */}
       <button
         onClick={() => setArchiveDrawerOpen(true)}
-        className="xl:hidden fixed bottom-32 md:bottom-6 right-4 z-40 w-14 h-14 rounded-full bg-[var(--accent)] text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+        className="xl:hidden fixed bottom-32 md:bottom-6 right-4 z-40 w-14 h-14 rounded-full bg-[var(--accent)] text-[var(--accent-ink)] shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
         aria-label="Open archive navigation"
       >
         <Archive className="w-6 h-6" />

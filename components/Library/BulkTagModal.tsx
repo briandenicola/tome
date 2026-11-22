@@ -68,7 +68,7 @@ export function BulkTagModal({ isOpen, onClose, bookCount, availableTags, onSubm
               onClick={() => setAction(a)}
               className={cn(
                 "px-4 py-2 text-sm font-medium",
-                action === a ? "bg-[var(--accent)] text-white" : "text-[var(--foreground)] hover:bg-[var(--hover-bg)]"
+                action === a ? "bg-[var(--accent)] text-[var(--accent-ink)]" : "text-[var(--foreground)] hover:bg-[var(--hover-bg)]"
               )}
             >
               {a === "add" ? "Add tags" : "Remove tags"}

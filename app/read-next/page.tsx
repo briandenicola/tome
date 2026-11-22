@@ -194,7 +194,7 @@ export default function ReadNextPage() {
             </p>
             <Link
               href="/library?status=to-read"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--accent)] text-white rounded-md hover:bg-[var(--light-accent)] shadow-md hover:shadow-lg transition-all font-semibold"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[var(--accent)] text-[var(--accent-ink)] rounded-md hover:bg-[var(--light-accent)] shadow-md hover:shadow-lg transition-all font-semibold"
             >
               Browse To-Read Books
             </Link>
