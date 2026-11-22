@@ -20,7 +20,11 @@ export interface IsbnLookupResult {
 }
 
 const OPEN_LIBRARY = "https://openlibrary.org";
-const TIMEOUT_MS = 10_000;
+/** Open Library's `jscmd=data` endpoint resolves authors and publishers before answering and is often slow. */
+const TIMEOUT_MS = 15_000;
+const RETRY_DELAY_MS = 1_000;
+/** Open Library asks API clients to identify themselves; anonymous clients are throttled harder. */
+const USER_AGENT = "Tome (self-hosted book tracker)";
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 /** Open Library's free-text publish date ("May 17, 2010", "2010", "2010-05-17") as YYYY[-MM[-DD]]. */
@@ -69,16 +73,64 @@ export async function lookupIsbn(raw: unknown): Promise<IsbnLookupResult> {
   const isbn = typeof raw === "string" ? raw.replace(/[\s-]/g, "").toUpperCase() : "";
   if (!/^(\d{9}[\dX]|\d{13})$/.test(isbn)) throw new ManualBookError("The ISBN must have 10 or 13 digits.");
   const url = `${OPEN_LIBRARY}/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`;
-  let body: Record<string, unknown>;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS), headers: { accept: "application/json" } });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    body = (await res.json()) as Record<string, unknown>;
-  } catch (error) {
-    getLogger().warn({ err: error, isbn }, "Open Library lookup failed");
-    throw new ManualBookError("Couldn't reach Open Library. Fill in the details yourself, or try again later.", 502);
-  }
+  const body = await fetchOpenLibrary(url, isbn);
   const found = mapOpenLibrary(isbn, body[`ISBN:${isbn}`]);
   if (!found) throw new ManualBookError("Open Library doesn't know that ISBN. Fill in the details yourself.", 404);
   return found;
+}
+
+/** Why a call to Open Library failed, so the form can say something more useful than "couldn't reach". */
+class OpenLibraryError extends Error {
+  constructor(
+    readonly kind: "timeout" | "network" | "http",
+    readonly status?: number,
+    options?: { cause?: unknown }
+  ) {
+    super(kind === "http" ? `HTTP ${status}` : kind, options);
+  }
+  /** A slow answer, a dropped connection, rate limiting or a server error may pass; a 4xx won't. */
+  get retryable() {
+    return this.kind !== "http" || this.status === 429 || (this.status ?? 0) >= 500;
+  }
+}
+
+async function fetchOnce(url: string): Promise<Record<string, unknown>> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      headers: { accept: "application/json", "user-agent": USER_AGENT },
+    });
+  } catch (error) {
+    const timedOut = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    throw new OpenLibraryError(timedOut ? "timeout" : "network", undefined, { cause: error });
+  }
+  if (!res.ok) throw new OpenLibraryError("http", res.status);
+  try {
+    return (await res.json()) as Record<string, unknown>;
+  } catch (error) {
+    throw new OpenLibraryError("network", undefined, { cause: error });
+  }
+}
+
+/** Fetches with one retry for failures that may pass, then turns the last failure into a message for the form. */
+async function fetchOpenLibrary(url: string, isbn: string): Promise<Record<string, unknown>> {
+  let last: OpenLibraryError | undefined;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      return await fetchOnce(url);
+    } catch (error) {
+      last = error instanceof OpenLibraryError ? error : new OpenLibraryError("network", undefined, { cause: error });
+      getLogger().warn({ err: last.cause ?? last, isbn, attempt, kind: last.kind, status: last.status }, "Open Library lookup failed");
+      if (attempt === 2 || !last.retryable) break;
+      await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+    }
+  }
+  const message =
+    last?.kind === "timeout"
+      ? "Open Library didn't answer in time; it's often slow. Try again, or fill in the details yourself."
+      : last?.kind === "http"
+        ? `Open Library answered with an error (HTTP ${last.status}). Try again later, or fill in the details yourself.`
+        : "Couldn't reach Open Library. Check that Tome's server can reach openlibrary.org, or fill in the details yourself.";
+  throw new ManualBookError(message, last?.kind === "timeout" ? 504 : 502);
 }
