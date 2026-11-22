@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, Library as LibraryIcon, Plus } from "lucide-react";
+import { RefreshCw, Library as LibraryIcon, Plus, CheckSquare } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Button } from "@/components/Utilities/Button";
 
@@ -13,6 +13,9 @@ interface LibraryHeaderProps {
   /** Whether a Calibre library is set up; the sync button only shows when it is. */
   calibreConfigured?: boolean;
   loading?: boolean;
+  /** Turns select mode on or off, for bulk actions on many books. */
+  onToggleSelect?: () => void;
+  selecting?: boolean;
 }
 
 export function LibraryHeader({
@@ -22,6 +25,8 @@ export function LibraryHeader({
   onAddBook,
   calibreConfigured = true,
   loading = false,
+  onToggleSelect,
+  selecting = false,
 }: LibraryHeaderProps) {
   return (
     <div className="flex items-start justify-between border-b border-[var(--border-color)] pb-6">
@@ -42,6 +47,18 @@ export function LibraryHeader({
       </div>
 
       <div className="flex gap-2 mt-3 sm:mt-2">
+        {onToggleSelect && (
+          <Button
+            onClick={onToggleSelect}
+            variant="secondary"
+            size="xl"
+            icon={<CheckSquare className="w-4 h-4" />}
+            title={selecting ? "Stop selecting books" : "Select books for bulk actions"}
+            aria-pressed={selecting}
+          >
+            <span className="hidden sm:inline">{selecting ? "Done" : "Select"}</span>
+          </Button>
+        )}
         {onAddBook && (
           <Button
             onClick={onAddBook}

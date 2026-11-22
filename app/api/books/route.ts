@@ -1,55 +1,21 @@
 import { getLogger } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { bookRepository } from "@/lib/repositories";
+import { parseBookFilters } from "@/lib/api/book-filters";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get("status") || undefined;
-    const search = searchParams.get("search")?.trim() || undefined;
-    const tagsParam = searchParams.get("tags");
-    const rating = searchParams.get("rating") || undefined;
-    const shelfParam = searchParams.get("shelf");
-    const excludeShelfParam = searchParams.get("excludeShelfId");
     const limit = parseInt(searchParams.get("limit") || "50");
     const skip = parseInt(searchParams.get("skip") || "0");
-    const showOrphaned = searchParams.get("showOrphaned") === "true";
-    const sortBy = searchParams.get("sortBy") || undefined;
-    const noTags = searchParams.get("noTags") === "true";
-
-    // Parse tags
-    const tags = tagsParam ? tagsParam.split(",").map((t) => t.trim()) : undefined;
-
-    // Parse shelf ID
-    const shelfIds = shelfParam ? [parseInt(shelfParam)] : undefined;
-    
-    // Parse exclude shelf ID
-    const excludeShelfId = excludeShelfParam ? parseInt(excludeShelfParam) : undefined;
-
-    // Determine orphaned filter
-    const orphanedOnly = showOrphaned;
+    const { filters, sortBy } = parseBookFilters(searchParams);
 
     // Get books with filters, sessions, and progress in a single optimized query
     // This replaces the N+1 query pattern (1 + N session queries + N progress queries)
     // with a single JOIN query for massive performance improvement
-    const { books: booksWithStatus, total } = await bookRepository.findWithFiltersAndRelations(
-      {
-        status,
-        search,
-        tags,
-        rating,
-        shelfIds,
-        excludeShelfId,
-        showOrphaned,
-        orphanedOnly,
-        noTags,
-      },
-      limit,
-      skip,
-      sortBy
-    );
+    const { books: booksWithStatus, total } = await bookRepository.findWithFiltersAndRelations(filters, limit, skip, sortBy);
 
     return NextResponse.json({
       books: booksWithStatus,

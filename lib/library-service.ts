@@ -26,6 +26,21 @@ export interface PaginatedBooks {
 
 export type BookWithStatus = BookWithStatusMinimal;
 
+/** The library's filters as the query string GET /api/books and GET /api/books/ids read. */
+function filterParams(filters: LibraryFilters): URLSearchParams {
+  const { status, search, tags, rating, shelf, showOrphaned, noTags, sortBy } = filters;
+  const params = new URLSearchParams();
+  if (status && status !== "all") params.set("status", status);
+  if (search) params.set("search", search);
+  if (tags && tags.length > 0) params.set("tags", tags.join(","));
+  if (rating && rating !== "all") params.set("rating", rating);
+  if (shelf) params.set("shelf", shelf.toString());
+  if (showOrphaned) params.set("showOrphaned", "true");
+  if (sortBy) params.set("sortBy", sortBy);
+  if (noTags) params.set("noTags", "true");
+  return params;
+}
+
 export class LibraryService {
   private cache = new Map<string, PaginatedBooks>();
   private tagsCache: string[] | null = null;
@@ -65,19 +80,10 @@ export class LibraryService {
     }
 
     try {
-      const { status, search, tags, rating, shelf, pagination, showOrphaned, noTags } = filters;
-      const { limit, skip } = pagination;
+      const { limit, skip } = filters.pagination;
 
       // Build query params for API call
-      const params = new URLSearchParams();
-      if (status && status !== "all") params.set("status", status);
-      if (search) params.set("search", search);
-      if (tags && tags.length > 0) params.set("tags", tags.join(","));
-      if (rating && rating !== "all") params.set("rating", rating);
-      if (shelf) params.set("shelf", shelf.toString());
-      if (showOrphaned) params.set("showOrphaned", "true");
-      if (filters.sortBy) params.set("sortBy", filters.sortBy);
-      if (noTags) params.set("noTags", "true");
+      const params = filterParams(filters);
       params.set("limit", limit.toString());
       params.set("skip", skip.toString());
 
@@ -109,6 +115,14 @@ export class LibraryService {
       getLogger().error({ err: error }, "LibraryService: Failed to fetch books");
       throw new Error("Failed to fetch books");
     }
+  }
+
+  /** The ids of every book matching the filters, not only the page loaded: what "select all" selects. */
+  async getMatchingBookIds(filters: LibraryFilters): Promise<number[]> {
+    const response = await fetch(`/api/books/ids?${filterParams(filters).toString()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    const data = await response.json();
+    return Array.isArray(data.ids) ? data.ids : [];
   }
 
   async getAvailableTags(): Promise<string[]> {

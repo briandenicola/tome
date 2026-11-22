@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Check } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useState, memo } from "react";
 import { StatusBadge } from "@/components/Utilities/StatusBadge";
@@ -17,6 +17,10 @@ interface BookCardProps {
   currentProgress?: number;
   className?: string;
   lastSynced?: Date | string | null;
+  /** In select mode a click selects the book instead of opening it. */
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: number) => void;
 }
 
 export const BookCard = memo(function BookCard({
@@ -27,18 +31,34 @@ export const BookCard = memo(function BookCard({
   currentProgress,
   className,
   lastSynced,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }: BookCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  return (
-    <Link href={`/books/${id}`}>
+  const card = (
       <div
         className={cn(
           "bg-[var(--card-bg)] border border-[var(--border-color)] shadow-lg rounded-md hover:shadow-xl transition-shadow cursor-pointer overflow-hidden group",
+          selectable && selected && "ring-2 ring-[var(--accent)] border-[var(--accent)]",
           className
         )}
       >
         <div className="aspect-[2/3] bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden relative">
+          {selectable && (
+            <span
+              aria-hidden="true"
+              className={cn(
+                "absolute top-2 left-2 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow",
+                selected
+                  ? "bg-[var(--accent)] border-[var(--accent)] text-white"
+                  : "bg-[var(--card-bg)]/80 border-[var(--foreground)]/40"
+              )}
+            >
+              {selected && <Check className="w-4 h-4" />}
+            </span>
+          )}
           {!imageError ? (
             <Image
               src={getCoverUrl(Number(id), lastSynced)}
@@ -83,8 +103,24 @@ export const BookCard = memo(function BookCard({
           )}
         </div>
       </div>
-    </Link>
   );
+
+  if (selectable) {
+    return (
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={selected}
+        aria-label={`Select ${title}`}
+        onClick={() => onToggleSelect?.(Number(id))}
+        className="block w-full text-left"
+      >
+        {card}
+      </button>
+    );
+  }
+
+  return <Link href={`/books/${id}`}>{card}</Link>;
 }, (prevProps, nextProps) => {
   // Custom comparison function for memo
   // Only re-render if these key props change
@@ -93,6 +129,9 @@ export const BookCard = memo(function BookCard({
     prevProps.title === nextProps.title &&
     prevProps.status === nextProps.status &&
     prevProps.currentProgress === nextProps.currentProgress &&
-    prevProps.lastSynced === nextProps.lastSynced
+    prevProps.lastSynced === nextProps.lastSynced &&
+    prevProps.selectable === nextProps.selectable &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.onToggleSelect === nextProps.onToggleSelect
   );
 });

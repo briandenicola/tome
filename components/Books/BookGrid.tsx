@@ -18,9 +18,21 @@ interface BookGridProps {
   loading?: boolean;
   loadingMore?: boolean;
   skeletonCount?: number; // Number of skeleton cards to show when loading
+  /** Select mode: clicking a card selects it instead of opening the book. */
+  selectable?: boolean;
+  selectedIds?: Set<number>;
+  onToggleSelect?: (id: number) => void;
 }
 
-export function BookGrid({ books, loading = false, loadingMore = false, skeletonCount = 18 }: BookGridProps) {
+export function BookGrid({
+  books,
+  loading = false,
+  loadingMore = false,
+  skeletonCount = 18,
+  selectable = false,
+  selectedIds,
+  onToggleSelect,
+}: BookGridProps) {
   return (
     <>
       {loading ? (
@@ -40,6 +52,9 @@ export function BookGrid({ books, loading = false, loadingMore = false, skeleton
                 authors={book.authors}
                 status={book.status}
                 lastSynced={book.lastSynced}
+                selectable={selectable}
+                selected={selectedIds?.has(book.id) ?? false}
+                onToggleSelect={onToggleSelect}
               />
             ))}
           </div>
