@@ -32,6 +32,7 @@ export interface Book {
     startedDate?: string;
     completedDate?: string;
     review?: string;
+    format?: string | null;
   };
   rating?: number | null;
   latestProgress?: {

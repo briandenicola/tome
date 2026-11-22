@@ -27,7 +27,8 @@ export function mapAbsProgress(body: { mediaProgress?: AbsMediaProgress[] }): So
   for (const p of body.mediaProgress ?? []) {
     if (!p.libraryItemId || p.episodeId || (p.mediaItemType && p.mediaItemType !== "book")) continue;
     // An audiobook's progress is through its audio; an ebook-only item has ebookProgress instead.
-    const fraction = p.duration && p.duration > 0 ? (p.progress ?? 0) : (p.ebookProgress ?? p.progress ?? 0);
+    const listened = !!p.duration && p.duration > 0;
+    const fraction = listened ? (p.progress ?? 0) : (p.ebookProgress ?? p.progress ?? 0);
     const progress = p.isFinished ? 100 : pct(fraction);
     if (progress <= 0 && !p.isFinished) continue;
     out.push({
@@ -36,6 +37,7 @@ export function mapAbsProgress(body: { mediaProgress?: AbsMediaProgress[] }): So
       authors: [],
       progress,
       finished: !!p.isFinished,
+      format: listened ? "audiobook" : "ebook",
       ...(p.finishedAt && { finishedAt: new Date(p.finishedAt) }),
       ...(p.lastUpdate && { lastUpdate: new Date(p.lastUpdate) }),
     });

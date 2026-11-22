@@ -321,6 +321,22 @@ describe("syncing", () => {
     expect((await logsOf(book.id)).map((l) => [l.currentPercentage, l.currentPage])).toEqual([[40, 120]]);
   });
 
+  test("a read synced from an app records its format, unless the person already set one", async () => {
+    const listened = await tomeBook("Piranesi", ["Susanna Clarke"]);
+    const set = await tomeBook("Hyperion", ["Dan Simmons"]);
+    await sessionRepository.update((await sessionRepository.findActiveByBookId(set.id))!.id, { format: "print" });
+    const source = fakeSource();
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    source.set([item("li_1", { progress: 10, format: "audiobook" }), item("li_2", { title: "Hyperion", authors: ["Dan Simmons"], progress: 10 })]);
+    await service.sync("audiobookshelf");
+    source.set([item("li_1", { progress: 20, format: "audiobook" }), item("li_2", { title: "Hyperion", authors: ["Dan Simmons"], progress: 20 })]);
+    await service.sync("audiobookshelf");
+
+    expect((await sessionRepository.findActiveByBookId(listened.id))?.format).toBe("audiobook");
+    expect((await sessionRepository.findActiveByBookId(set.id))?.format).toBe("print");
+    expect(mapAbsProgress({ mediaProgress: [{ libraryItemId: "e", mediaItemType: "book", duration: 0, ebookProgress: 0.5 }] })[0]!.format).toBe("ebook");
+  });
+
   test("the print edition's page count from Open Library comes before an estimate", async () => {
     const book = await tomeBook("Piranesi", ["Susanna Clarke"], { totalPages: null });
     const fetchMock = vi.fn(async () =>

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sessionRepository } from "@/lib/repositories";
 import { sessionService } from "@/lib/services/session.service";
 import { validateDateString } from "@/lib/utils/date-validation";
+import { isReadingFormat } from "@/lib/utils/reading-format";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic';
  *   "startedDate": string | null   // YYYY-MM-DD string or null
  *   "completedDate": string | null // YYYY-MM-DD string or null
  *   "review": string | null        // Review text or null to remove
+ *   "format": "ebook" | "audiobook" | "print" | null // How the book was read, or null for unknown
  * }
  * 
  * Responses:
@@ -97,6 +99,17 @@ export async function PATCH(
         : null;
     }
     
+    // Handle format
+    if ('format' in body) {
+      if (body.format !== null && !isReadingFormat(body.format)) {
+        return NextResponse.json(
+          { error: 'format must be "ebook", "audiobook", "print" or null' },
+          { status: 400 }
+        );
+      }
+      updateData.format = body.format;
+    }
+
     // Check if there are any updates to make
     if (Object.keys(updateData).length === 0) {
       // No updates provided, return current session

@@ -605,3 +605,26 @@ describe("PATCH /api/books/[id]/sessions/[sessionId]", () => {
     });
   });
 });
+
+describe("PATCH /api/books/[id]/sessions/[sessionId] - format", () => {
+  test("sets, changes and clears how the book was read", async () => {
+    const book = await bookRepository.create(mockBook1);
+    const session = await createTestSession(book.id);
+
+    let response = await makePatchRequest(book.id, session.id, { format: "audiobook" });
+    expect(response.status).toBe(200);
+    expect((await response.json()).format).toBe("audiobook");
+
+    response = await makePatchRequest(book.id, session.id, { format: null });
+    expect((await response.json()).format).toBeNull();
+    expect((await sessionRepository.findById(session.id))?.format).toBeNull();
+  });
+
+  test("refuses a format Tome doesn't know", async () => {
+    const book = await bookRepository.create(mockBook1);
+    const session = await createTestSession(book.id);
+    const response = await makePatchRequest(book.id, session.id, { format: "scroll" });
+    expect(response.status).toBe(400);
+    expect((await sessionRepository.findById(session.id))?.format).toBeNull();
+  });
+});

@@ -17,6 +17,8 @@ export const readingSessions = sqliteTable(
     startedDate: text("started_date"), // YYYY-MM-DD format
     completedDate: text("completed_date"), // YYYY-MM-DD format - when reading ended (for both "read" and "dnf" status)
     review: text("review"),
+    // How this read was done: an ebook, an audiobook or a printed book. Null when Tome doesn't know.
+    format: text("format", { enum: ["ebook", "audiobook", "print"] }),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     readNextOrder: integer("read_next_order").notNull().default(0),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
@@ -35,6 +37,9 @@ export const readingSessions = sqliteTable(
     readNextOrderIdx: index("idx_sessions_read_next_order").on(table.readNextOrder, table.id).where(sql`${table.status} = 'read-next'`),
   })
 );
+
+export const READING_FORMATS = ["ebook", "audiobook", "print"] as const;
+export type ReadingFormat = (typeof READING_FORMATS)[number];
 
 export type ReadingSession = typeof readingSessions.$inferSelect;
 export type NewReadingSession = typeof readingSessions.$inferInsert;

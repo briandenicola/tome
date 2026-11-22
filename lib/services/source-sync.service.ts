@@ -333,7 +333,7 @@ export class SourceSyncService {
 
     if (item.finished) {
       if (active?.status === "read") return "skipped";
-      await sessionService.ensureReadingStatus(bookId);
+      await this.noteFormat(await sessionService.ensureReadingStatus(bookId), source, item);
       const tz = await getCurrentUserTimezone();
       const finishedOn = item.finishedAt ? formatInTimeZone(item.finishedAt, tz, "yyyy-MM-dd") : today;
       try {
@@ -348,6 +348,7 @@ export class SourceSyncService {
     if (active?.status !== "reading") {
       active = await sessionService.ensureReadingStatus(bookId);
     }
+    await this.noteFormat(active, source, item);
     const latest = await progressRepository.findLatestBySessionId(active.id);
     if (latest && latest.currentPercentage >= item.progress) return "skipped";
     if (latest && latest.progressDate === today && latest.notes === note && item.progress < 100) {
@@ -356,6 +357,13 @@ export class SourceSyncService {
       await progressService.logProgress(bookId, { currentPercentage: item.progress, progressDate: today, notes: note });
     }
     return item.progress >= 100 ? "finished" : "logged";
+  }
+
+  /** Records how a read is being done, from the app reporting it, unless the read already says. */
+  private async noteFormat(session: { id: number; format?: string | null } | undefined, source: ReadingSource, item: SourceItem): Promise<void> {
+    if (!session || session.format) return;
+    const format = item.format ?? (source.id === "audiobookshelf" ? "audiobook" : "ebook");
+    await sessionRepository.update(session.id, { format });
   }
 
   /** Points an app item at a different Tome book, or adds it as a new book. A person's choice; it sticks. */

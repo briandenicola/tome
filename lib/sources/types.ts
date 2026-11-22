@@ -13,6 +13,8 @@ export interface SourceItem {
   seriesIndex?: number;
   /** An audiobook's length, when the app knows it: what Tome estimates a page count from when there's no other. */
   durationSeconds?: number;
+  /** Listened to or read as an ebook, when the app says. */
+  format?: "audiobook" | "ebook";
   /** 0 to 100. */
   progress: number;
   finished: boolean;

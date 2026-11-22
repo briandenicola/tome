@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { toast } from "@/utils/toast";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
@@ -154,6 +154,24 @@ export default function BookDetailPage() {
     // Invalidate relevant queries to refetch fresh data
     await queryClient.invalidateQueries({ queryKey: queryKeys.book.detail(parseInt(bookId)) });
   });
+
+  // How the current read is being done (ebook, audiobook, print); saved as soon as it's picked
+  const handleFormatChange = useCallback(async (format: string | null) => {
+    const sessionId = book?.activeSession?.id;
+    if (!sessionId) return;
+    try {
+      const response = await fetch(`/api/books/${bookId}/sessions/${sessionId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ format }),
+      });
+      if (!response.ok) throw new Error();
+      await queryClient.invalidateQueries({ queryKey: queryKeys.book.detail(parseInt(bookId)) });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.sessions.byBook(parseInt(bookId)) });
+    } catch {
+      toast.error("Couldn't save the format");
+    }
+  }, [book?.activeSession?.id, bookId, queryClient]);
 
   // Draft note management with localStorage autosave
   const { draftNote, saveDraft, clearDraft } = useDraftNote(parseInt(bookId));
@@ -551,6 +569,8 @@ export default function BookDetailPage() {
                 onEditStartDateChange={sessionDetailsHook.setEditStartDate}
                 onCancelEdit={sessionDetailsHook.cancelEditing}
                 onSaveStartDate={sessionDetailsHook.saveStartDate}
+                format={book.activeSession.format}
+                onFormatChange={handleFormatChange}
               />
 
               {/* Progress Bar */}
