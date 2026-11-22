@@ -52,7 +52,7 @@ export const BookCard = memo(function BookCard({
               className={cn(
                 "absolute top-2 left-2 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow",
                 selected
-                  ? "bg-[var(--accent)] border-[var(--accent)] text-white"
+                  ? "bg-[var(--accent)] border-[var(--accent)] text-[var(--accent-ink)]"
                   : "bg-card/80 border-foreground/40"
               )}
             >

@@ -267,7 +267,7 @@ export default function ManualBookModal({ isOpen, onClose, book, onSaved }: Manu
               setCoverFile(e.target.files?.[0] ?? null);
               setRemoveCover(false);
             }}
-            className="block w-full text-sm text-[var(--foreground)] file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:text-white"
+            className="block w-full text-sm text-[var(--foreground)] file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:text-[var(--accent-ink)]"
           />
           <input
             className={`${input} mt-2`}

@@ -6,6 +6,8 @@ const themeColor = (variable: string) =>
   `color-mix(in srgb, var(${variable}) calc(<alpha-value> * 100%), transparent)`;
 
 const config: Config = {
+  // `dark:` follows Tome's theme (data-theme on <html>, see lib/themes.ts), not the device's setting.
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -29,9 +31,11 @@ const config: Config = {
         card: themeColor("--card-bg"),
         "card-emphasis": themeColor("--card-bg-emphasis"),
         border: themeColor("--border-color"),
+        "accent-ink": themeColor("--accent-ink"),
       },
       fontFamily: {
-        serif: ["serif"],
+        // Headings and titles: the theme's display face (plain serif, or Cinzel in the museum themes).
+        serif: ["var(--font-display)"],
         sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
         mono: ["JetBrains Mono", "Menlo", "Monaco", "Courier New", "monospace"],
       },

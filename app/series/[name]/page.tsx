@@ -142,7 +142,7 @@ export default function SeriesDetailPage() {
                     <div className="flex-1 min-w-0 w-full">
                       {/* Series Index Circle */}
                       <div className="mb-3 flex justify-center sm:justify-start">
-                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent)] text-white text-sm font-bold shadow-sm">
+                        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent)] text-[var(--accent-ink)] text-sm font-bold shadow-sm">
                           {book.seriesIndex}
                         </div>
                       </div>

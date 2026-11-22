@@ -188,7 +188,7 @@ export default function ShelfEditor({
           </p>
           <Link
             href="/shelves"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-[var(--accent)] text-white rounded-md hover:bg-[var(--light-accent)] transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--accent-ink)] rounded-md hover:bg-[var(--light-accent)] transition-colors"
           >
             <Plus className="w-4 h-4" />
             Create Shelf

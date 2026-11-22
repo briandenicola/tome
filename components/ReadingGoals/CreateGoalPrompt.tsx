@@ -31,7 +31,7 @@ export function CreateGoalPrompt({ onCreateClick }: CreateGoalPromptProps) {
         ) : (
           <a
             href="/settings"
-            className="inline-block px-6 py-2.5 bg-[var(--accent)] text-white rounded-sm hover:bg-[var(--light-accent)] transition-colors font-semibold text-sm"
+            className="inline-block px-6 py-2.5 bg-[var(--accent)] text-[var(--accent-ink)] rounded-sm hover:bg-[var(--light-accent)] transition-colors font-semibold text-sm"
           >
             Create Goal
           </a>

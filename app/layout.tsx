@@ -1,9 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import { Cinzel } from "next/font/google";
+import { themeBootScript } from "@/lib/themes";
 import "./globals.css";
 import { LayoutWrapper } from "@/components/Layout/LayoutWrapper";
 import { ToastProvider } from "@/components/Utilities/ToastProvider";
 import { TimezoneDetector } from "@/components/Utilities/TimezoneDetector";
 import { Providers } from "./providers";
+
+// Display face of the museum themes (lib/themes.ts). Self-hosted by Next at build time. Not preloaded: only a museum
+// theme uses it, so Light and Dark never download it.
+const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-cinzel", display: "swap", preload: false });
 
 export const metadata: Metadata = {
   title: "Tome",
@@ -39,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" data-color-mode="light" suppressHydrationWarning>
+    <html lang="en" data-theme="light" data-color-mode="light" className={cinzel.variable} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -53,35 +59,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              (function() {
-                // Set theme before page loads to prevent flicker
-                const savedPreference = localStorage.getItem("themePreference");
-                const oldSavedMode = localStorage.getItem("darkMode");
-                
-                let preference = "auto"; // NEW DEFAULT
-                
-                // Check new format first
-                if (savedPreference && ["light", "dark", "auto"].includes(savedPreference)) {
-                  preference = savedPreference;
-                } 
-                // Migrate old format
-                else if (oldSavedMode !== null) {
-                  preference = oldSavedMode === "true" ? "dark" : "light";
-                  localStorage.setItem("themePreference", preference);
-                  localStorage.removeItem("darkMode");
-                }
-                
-                // Determine effective theme
-                let theme;
-                if (preference === "auto") {
-                  theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-                } else {
-                  theme = preference;
-                }
-                
-                document.documentElement.setAttribute("data-theme", theme);
-                document.documentElement.setAttribute("data-color-mode", theme);
-              })();
+              ${themeBootScript()}
 
               // Enable transitions only after a delay
               window.addEventListener('load', function() {

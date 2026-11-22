@@ -84,7 +84,7 @@ export function VersionSettings() {
                     href={versionData.latestReleaseUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-accent/90 text-white font-semibold rounded-sm transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-accent/90 text-[var(--accent-ink)] font-semibold rounded-sm transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2"
                   >
                     <span>View Release Notes</span>
                     <ExternalLink className="w-4 h-4" />

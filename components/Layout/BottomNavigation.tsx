@@ -140,7 +140,7 @@ export function BottomNavigation() {
                     className={clsx(
                       "w-16 h-16 rounded-full flex items-center justify-center transition-colors",
                       active
-                        ? "bg-[var(--accent)] text-white"
+                        ? "bg-[var(--accent)] text-[var(--accent-ink)]"
                         : "bg-[var(--border-color)] text-[var(--foreground)] hover:bg-accent/20"
                     )}
                   >

@@ -329,7 +329,7 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
                 className={cn(
                   "w-full px-4 py-2 rounded-lg font-medium transition-colors",
                   checkedTags.size >= 2
-                    ? "bg-[var(--accent)] text-white hover:bg-[var(--light-accent)]"
+                    ? "bg-[var(--accent)] text-[var(--accent-ink)] hover:bg-[var(--light-accent)]"
                     : "bg-foreground/10 text-[var(--subheading-text)] cursor-not-allowed"
                 )}
               >
