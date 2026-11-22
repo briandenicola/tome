@@ -186,7 +186,7 @@ export class ReadingGoalRepository extends BaseRepository<
   async getBooksByCompletionYear(
     userId: number | null,
     year: number
-  ): Promise<Array<Book & { completedDate: string; sessionId: number }>> {
+  ): Promise<Array<Book & { completedDate: string; sessionId: number; startedDate: string | null; sessionNumber: number }>> {
     const db = this.getDatabase();
 
     const results = db
@@ -216,6 +216,9 @@ export class ReadingGoalRepository extends BaseRepository<
         updatedAt: books.updatedAt,
         // Completion date from session (YYYY-MM-DD string)
         completedDate: readingSessions.completedDate,
+        // When that read began, and which read of the book it was (1 for the first, 2 for a re-read, ...)
+        startedDate: readingSessions.startedDate,
+        sessionNumber: readingSessions.sessionNumber,
       })
       .from(readingSessions)
       .innerJoin(books, eq(readingSessions.bookId, books.id))
@@ -233,7 +236,7 @@ export class ReadingGoalRepository extends BaseRepository<
       .orderBy(desc(readingSessions.completedDate))
       .all();
 
-    return results as unknown as Array<Book & { completedDate: string; sessionId: number }>;
+    return results as unknown as Array<Book & { completedDate: string; sessionId: number; startedDate: string | null; sessionNumber: number }>;
   }
 }
 

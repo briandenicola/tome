@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useStats } from "@/hooks/useStats";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
+import { ReadingReport } from "@/components/Stats/ReadingReport";
 
 export default function StatsPage() {
   usePageTitle("Stats");
@@ -143,6 +144,7 @@ export default function StatsPage() {
           </div>
         </>
       )}
+      {!isLoading && <ReadingReport />}
     </div>
   );
 }
