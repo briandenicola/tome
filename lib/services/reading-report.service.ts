@@ -1,4 +1,6 @@
 import { readingGoalRepository } from "@/lib/repositories/reading-goals.repository";
+import type { ReadingFormat } from "@/lib/db/schema/reading-sessions";
+import { effectiveFormat, FORMAT_LABELS } from "@/lib/utils/reading-format";
 
 /**
  * The year's reading report: every book finished in a year, with its tags, when it was read and its rating, ready to
@@ -23,12 +25,24 @@ export interface ReportRow {
   pages: number | null;
   /** True for a second or later read of the book. */
   reread: boolean;
+  /** How it was read: as recorded, else as the book's source says. Null when unknown. */
+  format: ReadingFormat | null;
+  /** When the book's metadata last changed, ISO 8601: the cover's cache key. */
+  lastSynced: string | null;
 }
 
 export interface ReadingReport {
   year: number;
   books: ReportRow[];
-  summary: { count: number; pages: number; rated: number; averageRating: number | null; averageDays: number | null };
+  summary: {
+    count: number;
+    pages: number;
+    rated: number;
+    averageRating: number | null;
+    averageDays: number | null;
+    /** Books per format; "unknown" for reads without one. */
+    formats: Record<ReadingFormat | "unknown", number>;
+  };
 }
 
 export const REPORT_FORMATS = ["json", "md", "csv"] as const;
@@ -59,6 +73,8 @@ export async function buildReadingReport(year: number): Promise<ReadingReport> {
       rating: b.rating ?? null,
       pages: b.totalPages ?? null,
       reread: (b.sessionNumber ?? 1) > 1,
+      format: effectiveFormat(b.format, b.source),
+      lastSynced: b.lastSynced ? new Date(b.lastSynced).toISOString() : null,
     }))
     // Oldest first: a report reads as the year went.
     .sort((x, y) => x.finishedDate.localeCompare(y.finishedDate) || x.title.localeCompare(y.title));
@@ -74,11 +90,18 @@ export async function buildReadingReport(year: number): Promise<ReadingReport> {
       rated: rated.length,
       averageRating: rated.length ? round1(rated.reduce((n, b) => n + b.rating!, 0) / rated.length) : null,
       averageDays: timed.length ? round1(timed.reduce((n, b) => n + b.days!, 0) / timed.length) : null,
+      formats: books.reduce(
+        (acc, b) => {
+          acc[b.format ?? "unknown"]++;
+          return acc;
+        },
+        { ebook: 0, audiobook: 0, print: 0, unknown: 0 } as Record<ReadingFormat | "unknown", number>
+      ),
     },
   };
 }
 
-const CSV_COLUMNS = ["Title", "Authors", "Series", "Tags", "Started", "Finished", "Days", "Rating", "Pages", "Re-read"];
+const CSV_COLUMNS = ["Title", "Authors", "Series", "Format", "Tags", "Started", "Finished", "Days", "Rating", "Pages", "Re-read"];
 
 /** A CSV cell: quoted when it must be, and never read as a formula by a spreadsheet. */
 function csvCell(value: string | number | null): string {
@@ -98,6 +121,7 @@ export function reportToCsv(report: ReadingReport): string {
         r.title,
         r.authors.join("; "),
         seriesLabel(r),
+        r.format ? FORMAT_LABELS[r.format] : null,
         r.tags.join("; "),
         r.startedDate,
         r.finishedDate,
@@ -129,13 +153,15 @@ export function reportToMarkdown(report: ReadingReport): string {
   if (summary.averageRating !== null) facts.push(`average rating ${summary.averageRating} (${summary.rated} rated)`);
   if (summary.averageDays !== null) facts.push(`${summary.averageDays} days per book on average`);
   out.push(facts.join(" · "), "");
-  out.push("| # | Title | Authors | Tags | Started | Finished | Days | Rating |");
-  out.push("|---:|---|---|---|---|---|---:|---|");
+  const formats = (["ebook", "audiobook", "print"] as const).filter((f) => summary.formats[f] > 0);
+  if (formats.length) out.push(formats.map((f) => `${FORMAT_LABELS[f]}: ${summary.formats[f]}`).join(" · "), "");
+  out.push("| # | Title | Authors | Format | Tags | Started | Finished | Days | Rating |");
+  out.push("|---:|---|---|---|---|---|---|---:|---|");
   books.forEach((r, i) => {
     const series = seriesLabel(r);
     const title = mdCell(r.title) + (series ? ` _(${mdCell(series)})_` : "") + (r.reread ? " (re-read)" : "");
     out.push(
-      `| ${i + 1} | ${title} | ${mdCell(r.authors.join(", "))} | ${mdCell(r.tags.join(", ")) || "—"} | ${r.startedDate ?? "—"} | ${r.finishedDate} | ${r.days ?? "—"} | ${stars(r.rating)} |`
+      `| ${i + 1} | ${title} | ${mdCell(r.authors.join(", "))} | ${r.format ? FORMAT_LABELS[r.format] : "—"} | ${mdCell(r.tags.join(", ")) || "—"} | ${r.startedDate ?? "—"} | ${r.finishedDate} | ${r.days ?? "—"} | ${stars(r.rating)} |`
     );
   });
   out.push("");

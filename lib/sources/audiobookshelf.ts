@@ -27,7 +27,8 @@ export function mapAbsProgress(body: { mediaProgress?: AbsMediaProgress[] }): So
   for (const p of body.mediaProgress ?? []) {
     if (!p.libraryItemId || p.episodeId || (p.mediaItemType && p.mediaItemType !== "book")) continue;
     // An audiobook's progress is through its audio; an ebook-only item has ebookProgress instead.
-    const fraction = p.duration && p.duration > 0 ? (p.progress ?? 0) : (p.ebookProgress ?? p.progress ?? 0);
+    const listened = !!p.duration && p.duration > 0;
+    const fraction = listened ? (p.progress ?? 0) : (p.ebookProgress ?? p.progress ?? 0);
     const progress = p.isFinished ? 100 : pct(fraction);
     if (progress <= 0 && !p.isFinished) continue;
     out.push({
@@ -36,6 +37,7 @@ export function mapAbsProgress(body: { mediaProgress?: AbsMediaProgress[] }): So
       authors: [],
       progress,
       finished: !!p.isFinished,
+      format: listened ? "audiobook" : "ebook",
       ...(p.finishedAt && { finishedAt: new Date(p.finishedAt) }),
       ...(p.lastUpdate && { lastUpdate: new Date(p.lastUpdate) }),
     });
@@ -45,7 +47,9 @@ export function mapAbsProgress(body: { mediaProgress?: AbsMediaProgress[] }): So
 
 /** Fills an item from GET /api/items/<id>. Pure, for tests. */
 export function mapAbsItem(item: SourceItem, body: unknown): SourceItem {
-  const meta = ((body as { media?: { metadata?: Record<string, unknown> } })?.media?.metadata ?? {}) as Record<string, unknown>;
+  const media = (body as { media?: { metadata?: Record<string, unknown>; duration?: unknown } })?.media;
+  const meta = (media?.metadata ?? {}) as Record<string, unknown>;
+  const duration = typeof media?.duration === "number" && media.duration > 0 ? media.duration : undefined;
   const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
   const authors = Array.isArray(meta.authors)
     ? meta.authors.map((a) => str((a as { name?: unknown })?.name)).filter((a): a is string => !!a)
@@ -61,6 +65,7 @@ export function mapAbsItem(item: SourceItem, body: unknown): SourceItem {
     ...(str(meta.description) && { description: str(meta.description) }),
     ...(series && str(series.name) && { series: str(series.name) }),
     ...(seriesIndex !== undefined && Number.isFinite(seriesIndex) && { seriesIndex: seriesIndex as number }),
+    ...(duration && { durationSeconds: duration }),
   };
 }
 

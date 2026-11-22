@@ -176,6 +176,20 @@
       "when": 1794063535204,
       "tag": "0024_flat_ser_duncan",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1795378489662,
+      "tag": "0025_nosy_gertrude_yorkes",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "6",
+      "when": 1795378743107,
+      "tag": "0026_daily_ego",
+      "breakpoints": true
     }
   ]
 }

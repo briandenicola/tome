@@ -10,6 +10,7 @@ import DeleteSessionModal from "@/components/Modals/DeleteSessionModal";
 import { SessionActionsDropdown } from "@/components/CurrentlyReading/SessionActionsDropdown";
 import { toast } from "@/utils/toast";
 import { formatDate } from '@/utils/dateHelpers';
+import { FORMAT_LABELS, isReadingFormat } from "@/lib/utils/reading-format";
 import MarkdownRenderer from "@/components/Markdown/MarkdownRenderer";
 
 interface ReadingSession {
@@ -20,6 +21,7 @@ interface ReadingSession {
   startedDate?: string;
   completedDate?: string;
   review?: string;
+  format?: string | null;
   isActive: boolean;
   progressSummary: {
     totalEntries: number;
@@ -100,6 +102,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
     startedDate: string | null;
     completedDate: string | null;
     review: string | null;
+    format: string | null;
   }) {
     if (!editingSession) return;
 
@@ -173,6 +176,11 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
                 <h3 className="text-lg font-semibold text-[var(--heading-text)]">
                   Read #{session.displayNumber ?? session.sessionNumber}
                 </h3>
+                {isReadingFormat(session.format) && (
+                  <span className="px-2 py-0.5 text-xs font-semibold bg-accent/15 text-[var(--accent)] rounded-full border border-accent/30">
+                    {FORMAT_LABELS[session.format]}
+                  </span>
+                )}
                 {session.status === 'dnf' ? (
                   <span className="px-2 py-0.5 text-xs font-semibold bg-red-500/20 text-red-600 dark:text-red-400 rounded-full border border-red-500/30">
                     Did Not Finish
@@ -284,6 +292,7 @@ export default function ReadingHistoryTab({ bookId, bookTitle = "this book" }: R
         currentStartedDate={editingSession?.startedDate ?? null}
         currentCompletedDate={editingSession?.completedDate ?? null}
         currentReview={editingSession?.review ?? null}
+        currentFormat={editingSession?.format ?? null}
       />
 
       <DeleteSessionModal

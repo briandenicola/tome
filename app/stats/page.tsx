@@ -9,10 +9,13 @@ import {
   Calendar,
   Flame,
   BarChart3,
+  PartyPopper,
 } from "lucide-react";
+import Link from "next/link";
 import { useStats } from "@/hooks/useStats";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { ReadingReport } from "@/components/Stats/ReadingReport";
+import { ReadingInsights } from "@/components/Stats/ReadingInsights";
 
 export default function StatsPage() {
   usePageTitle("Stats");
@@ -24,6 +27,15 @@ export default function StatsPage() {
         title="Reading Statistics"
         subtitle="Track your reading progress and achievements"
         icon={BarChart3}
+        actions={
+          <Link
+            href={`/stats/review?year=${new Date().getFullYear()}`}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] text-white font-semibold shadow-md hover:bg-[var(--dark-accent)] transition-colors"
+          >
+            <PartyPopper className="w-4 h-4" />
+            Year in review
+          </Link>
+        }
       />
 
       {/* Loading State */}
@@ -144,6 +156,7 @@ export default function StatsPage() {
           </div>
         </>
       )}
+      {!isLoading && <ReadingInsights />}
       {!isLoading && <ReadingReport />}
     </div>
   );

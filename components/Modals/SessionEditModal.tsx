@@ -6,6 +6,8 @@ import { getTodayLocalDate } from '@/utils/dateHelpers';
 import MarkdownEditor from "@/components/Markdown/MarkdownEditor";
 import { useDraftField } from "@/hooks/useDraftField";
 import { Button } from "@/components/Utilities/Button";
+import { FORMAT_LABELS } from "@/lib/utils/reading-format";
+import { READING_FORMATS, type ReadingFormat } from "@/lib/db/schema/reading-sessions";
 
 interface SessionEditModalProps {
   isOpen: boolean;
@@ -14,6 +16,7 @@ interface SessionEditModalProps {
     startedDate: string | null;
     completedDate: string | null;
     review: string | null;
+    format: ReadingFormat | null;
   }) => void;
   bookTitle: string;
   sessionNumber: number;
@@ -23,6 +26,7 @@ interface SessionEditModalProps {
   currentStartedDate?: string | null;
   currentCompletedDate?: string | null;
   currentReview?: string | null;
+  currentFormat?: string | null;
 }
 
 export default function SessionEditModal({
@@ -37,7 +41,9 @@ export default function SessionEditModal({
   currentStartedDate,
   currentCompletedDate,
   currentReview,
+  currentFormat,
 }: SessionEditModalProps) {
+  const [format, setFormat] = useState<string>("");
   const [startedDate, setStartedDate] = useState("");
   const [completedDate, setCompletedDate] = useState("");
   const [review, setReview] = useState("");
@@ -62,8 +68,9 @@ export default function SessionEditModal({
       setCompletedDate(currentCompletedDate || "");
       // Set review to current value (or empty string to clear previous state)
       setReview(currentReview || "");
+      setFormat(currentFormat || "");
     }
-  }, [isOpen, currentStartedDate, currentCompletedDate, currentReview]);
+  }, [isOpen, currentStartedDate, currentCompletedDate, currentReview, currentFormat]);
 
   // Restore draft only once when modal opens (if no current review exists)
   // This allows draft recovery when adding a review to a session that doesn't have one
@@ -91,6 +98,7 @@ export default function SessionEditModal({
       startedDate: startedValue,
       completedDate: completedValue,
       review: reviewValue,
+      format: (format || null) as ReadingFormat | null,
     });
     
     // Clear draft after successful save
@@ -167,6 +175,28 @@ export default function SessionEditModal({
               max={getTodayLocalDate()}
               className="w-full px-3 py-3 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)] max-h-[42px] text-left"
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="sessionFormat"
+              className="block text-sm font-medium text-[var(--heading-text)] mb-2"
+            >
+              Format
+            </label>
+            <select
+              id="sessionFormat"
+              value={format}
+              onChange={(e) => setFormat(e.target.value)}
+              className="w-full px-3 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            >
+              <option value="">Not set</option>
+              {READING_FORMATS.map((f) => (
+                <option key={f} value={f}>
+                  {FORMAT_LABELS[f]}
+                </option>
+              ))}
+            </select>
           </div>
 
           {(startedDate || completedDate) && (
