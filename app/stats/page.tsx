@@ -13,6 +13,7 @@ import {
 import { useStats } from "@/hooks/useStats";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import { ReadingReport } from "@/components/Stats/ReadingReport";
+import { ReadingInsights } from "@/components/Stats/ReadingInsights";
 
 export default function StatsPage() {
   usePageTitle("Stats");
@@ -144,6 +145,7 @@ export default function StatsPage() {
           </div>
         </>
       )}
+      {!isLoading && <ReadingInsights />}
       {!isLoading && <ReadingReport />}
     </div>
   );
