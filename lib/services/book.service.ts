@@ -1,5 +1,6 @@
 import { bookRepository, sessionRepository, progressRepository } from "@/lib/repositories";
-import type { Book } from "@/lib/db/schema/books";
+import { books, type Book } from "@/lib/db/schema/books";
+import { eq } from "drizzle-orm";
 import type { ReadingSession } from "@/lib/db/schema/reading-sessions";
 import type { ProgressLog } from "@/lib/db/schema/progress-logs";
 import type { BookFilter } from "@/lib/repositories/book.repository";
@@ -126,6 +127,12 @@ export class BookService {
       throw new Error("Book not found");
     }
 
+    // An estimated page count (from an audiobook's length) is being replaced by a real one: the logged percentages
+    // are where the person was, so the pages follow them, and the page count is no longer an estimate.
+    if (book.pagesEstimated) {
+      return this.replaceEstimatedPages(bookId, totalPages);
+    }
+
     // Validate that new page count doesn't contradict existing progress in active sessions
     const highestCurrentPage = await progressRepository.getHighestCurrentPageForActiveSessions(bookId);
 
@@ -191,6 +198,27 @@ export class BookService {
       
       throw new Error("Failed to update page count. Please try again.");
     }
+  }
+
+  /** Sets a real page count on a book whose count was estimated, moving its logged pages to match. */
+  private async replaceEstimatedPages(bookId: number, totalPages: number): Promise<Book> {
+    const { getDatabase } = await import("@/lib/db/context");
+    const db = getDatabase();
+    const updated = db.transaction((tx) => {
+      const book = bookRepository.updateTotalPagesWithRecalculation(bookId, totalPages, tx);
+      tx.update(books).set({ pagesEstimated: false }).where(eq(books.id, bookId)).run();
+      const logs = progressRepository.rederivePagesForBook(bookId, totalPages, tx);
+      getLogger().info({ bookId, totalPages, progressLogsUpdated: logs }, "[BookService] Replaced an estimated page count");
+      return { ...book, pagesEstimated: false };
+    });
+    // Pages read per day changed, so the streak may have.
+    try {
+      const { streakService } = await import("@/lib/services/streak.service");
+      await streakService.rebuildStreak();
+    } catch (error) {
+      getLogger().warn({ err: error, bookId }, "[BookService] Couldn't rebuild the streak after a page count change");
+    }
+    return updated;
   }
 
   /**

@@ -23,6 +23,8 @@ export interface BacklogBook {
   source: string;
   status: string | null;
   totalPages: number | null;
+  /** True when totalPages is estimated from an audiobook's length. */
+  pagesEstimated?: boolean;
   isbn?: string | null;
   series?: string | null;
   seriesIndex?: number | null;
@@ -95,6 +97,7 @@ function view(book: Book, status: string | null): BacklogBook {
     source: book.source,
     status,
     totalPages: book.totalPages ?? null,
+    ...(book.pagesEstimated ? { pagesEstimated: true } : {}),
     isbn: book.isbn ?? null,
     series: book.series ?? null,
     seriesIndex: book.seriesIndex ?? null,

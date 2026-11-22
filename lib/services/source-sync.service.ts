@@ -11,6 +11,8 @@ import { getLogger } from "@/lib/logger";
 import { audiobookshelf } from "@/lib/sources/audiobookshelf";
 import { grimmory } from "@/lib/sources/grimmory";
 import { SourceError, type ReadingSource, type SourceItem } from "@/lib/sources/types";
+import { estimatePagesFromDuration } from "@/lib/sources/page-estimate";
+import { lookupIsbn } from "@/lib/services/isbn-lookup.service";
 
 /**
  * Reading progress from the apps the books are read in (Audiobookshelf, Grimmory with its Kobo sync), logged in Tome
@@ -221,7 +223,7 @@ export class SourceSyncService {
       }
     }
 
-    if (detailed?.totalPages) await this.fillPages(bookId, detailed.totalPages);
+    await this.ensurePages(source, item, bookId, detailed);
     const outcome = await this.applyProgress(bookId, source, item, before, today);
 
     // A book waiting for its page count keeps the last progress it was logged at, so the next sync after the page
@@ -261,10 +263,45 @@ export class SourceSyncService {
     return tagged;
   }
 
-  /** Gives a book its page count from the app when Tome has none, so pages-read stats count it. */
-  private async fillPages(bookId: number, pages: number): Promise<void> {
+  /**
+   * Gives a book without a page count one, so its reading is logged and counts toward streaks and pages-read stats.
+   * In order: the app's own page count; the print edition's, from Open Library by ISBN; or, for an audiobook, an
+   * estimate from its length, marked as one. A book with a page count, or one nothing is known about, is left alone.
+   */
+  private async ensurePages(source: ReadingSource, item: SourceItem, bookId: number, detailed: SourceItem | null): Promise<void> {
     const book = await bookRepository.findById(bookId);
-    if (book && !book.totalPages) await bookRepository.update(bookId, { totalPages: pages });
+    if (!book || book.totalPages) return;
+    let details = detailed;
+    if (!details || (!details.totalPages && !details.durationSeconds)) {
+      try {
+        details = await source.details(item);
+      } catch (error) {
+        getLogger().info({ err: error, bookId }, "Couldn't get an item's details for its page count");
+        return;
+      }
+    }
+    if (details.totalPages) {
+      await bookRepository.update(bookId, { totalPages: details.totalPages, pagesEstimated: false });
+      return;
+    }
+    const isbn = normalizeIsbn(details.isbn) ?? book.isbn;
+    if (isbn) {
+      try {
+        const found = await lookupIsbn(isbn);
+        if (found.totalPages) {
+          await bookRepository.update(bookId, { totalPages: found.totalPages, pagesEstimated: false });
+          getLogger().info({ bookId, pages: found.totalPages }, "Took a book's page count from Open Library");
+          return;
+        }
+      } catch {
+        // Open Library doesn't know it, or can't be reached: estimate instead.
+      }
+    }
+    const estimated = estimatePagesFromDuration(details.durationSeconds);
+    if (estimated) {
+      await bookRepository.update(bookId, { totalPages: estimated, pagesEstimated: true });
+      getLogger().info({ bookId, pages: estimated, seconds: details.durationSeconds }, "Estimated a book's page count from its length");
+    }
   }
 
   /**

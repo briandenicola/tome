@@ -518,8 +518,13 @@ export default function BookDetailPage() {
                 className="flex items-center gap-1.5 text-[var(--accent)] group cursor-pointer"
               >
                 <BookOpen className="w-3 md:w-4 h-3 md:h-4" />
-                <span className="font-semibold group-hover:underline">
-                  {book.totalPages ? `${book.totalPages.toLocaleString()} pages` : 'Pages not set'}
+                <span
+                  className="font-semibold group-hover:underline"
+                  title={book.pagesEstimated ? "Estimated from the audiobook's length. Set the real page count to replace it." : undefined}
+                >
+                  {book.totalPages
+                    ? `${book.pagesEstimated ? "≈ " : ""}${book.totalPages.toLocaleString()} pages${book.pagesEstimated ? " (estimated)" : ""}`
+                    : 'Pages not set'}
                 </span>
                 <Pencil className="w-3 h-3 text-[var(--subheading-text)]" />
               </div>

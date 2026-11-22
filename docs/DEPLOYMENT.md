@@ -104,7 +104,7 @@ Tome can log your progress from the apps you read in, so you don't type it in: *
 - **Matching.** Each app book is matched to a Tome book by ISBN, else by title and an author's surname. A book Tome doesn't have is added, with its cover, once there's new reading on it. **Settings → Reading apps** lists every match; **Change** points one at another Tome book or adds it as a new book.
 - **Finished** in the app marks the book read in Tome, on the day it was finished. Reading it again in the app starts a re-read.
 - **Never backwards.** If Tome is already further on (you logged by hand, or the other app is ahead), nothing is logged.
-- **Page counts.** Tome needs a book's page count to start it. Grimmory's books bring theirs; audiobooks don't, so an audiobook waits ("needs a page count" in Settings) until you set one on its page. Its reading is logged on the next sync.
+- **Page counts.** Tome needs a book's page count to start it, and counts pages for streaks and stats. Grimmory's books bring theirs. For an audiobook without one, Tome looks up the print edition's page count on Open Library by ISBN, and failing that estimates one from the audiobook's length (about 30 pages an hour), shown as "≈ 412 pages (estimated)". Set the real count on the book's page at any time: the logged progress keeps its percentages and its pages are recounted. A book Tome knows neither the ISBN nor the length of waits ("needs a page count" in Settings) until you set one; its reading is logged on the next sync.
 - Physical books in Grimmory, podcasts, and books marked DNF in Tome are left alone.
 
 Grimmory has no API keys, so Tome signs in as you with `GRIMMORY_USERNAME` and `GRIMMORY_PASSWORD`, keeps the token in memory, and signs in again only when it expires.

@@ -116,6 +116,8 @@ describe("reading the apps", () => {
       },
     });
     expect(detailed).toMatchObject({ title: "Piranesi", authors: ["Susanna Clarke"], isbn: "9781635575637", series: "Standalone", seriesIndex: 1 });
+    expect(mapAbsItem(items[0]!, { media: { duration: 45_000.5, metadata: { title: "Long" } } }).durationSeconds).toBe(45_000.5);
+    expect(mapAbsItem(items[0]!, { media: { metadata: { title: "Unknown length" } } }).durationSeconds).toBeUndefined();
   });
 
   test("Grimmory: Kobo progress and read status; physical and unread books left out", () => {
@@ -304,6 +306,56 @@ describe("syncing", () => {
     await bookRepository.update(book.id, { totalPages: 250 });
     expect(await service.sync("audiobookshelf")).toMatchObject({ updated: 1, needPages: 0 });
     expect((await logsOf(book.id)).map((l) => l.currentPercentage)).toEqual([30]);
+  });
+
+  test("an audiobook without a page count gets one estimated from its length, and its listening is logged", async () => {
+    const book = await tomeBook("Piranesi", ["Susanna Clarke"], { totalPages: null });
+    const source = fakeSource();
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    source.set([item("li_1", { progress: 10, durationSeconds: 10 * 3600 })]);
+    await service.sync("audiobookshelf");
+
+    source.set([item("li_1", { progress: 40, durationSeconds: 10 * 3600 })]);
+    expect(await service.sync("audiobookshelf")).toMatchObject({ updated: 1, needPages: 0 });
+    expect(await bookRepository.findById(book.id)).toMatchObject({ totalPages: 300, pagesEstimated: true });
+    expect((await logsOf(book.id)).map((l) => [l.currentPercentage, l.currentPage])).toEqual([[40, 120]]);
+  });
+
+  test("the print edition's page count from Open Library comes before an estimate", async () => {
+    const book = await tomeBook("Piranesi", ["Susanna Clarke"], { totalPages: null });
+    const fetchMock = vi.fn(async () =>
+      new Response(JSON.stringify({ "ISBN:9781635575637": { title: "Piranesi", number_of_pages: 272 } }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const source = fakeSource();
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    const listening = { isbn: "978-1-63557-563-7", durationSeconds: 10 * 3600 };
+    source.set([item("li_1", { progress: 10, ...listening })]);
+    await service.sync("audiobookshelf");
+    source.set([item("li_1", { progress: 50, ...listening })]);
+    await service.sync("audiobookshelf");
+
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("ISBN:9781635575637"), expect.anything());
+    expect(await bookRepository.findById(book.id)).toMatchObject({ totalPages: 272, pagesEstimated: false });
+    expect((await logsOf(book.id)).map((l) => l.currentPage)).toEqual([136]);
+  });
+
+  test("setting the real page count on an estimated book keeps where the reading was", async () => {
+    const book = await tomeBook("Piranesi", ["Susanna Clarke"], { totalPages: null });
+    const source = fakeSource();
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    source.set([item("li_1", { progress: 10, durationSeconds: 10 * 3600 })]);
+    await service.sync("audiobookshelf");
+    source.set([item("li_1", { progress: 40, durationSeconds: 10 * 3600 })]);
+    await service.sync("audiobookshelf");
+
+    const { bookService } = await import("@/lib/services/book.service");
+    await bookService.updateTotalPages(book.id, 200);
+    expect(await bookRepository.findById(book.id)).toMatchObject({ totalPages: 200, pagesEstimated: false });
+    expect((await logsOf(book.id)).map((l) => [l.currentPercentage, l.currentPage, l.pagesRead])).toEqual([[40, 80, 80]]);
   });
 
   test("a wrong match can be pointed at the right book", async () => {
