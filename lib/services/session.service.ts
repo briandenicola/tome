@@ -1,4 +1,5 @@
 import { bookRepository, sessionRepository, progressRepository } from "@/lib/repositories";
+import { revalidateBookPages } from "@/lib/utils/revalidate-book-pages";
 import type { ReadingSession } from "@/lib/db/schema/reading-sessions";
 import { streakService } from "@/lib/services/streak.service";
 import { calibreService } from "@/lib/services/calibre.service";
@@ -1391,20 +1392,9 @@ export class SessionService {
    * Invalidate Next.js cache for relevant pages
    */
   private async invalidateCache(bookId: number): Promise<void> {
-    try {
-      // Lazy import to avoid mock pollution in tests
-      const { revalidatePath } = await import("next/cache");
-      revalidatePath("/"); // Dashboard
-      revalidatePath("/library"); // Library page
-      revalidatePath("/stats"); // Stats page
-      revalidatePath("/journal"); // Journal page
-      revalidatePath(`/books/${bookId}`); // Book detail page
-      revalidatePath("/series"); // Series pages (list and detail)
-    } catch (error) {
-      getLogger().error({ err: error }, "[SessionService] Failed to invalidate cache");
-      // Don't fail the request if cache invalidation fails
-    }
+    await revalidateBookPages(bookId, "SessionService");
   }
+
 }
 
 /**
