@@ -4,6 +4,7 @@ import type { ReadingSession } from "@/lib/db/schema/reading-sessions";
 import { manualBookService, ManualBookError, type ManualBookInput } from "@/lib/services/manual-book.service";
 import { sessionService } from "@/lib/services/session.service";
 import { getLogger } from "@/lib/logger";
+import { effectiveFormat } from "@/lib/utils/reading-format";
 
 /**
  * The backlog: books waiting to be read, as "to read" (the pile) or "read next" (the ordered queue). What agents use,
@@ -23,6 +24,8 @@ export interface BacklogBook {
   source: string;
   status: string | null;
   totalPages: number | null;
+  /** True when totalPages is estimated from an audiobook's length. */
+  pagesEstimated?: boolean;
   isbn?: string | null;
   series?: string | null;
   seriesIndex?: number | null;
@@ -32,6 +35,8 @@ export interface BacklogBook {
   startedDate?: string | null;
   /** Where the current read is, as last logged in Tome. Null when nothing is logged yet. Only on books being read. */
   progress?: BookProgress | null;
+  /** How the current or last read is being done: "ebook", "audiobook" or "print". Left out when unknown. */
+  format?: string;
   /**
    * What reading apps (Audiobookshelf, Grimmory) last reported for this book. Tome logs app progress only once a book
    * has a page count, so an audiobook without one shows its listening progress here and nowhere else.
@@ -95,6 +100,7 @@ function view(book: Book, status: string | null): BacklogBook {
     source: book.source,
     status,
     totalPages: book.totalPages ?? null,
+    ...(book.pagesEstimated ? { pagesEstimated: true } : {}),
     isbn: book.isbn ?? null,
     series: book.series ?? null,
     seriesIndex: book.seriesIndex ?? null,
@@ -110,7 +116,11 @@ async function describe(book: Book, session?: ReadingSession | null): Promise<Ba
   const s = session === undefined ? await sessionOf(book.id) : session ?? undefined;
   const out = view(book, s?.status ?? null);
   if (!s) return out;
-  if (s.status === "reading" || s.status === "read" || s.status === "dnf") out.startedDate = s.startedDate ?? null;
+  if (s.status === "reading" || s.status === "read" || s.status === "dnf") {
+    out.startedDate = s.startedDate ?? null;
+    const format = effectiveFormat(s.format, book.source);
+    if (format) out.format = format;
+  }
   if (s.status === "reading") {
     const latest = await progressRepository.findLatestBySessionId(s.id);
     out.progress = latest

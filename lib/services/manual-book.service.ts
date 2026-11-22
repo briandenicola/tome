@@ -152,8 +152,18 @@ export class ManualBookService {
 
   /** Changes the details of a book added by hand. Only the fields sent change. */
   async update(id: number, input: ManualBookInput): Promise<Book> {
-    await manualBook(id);
+    const book = await manualBook(id);
     const fields = parse(input, true);
+    // A page count a person sets is real. Replacing an estimate moves the logged pages with it, as on the book page.
+    if (typeof fields.totalPages === "number" && book.pagesEstimated) {
+      if (fields.totalPages !== book.totalPages) {
+        const { bookService } = await import("@/lib/services/book.service");
+        await bookService.updateTotalPages(id, fields.totalPages);
+        delete fields.totalPages;
+      } else {
+        (fields as Record<string, unknown>).pagesEstimated = false;
+      }
+    }
     const updated = await bookRepository.update(id, { ...fields, updatedAt: new Date() });
     if (!updated) throw new ManualBookError("That book isn't in Tome any more.", 404);
     return updated;

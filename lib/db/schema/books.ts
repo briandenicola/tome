@@ -31,6 +31,9 @@ export const books = sqliteTable(
     coverFile: text("cover_file"),
     description: text("description"),
     rating: integer("rating"), // 1-5 stars; synced with Calibre for Calibre books
+    // True when totalPages is Tome's estimate from an audiobook's length, not a real page count. Cleared once a
+    // person sets the page count.
+    pagesEstimated: integer("pages_estimated", { mode: "boolean" }).notNull().default(false),
     orphaned: integer("orphaned", { mode: "boolean" }).notNull().default(false),
     orphanedAt: integer("orphaned_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),

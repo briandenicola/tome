@@ -40,6 +40,7 @@ export function mapGrimmoryBooks(books: GrimmoryBookSummary[]): SourceItem[] {
     const lastUpdate = last && !isNaN(last.getTime()) ? last : undefined;
     out.push({
       externalId: String(b.id),
+      format: "ebook",
       title: b.title?.trim() || "Untitled",
       authors: (b.authors ?? []).filter((a) => typeof a === "string" && a.trim()),
       ...((b.isbn13 || b.isbn10) && { isbn: (b.isbn13 || b.isbn10)! }),

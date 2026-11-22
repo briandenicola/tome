@@ -1,0 +1,1 @@
+ALTER TABLE `books` ADD `pages_estimated` integer DEFAULT false NOT NULL;

@@ -698,6 +698,40 @@ export class ProgressRepository extends BaseRepository<
 
     return totalLogsUpdated;
   }
+
+  /**
+   * Re-derives every logged page of a book from its percentage, for a new page count. Used when an estimated page
+   * count is replaced: what was logged is where the person was in the book, so the percentages stay and the pages
+   * move. Pages read are recounted along each read, the first entry counting from page 0, as logging does.
+   * Synchronous, for use inside a transaction. Returns how many entries changed.
+   */
+  rederivePagesForBook(bookId: number, newTotalPages: number, tx?: any): number {
+    const database = tx || this.getDatabase();
+    const logs: ProgressLog[] = database
+      .select()
+      .from(progressLogs)
+      .where(eq(progressLogs.bookId, bookId))
+      .orderBy(asc(progressLogs.sessionId), asc(progressLogs.progressDate), asc(progressLogs.createdAt), asc(progressLogs.id))
+      .all();
+
+    let changed = 0;
+    let session: number | null | undefined;
+    let previousPage = 0;
+    for (const log of logs) {
+      if (log.sessionId !== session) {
+        session = log.sessionId;
+        previousPage = 0;
+      }
+      const currentPage = Math.min(newTotalPages, Math.round((log.currentPercentage / 100) * newTotalPages));
+      const pagesRead = Math.max(0, currentPage - previousPage);
+      previousPage = currentPage;
+      if (currentPage !== log.currentPage || pagesRead !== log.pagesRead) {
+        database.update(progressLogs).set({ currentPage, pagesRead }).where(eq(progressLogs.id, log.id)).run();
+        changed++;
+      }
+    }
+    return changed;
+  }
 }
 
 // Singleton instance

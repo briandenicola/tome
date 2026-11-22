@@ -15,6 +15,8 @@ export interface Book {
   title: string;
   authors: string[];
   totalPages?: number;
+  /** The page count is estimated from an audiobook's length. */
+  pagesEstimated?: boolean;
   publisher?: string;
   pubDate?: string;
   series?: string;
@@ -30,6 +32,7 @@ export interface Book {
     startedDate?: string;
     completedDate?: string;
     review?: string;
+    format?: string | null;
   };
   rating?: number | null;
   latestProgress?: {
@@ -92,7 +95,7 @@ export function useBookDetail(bookId: string): UseBookDetailReturn {
 
       // Optimistically update to the new value
       queryClient.setQueryData<Book>(bookKey, (old) => 
-        old ? { ...old, totalPages } : old
+        old ? { ...old, totalPages, pagesEstimated: false } : old
       );
 
       // Return context with previous value for rollback
