@@ -20,6 +20,10 @@
   --sidebar-width-collapsed: 4rem; /* 64px */
   --sidebar-width-expanded: 13rem; /* 208px */
   --main-content-padding: 3rem; /* 48px */
+
+  /* Derived from --foreground, so they follow the theme without being repeated in each theme block. */
+  --hover-bg: color-mix(in srgb, var(--foreground) 10%, transparent); /* row/menu hover, loading skeletons */
+  --muted: color-mix(in srgb, var(--foreground) 50%, transparent); /* placeholder text */
 }
 
 /* Dark mode via data attribute */
