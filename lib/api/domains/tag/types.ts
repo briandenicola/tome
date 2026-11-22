@@ -65,7 +65,9 @@ export interface BulkTagRequest {
  * Response from bulk tag operations
  */
 export interface BulkTagResponse {
-  success: boolean;
+  success?: boolean;
+  /** How many books' tags changed. */
+  booksUpdated?: number;
   message?: string;
   error?: string;
 }

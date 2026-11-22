@@ -11,6 +11,13 @@ import { ScrollToTopButton } from "@/components/Layout/ScrollToTopButton";
 import { toast } from "@/utils/toast";
 import { usePageTitle } from "@/lib/hooks/usePageTitle";
 import ManualBookModal from "@/components/Modals/ManualBookModal";
+import { LibraryBulkActionBar } from "@/components/Library/LibraryBulkActionBar";
+import { BulkTagModal } from "@/components/Library/BulkTagModal";
+import { BulkDeleteBooksModal } from "@/components/Library/BulkDeleteBooksModal";
+import { ShelfSelectionModal } from "@/components/ShelfManagement/ShelfSelectionModal";
+import { tagApi } from "@/lib/api/domains/tag/api";
+
+const plural = (n: number) => `${n} ${n === 1 ? "book" : "books"}`;
 
 function LibraryPageContent() {
   usePageTitle("Library");
@@ -507,6 +514,109 @@ function LibraryPageContent() {
     router.replace('/library');
   }
 
+  // Select mode, for bulk actions: the ids of the selected books, which "Select all" fills with every book that
+  // matches the filters, loaded or not.
+  const [selecting, setSelecting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkModal, setBulkModal] = useState<"tags" | "shelf" | "delete" | null>(null);
+
+  // A selection belongs to the filters it was made under: changing them starts over, so an action never reaches
+  // books that aren't on screen any more.
+  const filterKey = JSON.stringify([filters.search, filters.status, filters.tags, filters.rating, filters.shelf, filters.noTags]);
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [filterKey]);
+
+  const toggleSelectMode = useCallback(() => {
+    setSelecting((on) => !on);
+    setSelectedIds(new Set());
+  }, []);
+
+  const toggleBookSelection = useCallback((id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleSelectAllMatching = useCallback(async () => {
+    setBulkBusy(true);
+    try {
+      setSelectedIds(new Set(await libraryService.getMatchingBookIds(filters)));
+    } catch {
+      toast.error("Couldn't select all the books");
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [filters]);
+
+  const handleBulkTags = useCallback(async (action: "add" | "remove", tags: string[]) => {
+    const ids = Array.from(selectedIds);
+    try {
+      const result = await tagApi.bulkOperation(ids, tags, action);
+      toast.success(`${action === "add" ? "Tagged" : "Untagged"} ${plural(result.booksUpdated ?? ids.length)}`);
+      setBulkModal(null);
+      libraryService.clearCache();
+      setAvailableTags(await libraryService.getAvailableTags().catch(() => availableTags));
+      await refresh();
+    } catch {
+      toast.error("Couldn't change the tags");
+    }
+  }, [selectedIds, refresh, availableTags]);
+
+  const handleBulkShelf = useCallback(async (shelfId: number) => {
+    const ids = Array.from(selectedIds);
+    const shelf = availableShelves.find((s) => s.id === shelfId);
+    try {
+      const response = await fetch(`/api/shelves/${shelfId}/books/bulk`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookIds: ids }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error?.message);
+      const added = data.data?.count ?? 0;
+      const already = ids.length - added;
+      toast.success(
+        `Added ${plural(added)} to ${shelf?.name ?? "the shelf"}` + (already > 0 ? ` (${already} already there)` : "")
+      );
+      setBulkModal(null);
+      if (filters.shelf) await refresh();
+    } catch {
+      toast.error("Couldn't add the books to the shelf");
+    }
+  }, [selectedIds, availableShelves, filters.shelf, refresh]);
+
+  const handleBulkDelete = useCallback(async () => {
+    setBulkBusy(true);
+    try {
+      const response = await fetch("/api/books/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookIds: Array.from(selectedIds) }),
+      });
+      if (!response.ok) throw new Error();
+      const result: { removed: number[]; skippedCalibre: number[] } = await response.json();
+      const skipped = result.skippedCalibre.length;
+      if (result.removed.length > 0) {
+        toast.success(`Deleted ${plural(result.removed.length)}` + (skipped > 0 ? `; skipped ${skipped} from Calibre` : ""));
+      } else {
+        toast.info(`Nothing deleted: ${skipped === 1 ? "that book is" : "those books are"} from Calibre`);
+      }
+      setSelectedIds(new Set(result.skippedCalibre));
+      setBulkModal(null);
+      libraryService.clearCache();
+      await refresh();
+    } catch {
+      toast.error("Couldn't delete the books");
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [selectedIds, refresh]);
+
   // During initial load, show skeleton UI with header and filters
   const isInitialLoading = loading && books.length === 0;
 
@@ -519,6 +629,8 @@ function LibraryPageContent() {
         onAddBook={() => setAddingBook(true)}
         calibreConfigured={calibreConfigured}
         loading={isInitialLoading}
+        onToggleSelect={toggleSelectMode}
+        selecting={selecting}
       />
 
       <ManualBookModal
@@ -562,10 +674,52 @@ function LibraryPageContent() {
         books={books}
         loading={isInitialLoading}
         loadingMore={loadingMore}
+        selectable={selecting}
+        selectedIds={selectedIds}
+        onToggleSelect={toggleBookSelection}
       />
 
-      {/* Infinite scroll trigger */}
-      <div ref={observerTarget} className="py-8" />
+      {/* Infinite scroll trigger; in select mode, room for the action bar too */}
+      <div ref={observerTarget} className={selecting ? "pb-32 pt-8" : "py-8"} />
+
+      {selecting && (
+        <LibraryBulkActionBar
+          selectedCount={selectedIds.size}
+          matchingCount={total}
+          onSelectAllMatching={handleSelectAllMatching}
+          onClearSelection={() => setSelectedIds(new Set())}
+          onTags={() => setBulkModal("tags")}
+          onAddToShelf={() => setBulkModal("shelf")}
+          onDelete={() => setBulkModal("delete")}
+          onDone={toggleSelectMode}
+          loading={bulkBusy}
+        />
+      )}
+
+      <BulkTagModal
+        isOpen={bulkModal === "tags"}
+        onClose={() => setBulkModal(null)}
+        bookCount={selectedIds.size}
+        availableTags={availableTags}
+        onSubmit={handleBulkTags}
+      />
+
+      <ShelfSelectionModal
+        isOpen={bulkModal === "shelf"}
+        onClose={() => setBulkModal(null)}
+        onSelectShelf={(shelfId) => handleBulkShelf(shelfId)}
+        title={`Add ${plural(selectedIds.size)} to a shelf`}
+        confirmButtonText="Add to shelf"
+        allowKeepSelected={false}
+      />
+
+      <BulkDeleteBooksModal
+        isOpen={bulkModal === "delete"}
+        onClose={() => setBulkModal(null)}
+        bookCount={selectedIds.size}
+        deleting={bulkBusy}
+        onConfirm={handleBulkDelete}
+      />
 
       {/* Scroll to top button */}
       <ScrollToTopButton />

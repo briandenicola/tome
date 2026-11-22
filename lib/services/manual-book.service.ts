@@ -159,6 +159,29 @@ export class ManualBookService {
     return updated;
   }
 
+  /**
+   * Removes many books at once, like remove() does one. Calibre books are left alone: Tome doesn't change the Calibre
+   * library, and a Calibre book removed from Tome would come back on the next sync without its reading history.
+   */
+  async removeMany(ids: number[]): Promise<{ removed: number[]; skippedCalibre: number[]; missing: number[] }> {
+    const unique = [...new Set(ids)];
+    const found = new Map((await bookRepository.findByIds(unique)).map((b) => [b.id, b]));
+    const out = { removed: [] as number[], skippedCalibre: [] as number[], missing: [] as number[] };
+    for (const id of unique) {
+      const book = found.get(id);
+      if (!book) out.missing.push(id);
+      else if (book.source === "calibre") out.skippedCalibre.push(id);
+      else {
+        await bookRepository.delete(id);
+        deleteCover(book.coverFile);
+        coverCache.delete(id);
+        out.removed.push(id);
+      }
+    }
+    getLogger().info({ removed: out.removed.length, skippedCalibre: out.skippedCalibre.length }, "Removed books in bulk");
+    return out;
+  }
+
   /** Removes a book added by hand, with its reading sessions, progress and cover. The person confirms first. */
   async remove(id: number): Promise<void> {
     const book = await manualBook(id);
