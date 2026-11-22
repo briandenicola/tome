@@ -257,7 +257,7 @@ export function MonthSelector({
           onClick={handlePrevious}
           disabled={isPreviousDisabled()}
           aria-label="Previous month"
-          className="h-[36px] w-[36px] flex items-center justify-center bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md hover:border-[var(--foreground)]/30 focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 focus:border-transparent transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[var(--border-color)]"
+          className="h-[36px] w-[36px] flex items-center justify-center bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md hover:border-foreground/30 focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 focus:border-transparent transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[var(--border-color)]"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 text-[var(--foreground)] animate-spin" />
@@ -276,7 +276,7 @@ export function MonthSelector({
               onMonthChange(value === "all" ? null : parseInt(value));
             }}
             disabled={loading}
-            className="appearance-none h-[36px] bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md px-4 pr-10 text-[var(--foreground)] font-semibold text-sm hover:border-[var(--foreground)]/30 focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 focus:border-transparent transition-colors cursor-pointer min-w-[140px] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="appearance-none h-[36px] bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md px-4 pr-10 text-[var(--foreground)] font-semibold text-sm hover:border-foreground/30 focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 focus:border-transparent transition-colors cursor-pointer min-w-[140px] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <option value="all">All Year</option>
             {MONTH_NAMES.map((monthName, index) => {
@@ -293,7 +293,7 @@ export function MonthSelector({
               );
             })}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--foreground)]/60 pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/60 pointer-events-none" />
         </div>
 
         {/* Next Month Button */}
@@ -301,7 +301,7 @@ export function MonthSelector({
           onClick={handleNext}
           disabled={isNextDisabled()}
           aria-label="Next month"
-          className="h-[36px] w-[36px] flex items-center justify-center bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md hover:border-[var(--foreground)]/30 focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 focus:border-transparent transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[var(--border-color)]"
+          className="h-[36px] w-[36px] flex items-center justify-center bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md hover:border-foreground/30 focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2 focus:border-transparent transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[var(--border-color)]"
         >
           {loading ? (
             <Loader2 className="w-4 h-4 text-[var(--foreground)] animate-spin" />

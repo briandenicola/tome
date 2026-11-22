@@ -90,7 +90,7 @@ export default function BookHeader({
                   <div className="inline-flex items-center justify-center w-8 h-8 rounded-md shadow-sm bg-[var(--background)]">
                     <Lock className="w-4 h-4 text-red-500/80" />
                   </div>
-                  <span className="font-semibold text-[var(--foreground)]/55">
+                  <span className="font-semibold text-foreground/55">
                     {optionConfig.labels.long}
                   </span>
                 </>
@@ -123,7 +123,7 @@ export default function BookHeader({
   return (
     <div className="w-full max-w-[220px] md:max-w-none md:w-[250px] mx-auto md:mx-0 space-y-4">
       {/* Cover */}
-      <div className="relative aspect-[2/3] bg-[var(--light-accent)]/30 rounded border border-[var(--border-color)] overflow-hidden flex items-center justify-center shadow-lg">
+      <div className="relative aspect-[2/3] bg-light-accent/30 rounded border border-[var(--border-color)] overflow-hidden flex items-center justify-center shadow-lg">
         {!imageError ? (
           <Image
               src={getCoverUrl(book.id, book.lastSynced)}
@@ -134,7 +134,7 @@ export default function BookHeader({
             onError={onImageError}
           />
         ) : (
-          <BookOpen className="w-16 md:w-24 h-16 md:h-24 text-[var(--foreground)]/40" />
+          <BookOpen className="w-16 md:w-24 h-16 md:h-24 text-foreground/40" />
         )}
       </div>
 

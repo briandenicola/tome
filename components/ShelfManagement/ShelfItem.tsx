@@ -102,10 +102,10 @@ export function ShelfItem({ shelf, onEdit, onDelete }: ShelfItemProps) {
             e.stopPropagation();
             setShowMenu(!showMenu);
           }}
-          className="p-2 bg-[var(--card-bg)]/90 backdrop-blur-sm hover:bg-[var(--hover-bg)] rounded-lg transition-colors shadow-md border border-[var(--border-color)]"
+          className="p-2 bg-card/90 backdrop-blur-sm hover:bg-[var(--hover-bg)] rounded-lg transition-colors shadow-md border border-[var(--border-color)]"
           aria-label="More actions"
         >
-          <MoreVertical className="w-5 h-5 text-[var(--foreground)]/60" />
+          <MoreVertical className="w-5 h-5 text-foreground/60" />
         </button>
 
         {showMenu && (

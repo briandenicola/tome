@@ -93,13 +93,13 @@ export function ReadingReport() {
         {loading ? (
           <div className="p-6 space-y-3" aria-busy="true">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-5 bg-[var(--foreground)]/10 rounded animate-pulse" />
+              <div key={i} className="h-5 bg-foreground/10 rounded animate-pulse" />
             ))}
           </div>
         ) : error ? (
           <p className="p-6 text-sm text-red-600">Couldn&apos;t load the report.</p>
         ) : !report || report.books.length === 0 ? (
-          <p className="p-6 text-sm text-[var(--foreground)]/70">No books finished in {year}.</p>
+          <p className="p-6 text-sm text-foreground/70">No books finished in {year}.</p>
         ) : (
           <>
             <p className="px-4 pt-4 text-sm text-[var(--subheading-text)] font-medium">
@@ -110,7 +110,7 @@ export function ReadingReport() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wider text-[var(--foreground)]/60 border-b border-[var(--border-color)]">
+                  <tr className="text-left text-xs uppercase tracking-wider text-foreground/60 border-b border-[var(--border-color)]">
                     <th className="px-4 py-3 font-semibold">Book</th>
                     <th className="px-4 py-3 font-semibold">Tags</th>
                     <th className="px-4 py-3 font-semibold whitespace-nowrap">Read</th>
@@ -131,20 +131,20 @@ export function ReadingReport() {
                         {r.tags.length ? (
                           <div className="flex flex-wrap gap-1">
                             {r.tags.map((t) => (
-                              <span key={t} className="px-2 py-0.5 rounded bg-[var(--light-accent)]/30 text-xs">
+                              <span key={t} className="px-2 py-0.5 rounded bg-light-accent/30 text-xs">
                                 {t}
                               </span>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-[var(--foreground)]/40">—</span>
+                          <span className="text-foreground/40">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {r.startedDate ? `${shortDate(r.startedDate)} – ` : ""}
                         {shortDate(r.finishedDate)}
                         {r.days !== null && (
-                          <div className="text-xs text-[var(--foreground)]/60">
+                          <div className="text-xs text-foreground/60">
                             {r.days} {r.days === 1 ? "day" : "days"}
                           </div>
                         )}
@@ -155,12 +155,12 @@ export function ReadingReport() {
                             {[1, 2, 3, 4, 5].map((n) => (
                               <Star
                                 key={n}
-                                className={cn("w-4 h-4", n <= r.rating! ? "fill-[var(--accent)] text-[var(--accent)]" : "text-[var(--foreground)]/25")}
+                                className={cn("w-4 h-4", n <= r.rating! ? "fill-[var(--accent)] text-[var(--accent)]" : "text-foreground/25")}
                               />
                             ))}
                           </span>
                         ) : (
-                          <span className="text-[var(--foreground)]/40">—</span>
+                          <span className="text-foreground/40">—</span>
                         )}
                       </td>
                     </tr>

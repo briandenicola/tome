@@ -298,7 +298,7 @@ export function ShelfIconPicker({
                 type="button"
                 onClick={() => onSelectIcon(null)}
                 disabled={disabled}
-                className="text-xs text-[var(--foreground)]/60 hover:text-[var(--accent-color)] transition-colors disabled:opacity-50"
+                className="text-xs text-foreground/60 hover:text-[var(--accent)] transition-colors disabled:opacity-50"
               >
                 Remove icon
               </button>
@@ -310,7 +310,7 @@ export function ShelfIconPicker({
               className="w-12 h-12 rounded-full border-2 border-[var(--border-color)]"
               style={{ backgroundColor: color }}
             />
-            <p className="text-sm text-[var(--foreground)]/60">
+            <p className="text-sm text-foreground/60">
               No icon selected
             </p>
           </div>
@@ -322,7 +322,7 @@ export function ShelfIconPicker({
         type="button"
         onClick={() => setShowPicker(!showPicker)}
         disabled={disabled}
-        className="px-4 py-2 text-sm font-medium bg-[var(--background)] border border-[var(--border-color)] rounded-lg hover:border-[var(--accent-color)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-4 py-2 text-sm font-medium bg-[var(--background)] border border-[var(--border-color)] rounded-lg hover:border-[var(--accent)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {showPicker ? "Hide Icons" : "Choose Icon"}
       </button>
@@ -332,7 +332,7 @@ export function ShelfIconPicker({
         <div className="mt-3 p-3 bg-[var(--background)] border border-[var(--border-color)] rounded-lg max-h-[60vh] overflow-y-auto">
           {/* Search input */}
           <div className="mb-3 relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/50">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50">
               <Search className="w-4 h-4" />
             </div>
             <input
@@ -341,7 +341,7 @@ export function ShelfIconPicker({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search icons..."
               disabled={disabled}
-              className="w-full pl-10 pr-10 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--foreground)] placeholder:text-[var(--foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full pl-10 pr-10 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--foreground)] placeholder:text-foreground/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed"
               autoFocus
             />
             {searchQuery && (
@@ -349,7 +349,7 @@ export function ShelfIconPicker({
                 type="button"
                 onClick={() => setSearchQuery("")}
                 disabled={disabled}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/50 hover:text-[var(--foreground)] transition-colors disabled:opacity-50"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-[var(--foreground)] transition-colors disabled:opacity-50"
                 aria-label="Clear search"
               >
                 <X className="w-4 h-4" />
@@ -375,7 +375,7 @@ export function ShelfIconPicker({
                     className={cn(
                       "group relative aspect-square flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-all",
                       isSelected
-                        ? "bg-[var(--accent-color)]/20"
+                        ? "bg-accent/20"
                         : "hover:bg-[var(--hover-bg)]",
                       disabled && "opacity-50 cursor-not-allowed"
                     )}
@@ -386,7 +386,7 @@ export function ShelfIconPicker({
                       icon={name}
                       size="sm"
                     />
-                    <span className="text-[9px] text-[var(--foreground)]/60 text-center leading-tight truncate w-full">
+                    <span className="text-[9px] text-foreground/60 text-center leading-tight truncate w-full">
                       {name}
                     </span>
                   </button>
@@ -394,7 +394,7 @@ export function ShelfIconPicker({
               })}
             </div>
           ) : (
-            <div className="text-center py-8 text-[var(--foreground)]/60">
+            <div className="text-center py-8 text-foreground/60">
               <p className="text-sm">No icons found</p>
               <p className="text-xs mt-1">Try a different search term</p>
             </div>

@@ -21,7 +21,7 @@ export function ToastProvider() {
           toast:
             "bg-[var(--card-bg)] border-[var(--border-color)] text-[var(--foreground)] shadow-lg font-sans",
           title: "font-semibold text-[var(--foreground)]",
-          description: "text-[var(--foreground)]/70 font-medium",
+          description: "text-foreground/70 font-medium",
           actionButton: "bg-[var(--accent)] text-white hover:bg-[var(--light-accent)]",
           cancelButton: "bg-[var(--border-color)] text-[var(--foreground)]",
           success: "tome-toast-success",

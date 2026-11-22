@@ -181,15 +181,15 @@ export default function ProgressEditModal({
         }
       >
         <div className="space-y-4">
-          <p className="text-[var(--foreground)]/80 font-medium">
+          <p className="text-foreground/80 font-medium">
             Are you sure you want to delete this progress entry? This action cannot be undone.
           </p>
           <div className="bg-[var(--background)] border border-[var(--border-color)] rounded p-4">
-            <p className="text-sm text-[var(--foreground)]/70 font-medium">
+            <p className="text-sm text-foreground/70 font-medium">
               <span className="font-semibold">Date:</span>{" "}
               {currentProgress.progressDate}
             </p>
-            <p className="text-sm text-[var(--foreground)]/70 font-medium mt-1">
+            <p className="text-sm text-foreground/70 font-medium mt-1">
               <span className="font-semibold">Progress:</span>{" "}
               {progressInputMode === "page"
                 ? `Page ${currentProgress.currentPage}`
@@ -197,7 +197,7 @@ export default function ProgressEditModal({
             </p>
             {currentProgress.notes && (
               <div className="mt-2">
-                <span className="text-sm font-semibold text-[var(--foreground)]/70">Notes:</span>
+                <span className="text-sm font-semibold text-foreground/70">Notes:</span>
                 <div className="mt-1">
                   <MarkdownRenderer content={currentProgress.notes} />
                 </div>
@@ -247,7 +247,7 @@ export default function ProgressEditModal({
         <div>
           <label
             htmlFor="progressDate"
-            className="block text-sm font-semibold text-[var(--foreground)]/80 mb-2"
+            className="block text-sm font-semibold text-foreground/80 mb-2"
           >
             Date
           </label>
@@ -263,7 +263,7 @@ export default function ProgressEditModal({
 
         {/* Progress Input with Toggle */}
         <div>
-          <label className="block text-sm font-semibold text-[var(--foreground)]/80 mb-2">
+          <label className="block text-sm font-semibold text-foreground/80 mb-2">
             Progress
           </label>
           <div className="flex gap-2">
@@ -320,7 +320,7 @@ export default function ProgressEditModal({
                     className={cn(
                       "w-full px-4 py-2.5 text-left flex items-center justify-between transition-colors",
                       progressInputMode === "page"
-                        ? "bg-[var(--accent)]/10"
+                        ? "bg-accent/10"
                         : "hover:bg-[var(--background)]"
                     )}
                   >
@@ -339,7 +339,7 @@ export default function ProgressEditModal({
                     className={cn(
                       "w-full px-4 py-2.5 text-left flex items-center justify-between transition-colors",
                       progressInputMode === "percentage"
-                        ? "bg-[var(--accent)]/10"
+                        ? "bg-accent/10"
                         : "hover:bg-[var(--background)]"
                     )}
                   >
@@ -358,7 +358,7 @@ export default function ProgressEditModal({
         <div>
           <label
             htmlFor="notes"
-            className="block text-sm font-semibold text-[var(--foreground)]/80 mb-2"
+            className="block text-sm font-semibold text-foreground/80 mb-2"
           >
             Notes (optional)
           </label>

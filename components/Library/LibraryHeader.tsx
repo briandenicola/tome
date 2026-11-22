@@ -37,7 +37,7 @@ export function LibraryHeader({
         </h1>
         {loading ? (
           <p className="text-[var(--subheading-text)] mt-2 font-medium">
-            <span className="inline-block h-[1.25rem] w-24 bg-[var(--foreground)]/10 rounded animate-pulse align-middle" />
+            <span className="inline-block h-[1.25rem] w-24 bg-foreground/10 rounded animate-pulse align-middle" />
           </p>
         ) : (
           <p className="text-[var(--subheading-text)] mt-2 font-medium">

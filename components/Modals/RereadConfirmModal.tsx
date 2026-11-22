@@ -24,7 +24,7 @@ export default function RereadConfirmModal({
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[var(--accent)]/10 rounded-lg">
+            <div className="p-2 bg-accent/10 rounded-lg">
               <BookOpen className="w-6 h-6 text-[var(--accent)]" />
             </div>
             <div>
@@ -35,7 +35,7 @@ export default function RereadConfirmModal({
           </div>
           <button
             onClick={onClose}
-            className="text-[var(--foreground)]/50 hover:text-[var(--foreground)] transition-colors"
+            className="text-foreground/50 hover:text-[var(--foreground)] transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5" />

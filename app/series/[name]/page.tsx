@@ -118,7 +118,7 @@ export default function SeriesDetailPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Book Cover */}
                 <div className="flex-shrink-0 w-40 sm:w-32 md:w-40 mx-auto sm:mx-0">
-                  <div className="relative aspect-[2/3] bg-[var(--light-accent)]/30 rounded border border-[var(--border-color)] overflow-hidden">
+                  <div className="relative aspect-[2/3] bg-light-accent/30 rounded border border-[var(--border-color)] overflow-hidden">
                     {!imageErrors[book.id] ? (
                       <Image
                         src={getCoverUrl(book.id, book.lastSynced)}
@@ -130,7 +130,7 @@ export default function SeriesDetailPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <BookOpen className="w-8 h-8 text-[var(--foreground)]/40" />
+                        <BookOpen className="w-8 h-8 text-foreground/40" />
                       </div>
                     )}
                   </div>

@@ -177,7 +177,7 @@ export function StreakHeatmap({ data, threshold }: StreakHeatmapProps) {
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-[var(--foreground)]/60">
+      <div className="flex items-center justify-center h-32 text-foreground/60">
         <p>No reading activity data available</p>
       </div>
     );
@@ -304,7 +304,7 @@ export function StreakHeatmap({ data, threshold }: StreakHeatmapProps) {
               className={
                 tooltip.thresholdMet
                   ? 'text-[var(--accent)] font-semibold'
-                  : 'text-[var(--foreground)]/60'
+                  : 'text-foreground/60'
               }
             >
               {tooltip.thresholdMet ? 'Goal met' : 'Below goal'}

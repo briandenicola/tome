@@ -90,7 +90,7 @@ export function BulkDeleteTagsModal({
             <p className="text-sm font-medium text-red-500 mb-1">
               Warning: This action cannot be undone
             </p>
-            <p className="text-sm text-[var(--foreground)]/70">
+            <p className="text-sm text-foreground/70">
               This will remove {tagCount === 1 ? "this tag" : "these tags"} from a total of{" "}
               <span className="font-semibold">{totalBooks}</span>{" "}
               {totalBooks === 1 ? "book" : "books"}.
@@ -120,7 +120,7 @@ export function BulkDeleteTagsModal({
           </div>
         </div>
 
-        <p className="text-sm text-[var(--foreground)]/70">
+        <p className="text-sm text-foreground/70">
           Are you sure you want to delete {tagCount === 1 ? "this tag" : "these tags"}?
         </p>
       </div>

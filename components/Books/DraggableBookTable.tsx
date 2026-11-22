@@ -107,7 +107,7 @@ function SortableRow({ book, index, imageErrors, onImageError, onRemoveBook, isD
       className={cn(
         "transition-colors",
         isSelectMode && "cursor-pointer",
-        isSelectMode && isSelected && "bg-[var(--accent)]/10",
+        isSelectMode && isSelected && "bg-accent/10",
         !isSelectMode && "hover:bg-[var(--hover-bg)]",
         index % 2 === 0 ? "bg-[var(--card-bg)]" : "bg-[var(--background)]",
         isDragging && "relative z-50"
@@ -147,7 +147,7 @@ function SortableRow({ book, index, imageErrors, onImageError, onRemoveBook, isD
       {/* Cover */}
       <td className="px-4 py-3">
         <Link href={`/books/${book.id}`} className="block">
-          <div className="w-10 h-[60px] bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden rounded relative shadow-sm hover:shadow-lg transition-shadow duration-300 ease">
+          <div className="w-10 h-[60px] bg-light-accent/30 flex items-center justify-center overflow-hidden rounded relative shadow-sm hover:shadow-lg transition-shadow duration-300 ease">
             {!hasImageError ? (
               <Image
                 src={getCoverUrl(book.id, book.lastSynced)}
@@ -158,7 +158,7 @@ function SortableRow({ book, index, imageErrors, onImageError, onRemoveBook, isD
                 onError={() => onImageError(book.id)}
               />
             ) : (
-              <BookOpen className="w-5 h-5 text-[var(--accent)]/40" />
+              <BookOpen className="w-5 h-5 text-accent/40" />
             )}
           </div>
         </Link>
@@ -258,7 +258,7 @@ function SortableRow({ book, index, imageErrors, onImageError, onRemoveBook, isD
           <div className="flex items-center gap-2">
             <Link
               href={`/books/${book.id}`}
-              className="p-1.5 text-[var(--accent)] hover:bg-[var(--accent)]/10 rounded transition-colors"
+              className="p-1.5 text-[var(--accent)] hover:bg-accent/10 rounded transition-colors"
               title="View details"
               onClick={(e) => e.stopPropagation()}
             >
@@ -419,7 +419,7 @@ export function DraggableBookTable({
   if (books.length === 0) {
     return (
       <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg p-12 text-center">
-        <BookOpen className="w-16 h-16 text-[var(--accent)]/40 mx-auto mb-4" />
+        <BookOpen className="w-16 h-16 text-accent/40 mx-auto mb-4" />
         <h3 className="text-xl font-serif font-semibold text-[var(--heading-text)] mb-2">
           No books on this shelf
         </h3>

@@ -174,7 +174,7 @@ describe("LibraryFilters - Rating Filter with Visual Stars", () => {
       
       // Should have star icons with different fill states
       // Filled stars have fill-[var(--accent)] class
-      // Unfilled stars have text-[var(--foreground)]/30 class
+      // Unfilled stars have text-foreground/30 class
       const stars = container.querySelectorAll('svg[class*="w-4 h-4"]');
       expect(stars.length).toBeGreaterThan(0);
     });

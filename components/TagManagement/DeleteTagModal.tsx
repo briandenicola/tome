@@ -89,14 +89,14 @@ export function DeleteTagModal({
             <p className="text-sm font-medium text-red-500 mb-1">
               Warning: This action cannot be undone
             </p>
-            <p className="text-sm text-[var(--foreground)]/70">
+            <p className="text-sm text-foreground/70">
               This will remove the tag <span className="font-semibold">&quot;{tagName}&quot;</span> from all{" "}
               <span className="font-semibold">{bookCount}</span>{" "}
               {bookCount === 1 ? "book" : "books"} that currently have it.
             </p>
           </div>
         </div>
-        <p className="text-sm text-[var(--foreground)]/70">
+        <p className="text-sm text-foreground/70">
           Are you sure you want to delete this tag?
         </p>
       </div>

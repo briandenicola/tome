@@ -31,7 +31,7 @@ export function VersionSettings() {
 
       {/* Error State */}
       {error && !versionData && (
-        <div className="flex items-center gap-2 text-sm text-[var(--foreground)]/70">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <AlertCircle className="w-4 h-4" />
           <span>Unable to fetch version information</span>
         </div>
@@ -42,7 +42,7 @@ export function VersionSettings() {
         <div className="space-y-4">
           {/* Current Version */}
           <div>
-            <span className="text-sm font-semibold text-[var(--foreground)]/70">
+            <span className="text-sm font-semibold text-foreground/70">
               Current Version:
             </span>{" "}
             <span className="text-base font-bold text-[var(--foreground)]">
@@ -84,7 +84,7 @@ export function VersionSettings() {
                     href={versionData.latestReleaseUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-[var(--accent)]/90 text-white font-semibold rounded-sm transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--accent)] hover:bg-accent/90 text-white font-semibold rounded-sm transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-[var(--accent)] focus:outline-offset-2"
                   >
                     <span>View Release Notes</span>
                     <ExternalLink className="w-4 h-4" />
@@ -104,7 +104,7 @@ export function VersionSettings() {
 
           {/* GitHub Check Failed */}
           {versionData.error && (
-            <div className="flex items-center gap-2 text-xs text-[var(--foreground)]/50">
+            <div className="flex items-center gap-2 text-xs text-foreground/50">
               <AlertCircle className="w-3 h-3" />
               <span>{versionData.error}</span>
             </div>

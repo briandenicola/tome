@@ -83,7 +83,7 @@ export function BulkTagModal({ isOpen, onClose, bookCount, availableTags, onSubm
           allowCreate={action === "add"}
           placeholder={action === "add" ? "Search or create tags..." : "Search tags..."}
         />
-        <p className="text-xs text-[var(--foreground)]/60">Tags on Calibre books are written to Calibre too, as when you tag one book.</p>
+        <p className="text-xs text-foreground/60">Tags on Calibre books are written to Calibre too, as when you tag one book.</p>
       </div>
     </BaseModal>
   );

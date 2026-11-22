@@ -56,13 +56,13 @@ export default function RatingModal({
               <span className="mr-1 font-bold">Rate Book:</span>
               <span>{bookTitle}</span>
             </h2>
-            <p className="text-sm text-[var(--foreground)]/70 font-medium">
+            <p className="text-sm text-foreground/70 font-medium">
               
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="text-[var(--foreground)]/50 hover:text-[var(--foreground)] transition-colors"
+            className="text-foreground/50 hover:text-[var(--foreground)] transition-colors"
             aria-label="Close"
           >
             <X className="w-5 h-5" />

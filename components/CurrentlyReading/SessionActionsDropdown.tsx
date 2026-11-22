@@ -96,7 +96,7 @@ export function SessionActionsDropdown({
           setShowMenu(!showMenu);
         }}
         disabled={disabled}
-        className="p-1.5 text-[var(--foreground)]/70 hover:text-[var(--foreground)] hover:bg-[var(--hover-bg)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-1.5 text-foreground/70 hover:text-[var(--foreground)] hover:bg-[var(--hover-bg)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Session actions"
         title="Session actions"
       >

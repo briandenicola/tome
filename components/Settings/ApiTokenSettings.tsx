@@ -76,7 +76,7 @@ export function ApiTokenSettings() {
           create.mutate();
         }}
       >
-        <label className="flex flex-col gap-1 text-sm text-[var(--foreground)]/80">
+        <label className="flex flex-col gap-1 text-sm text-foreground/80">
           Name
           <input
             className="px-3 py-2 rounded-md border border-[var(--border-color)] bg-[var(--background)] text-[var(--foreground)] min-w-[14rem]"
@@ -87,7 +87,7 @@ export function ApiTokenSettings() {
             required
           />
         </label>
-        <label className="flex flex-col gap-1 text-sm text-[var(--foreground)]/80">
+        <label className="flex flex-col gap-1 text-sm text-foreground/80">
           Access
           <select
             className="px-3 py-2 rounded-md border border-[var(--border-color)] bg-[var(--background)] text-[var(--foreground)]"
@@ -123,15 +123,15 @@ export function ApiTokenSettings() {
       )}
 
       {isLoading && <div className="h-4 bg-[var(--border-color)] rounded animate-pulse w-48" />}
-      {error && <p className="text-sm text-[var(--foreground)]/70">The tokens couldn&apos;t be loaded. Refresh to try again.</p>}
-      {data && data.length === 0 && <p className="text-sm text-[var(--foreground)]/70">No tokens yet.</p>}
+      {error && <p className="text-sm text-foreground/70">The tokens couldn&apos;t be loaded. Refresh to try again.</p>}
+      {data && data.length === 0 && <p className="text-sm text-foreground/70">No tokens yet.</p>}
       {data && data.length > 0 && (
         <ul className="divide-y divide-[var(--border-color)]">
           {data.map((t) => (
             <li key={t.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="min-w-0">
                 <p className="font-semibold text-[var(--foreground)] truncate">{t.name}</p>
-                <p className="text-sm text-[var(--foreground)]/70">
+                <p className="text-sm text-foreground/70">
                   {t.access === "write" ? "Read and write" : "Read"} · ends in …{t.hint} · made{" "}
                   {formatDistanceToNow(new Date(t.createdAt), { addSuffix: true })} ·{" "}
                   {t.lastUsedAt ? `last used ${formatDistanceToNow(new Date(t.lastUsedAt), { addSuffix: true })}` : "never used"}

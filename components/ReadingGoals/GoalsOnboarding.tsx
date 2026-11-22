@@ -100,7 +100,7 @@ export function GoalsOnboarding({ onCreateGoal }: GoalsOnboardingProps) {
           <div>
             <label
               htmlFor="books-goal"
-              className="block text-sm font-semibold text-[var(--foreground)]/70 mb-2"
+              className="block text-sm font-semibold text-foreground/70 mb-2"
             >
               Books to read
             </label>

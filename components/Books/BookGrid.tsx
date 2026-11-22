@@ -63,7 +63,7 @@ export function BookGrid({
           {loadingMore && (
             <div className="text-center py-8">
               <div className="inline-block w-6 h-6 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-[var(--foreground)]/70 mt-2 font-medium">
+              <p className="text-foreground/70 mt-2 font-medium">
                 Loading more books...
               </p>
             </div>
@@ -71,7 +71,7 @@ export function BookGrid({
         </>
       ) : (
         <div className="bg-[var(--card-bg)] border border-[var(--border-color)] p-12 text-center">
-          <p className="text-[var(--foreground)]/70 font-medium">
+          <p className="text-foreground/70 font-medium">
             No books found. Add a book, sync with Calibre, or change your filters.
           </p>
         </div>

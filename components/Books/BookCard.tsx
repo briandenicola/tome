@@ -45,7 +45,7 @@ export const BookCard = memo(function BookCard({
           className
         )}
       >
-        <div className="aspect-[2/3] bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden relative">
+        <div className="aspect-[2/3] bg-light-accent/30 flex items-center justify-center overflow-hidden relative">
           {selectable && (
             <span
               aria-hidden="true"
@@ -53,7 +53,7 @@ export const BookCard = memo(function BookCard({
                 "absolute top-2 left-2 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow",
                 selected
                   ? "bg-[var(--accent)] border-[var(--accent)] text-white"
-                  : "bg-[var(--card-bg)]/80 border-[var(--foreground)]/40"
+                  : "bg-card/80 border-foreground/40"
               )}
             >
               {selected && <Check className="w-4 h-4" />}
@@ -69,7 +69,7 @@ export const BookCard = memo(function BookCard({
               onError={() => setImageError(true)}
             />
           ) : (
-            <BookOpen className="w-16 h-16 text-[var(--accent)]/40" />
+            <BookOpen className="w-16 h-16 text-accent/40" />
           )}
         </div>
 
@@ -90,7 +90,7 @@ export const BookCard = memo(function BookCard({
           {currentProgress !== undefined && status !== "read" && (
             <div className="pt-3 mt-1 border-t border-[var(--border-color)]">
               <div className="flex items-center justify-between mb-2.5">
-                <span className="text-xs uppercase tracking-wider font-semibold text-[var(--foreground)]/60">Progress</span>
+                <span className="text-xs uppercase tracking-wider font-semibold text-foreground/60">Progress</span>
                 <span className="text-sm font-mono font-bold text-[var(--accent)]">{Math.round(currentProgress)}%</span>
               </div>
               <div className="w-full bg-[var(--background)] rounded-full h-2.5 shadow-inner">

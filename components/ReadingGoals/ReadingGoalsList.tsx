@@ -52,7 +52,7 @@ export function ReadingGoalsList({ goals, onEdit, onDelete }: ReadingGoalsListPr
         return (
           <div
             key={goal.id}
-            className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md p-4 flex items-center justify-between hover:border-[var(--accent)]/30 transition-colors"
+            className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-md p-4 flex items-center justify-between hover:border-accent/30 transition-colors"
           >
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-1">
@@ -60,12 +60,12 @@ export function ReadingGoalsList({ goals, onEdit, onDelete }: ReadingGoalsListPr
                   {goal.year}
                 </h4>
                 {isCurrentYear && (
-                  <span className="px-2 py-0.5 text-xs font-semibold bg-[var(--accent)]/20 text-[var(--accent)] rounded">
+                  <span className="px-2 py-0.5 text-xs font-semibold bg-accent/20 text-[var(--accent)] rounded">
                     Current
                   </span>
                 )}
                 {isPastYear && (
-                  <span className="px-2 py-0.5 text-xs font-semibold bg-[var(--foreground)]/10 text-[var(--foreground)]/60 rounded">
+                  <span className="px-2 py-0.5 text-xs font-semibold bg-foreground/10 text-foreground/60 rounded">
                     Completed
                   </span>
                 )}
@@ -84,7 +84,7 @@ export function ReadingGoalsList({ goals, onEdit, onDelete }: ReadingGoalsListPr
                   onClick={() => onEdit(goal)}
                   disabled={deletingId === goal.id}
                   variant="icon-danger"
-                  className="text-[var(--foreground)]/60 hover:text-[var(--accent)] hover:bg-[var(--accent)]/10"
+                  className="text-foreground/60 hover:text-[var(--accent)] hover:bg-accent/10"
                   title="Edit goal"
                   icon={<Pencil className="w-4 h-4" />}
                 />

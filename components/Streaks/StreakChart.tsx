@@ -98,7 +98,7 @@ export function StreakChart({ data, threshold }: StreakChartProps) {
           )}
           <p className="text-sm text-[var(--foreground)] mt-1">
             Status:{" "}
-            <span className={data.thresholdMet ? "text-[var(--accent)] font-semibold" : "text-[var(--foreground)]/60"}>
+            <span className={data.thresholdMet ? "text-[var(--accent)] font-semibold" : "text-foreground/60"}>
               {data.thresholdMet ? "Goal met" : "Below goal"}
             </span>
           </p>

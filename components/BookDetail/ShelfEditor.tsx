@@ -105,21 +105,21 @@ export default function ShelfEditor({
       {/* Filter Input */}
       {availableShelves.length > 0 && (
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 pointer-events-none" />
           <input
             type="text"
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
             placeholder="Filter shelves..."
             disabled={saving}
-            className="w-full pl-10 pr-10 py-3 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder-[var(--foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-colors disabled:opacity-50"
+            className="w-full pl-10 pr-10 py-3 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder-foreground/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-colors disabled:opacity-50"
           />
           {filterQuery && (
             <button
               type="button"
               onClick={() => setFilterQuery("")}
               disabled={saving}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors disabled:opacity-50"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-[var(--foreground)] transition-colors disabled:opacity-50"
               aria-label="Clear filter"
             >
               <X className="w-4 h-4" />
@@ -144,8 +144,8 @@ export default function ShelfEditor({
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-lg border-2 transition-all text-left",
                   isSelected
-                    ? "bg-[var(--accent)]/10 border-[var(--accent)] shadow-sm"
-                    : "border-[var(--border-color)] hover:border-[var(--accent)]/50 hover:bg-[var(--background)]",
+                    ? "bg-accent/10 border-[var(--accent)] shadow-sm"
+                    : "border-[var(--border-color)] hover:border-accent/50 hover:bg-[var(--background)]",
                   saving && "opacity-50 cursor-not-allowed"
                 )}
               >
@@ -175,15 +175,15 @@ export default function ShelfEditor({
         </div>
       ) : availableShelves.length > 0 ? (
         <div className="text-center py-8 mb-6">
-          <Search className="w-12 h-12 mx-auto mb-3 text-[var(--foreground)]/30" />
-          <p className="text-sm text-[var(--foreground)]/70">
+          <Search className="w-12 h-12 mx-auto mb-3 text-foreground/30" />
+          <p className="text-sm text-foreground/70">
             No shelves match &quot;{filterQuery}&quot;
           </p>
         </div>
       ) : (
         <div className="text-center py-8 mb-6">
-          <FolderOpen className="w-12 h-12 mx-auto mb-3 text-[var(--foreground)]/30" />
-          <p className="text-sm text-[var(--foreground)]/70 mb-4">
+          <FolderOpen className="w-12 h-12 mx-auto mb-3 text-foreground/30" />
+          <p className="text-sm text-foreground/70 mb-4">
             No shelves available. Create a shelf first.
           </p>
           <Link
@@ -257,7 +257,7 @@ export default function ShelfEditor({
       >
         {/* Book Title and Summary */}
         <div className="mb-4">
-          <p className="text-sm text-[var(--foreground)]/70 font-medium mb-1">
+          <p className="text-sm text-foreground/70 font-medium mb-1">
             {bookTitle}
           </p>
           <p className="text-xs text-[var(--subheading-text)]">
@@ -287,7 +287,7 @@ export default function ShelfEditor({
             <h2 className="text-xl font-serif font-bold text-[var(--heading-text)] mb-1">
               Add to Shelves
             </h2>
-            <p className="text-sm text-[var(--foreground)]/70 font-medium truncate mb-1">
+            <p className="text-sm text-foreground/70 font-medium truncate mb-1">
               {bookTitle}
             </p>
             <p className="text-xs text-[var(--subheading-text)]">
@@ -297,7 +297,7 @@ export default function ShelfEditor({
           <button
             onClick={handleClose}
             disabled={saving}
-            className="text-[var(--foreground)]/50 hover:text-[var(--foreground)] transition-colors disabled:opacity-50 flex-shrink-0"
+            className="text-foreground/50 hover:text-[var(--foreground)] transition-colors disabled:opacity-50 flex-shrink-0"
             aria-label="Close"
           >
             <X className="w-5 h-5" />

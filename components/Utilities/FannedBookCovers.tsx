@@ -73,7 +73,7 @@ export default function FannedBookCovers({
         className={`flex items-center justify-center ${className}`}
         style={{ height: `${height}px` }}
       >
-        <BookOpen className="w-16 h-16 text-[var(--foreground)]/30" />
+        <BookOpen className="w-16 h-16 text-foreground/30" />
       </div>
     );
   }
@@ -159,7 +159,7 @@ export default function FannedBookCovers({
                 {isLoading ? (
                   // Skeleton state
                   <div 
-                    className="bg-[var(--foreground)]/10 rounded shadow-xl border-2 border-[var(--card-bg)]"
+                    className="bg-foreground/10 rounded shadow-xl border-2 border-[var(--card-bg)]"
                     style={{ 
                       width: `${dimensions.width}px`, 
                       height: `${dimensions.height}px` 
@@ -185,7 +185,7 @@ export default function FannedBookCovers({
                       height: `${dimensions.height}px` 
                     }}
                   >
-                    <BookOpen className="w-8 h-8 text-[var(--foreground)]/30" />
+                    <BookOpen className="w-8 h-8 text-foreground/30" />
                   </div>
                 )}
               </div>

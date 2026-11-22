@@ -200,13 +200,13 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
         <div className="space-y-3">
           {/* Search bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--foreground)]/40" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground/40" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tags..."
-              className={`w-full pl-10 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder-[var(--foreground)]/50 focus:outline-none focus:border-[var(--accent)] transition-colors ${
+              className={`w-full pl-10 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder-foreground/50 focus:outline-none focus:border-[var(--accent)] transition-colors ${
                 searchQuery ? "pr-10" : "pr-4"
               }`}
             />
@@ -214,7 +214,7 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-[var(--foreground)] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -233,13 +233,13 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
                 const Icon = currentOption?.icon || ArrowDownAZ;
                 return (
                   <>
-                    <Icon className="w-4 h-4 shrink-0 text-[var(--foreground)]/60" />
+                    <Icon className="w-4 h-4 shrink-0 text-foreground/60" />
                     <span className="flex-1 text-left text-sm">
                       {currentOption?.label || "Name (A-Z)"}
                     </span>
                     <ChevronDown
                       className={cn(
-                        "w-4 h-4 transition-transform shrink-0 text-[var(--foreground)]/60",
+                        "w-4 h-4 transition-transform shrink-0 text-foreground/60",
                         showSortDropdown && "rotate-180"
                       )}
                     />
@@ -263,10 +263,10 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
                       className={cn(
                         "w-full px-4 py-2.5 text-left flex items-center gap-2 transition-colors text-sm",
                         "text-[var(--foreground)] hover:bg-[var(--background)] cursor-pointer",
-                        sortOption === option.value && "bg-[var(--accent)]/10"
+                        sortOption === option.value && "bg-accent/10"
                       )}
                     >
-                      <Icon className="w-4 h-4 text-[var(--foreground)]/60 shrink-0" />
+                      <Icon className="w-4 h-4 text-foreground/60 shrink-0" />
                       <span className="flex-1">{option.label}</span>
                       {sortOption === option.value && (
                         <Check className="w-4 h-4 text-[var(--accent)] shrink-0" />
@@ -285,7 +285,7 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
               <div className="flex gap-2">
                 <button
                   onClick={() => setCheckboxMode(true)}
-                  className="flex-[2] flex items-center justify-center gap-2 px-4 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--heading-text)] hover:border-[var(--accent)] hover:bg-[var(--foreground)]/5 transition-colors font-medium"
+                  className="flex-[2] flex items-center justify-center gap-2 px-4 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--heading-text)] hover:border-[var(--accent)] hover:bg-foreground/5 transition-colors font-medium"
                 >
                   <CheckSquare className="w-4 h-4" />
                   Select Multiple
@@ -306,7 +306,7 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
               // Show single button when not filtering
               <button
                 onClick={() => setCheckboxMode(true)}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--heading-text)] hover:border-[var(--accent)] hover:bg-[var(--foreground)]/5 transition-colors font-medium"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--heading-text)] hover:border-[var(--accent)] hover:bg-foreground/5 transition-colors font-medium"
               >
                 <CheckSquare className="w-4 h-4" />
                 Select Multiple
@@ -330,7 +330,7 @@ export const TagList = forwardRef<TagListRef, TagListProps>(function TagList({
                   "w-full px-4 py-2 rounded-lg font-medium transition-colors",
                   checkedTags.size >= 2
                     ? "bg-[var(--accent)] text-white hover:bg-[var(--light-accent)]"
-                    : "bg-[var(--foreground)]/10 text-[var(--subheading-text)] cursor-not-allowed"
+                    : "bg-foreground/10 text-[var(--subheading-text)] cursor-not-allowed"
                 )}
               >
                 Merge Selected

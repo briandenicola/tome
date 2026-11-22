@@ -75,7 +75,7 @@ const BookCardSimple = memo(function BookCardSimple({
       <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg overflow-hidden group hover:shadow-md transition-shadow">
         <div className="relative">
           <Link href={`/books/${book.id}`}>
-            <div className="aspect-[2/3] bg-[var(--light-accent)]/30 flex items-center justify-center overflow-hidden relative">
+            <div className="aspect-[2/3] bg-light-accent/30 flex items-center justify-center overflow-hidden relative">
               {!imageError ? (
                 <Image
                   src={getCoverUrl(book.id, book.lastSynced)}
@@ -86,7 +86,7 @@ const BookCardSimple = memo(function BookCardSimple({
                   onError={() => setImageError(true)}
                 />
               ) : (
-                <BookOpen className="w-12 h-12 text-[var(--accent)]/40" />
+                <BookOpen className="w-12 h-12 text-accent/40" />
               )}
             </div>
           </Link>
@@ -229,7 +229,7 @@ export const TagDetailPanel = memo(function TagDetailPanel({
             </h2>
             <p className="text-sm text-[var(--subheading-text)] mt-1">
               {loading ? (
-                <span className="inline-block h-4 w-20 bg-[var(--foreground)]/10 rounded animate-pulse" />
+                <span className="inline-block h-4 w-20 bg-foreground/10 rounded animate-pulse" />
               ) : (
                 <>
                   {totalBooks} {totalBooks === 1 ? "book" : "books"}
@@ -245,7 +245,7 @@ export const TagDetailPanel = memo(function TagDetailPanel({
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-[var(--foreground)]/10 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-foreground/10 transition-colors"
             title="Back to tags"
           >
             <X className="w-5 h-5" />
@@ -262,10 +262,10 @@ export const TagDetailPanel = memo(function TagDetailPanel({
                 key={i}
                 className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg overflow-hidden animate-pulse"
               >
-                <div className="aspect-[2/3] bg-[var(--foreground)]/10" />
+                <div className="aspect-[2/3] bg-foreground/10" />
                 <div className="p-3 space-y-2">
-                  <div className="h-4 bg-[var(--foreground)]/10 rounded" />
-                  <div className="h-3 bg-[var(--foreground)]/10 rounded w-3/4" />
+                  <div className="h-4 bg-foreground/10 rounded" />
+                  <div className="h-3 bg-foreground/10 rounded w-3/4" />
                 </div>
               </div>
             ))}

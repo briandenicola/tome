@@ -137,7 +137,7 @@ export function RenameTagModal({
               <p className="mt-2 text-sm text-red-500">{error}</p>
             )}
           </div>
-          <p className="text-sm text-[var(--foreground)]/70">
+          <p className="text-sm text-foreground/70">
             This will rename the tag across all books that have it.
           </p>
         </div>

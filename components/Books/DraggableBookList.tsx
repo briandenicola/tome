@@ -84,7 +84,7 @@ function SortableBookItem({ book, actions, isSelectMode = false, isSelected = fa
             {...listeners}
             className={cn(
               "flex-shrink-0 px-2 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none",
-              "text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors",
+              "text-foreground/40 hover:text-[var(--foreground)] transition-colors",
               "bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg",
               "hover:bg-[var(--hover-bg)]"
             )}
@@ -230,7 +230,7 @@ export function DraggableBookList({
           <div className="flex items-stretch gap-2 opacity-90">
             {!isSelectMode && (
               <div className="flex-shrink-0 px-2 flex items-center justify-center bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg">
-                <GripVertical className="w-5 h-5 text-[var(--foreground)]/40" />
+                <GripVertical className="w-5 h-5 text-foreground/40" />
               </div>
             )}
             <div className="flex-1">

@@ -316,7 +316,7 @@ export default function ShelfDetailPage() {
           )
         ) : books.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-[var(--foreground)]/40 mb-4">
+            <div className="text-foreground/40 mb-4">
               <svg
                 className="w-24 h-24 mx-auto"
                 fill="none"
@@ -334,7 +334,7 @@ export default function ShelfDetailPage() {
             <h3 className="text-xl font-serif font-semibold text-[var(--heading-text)] mb-2">
               No books on this shelf
             </h3>
-            <p className="text-[var(--foreground)]/60 mb-6">
+            <p className="text-foreground/60 mb-6">
               Add books to this shelf from your library
             </p>
             <Link href="/library">
@@ -345,7 +345,7 @@ export default function ShelfDetailPage() {
           </div>
         ) : listView.filteredBooks.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-[var(--foreground)]/40 mb-4">
+            <div className="text-foreground/40 mb-4">
               <svg className="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="8" strokeWidth="2" />
                 <path d="M21 21l-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
@@ -354,7 +354,7 @@ export default function ShelfDetailPage() {
             <h3 className="text-xl font-serif font-semibold text-[var(--heading-text)] mb-2">
               No matching books
             </h3>
-            <p className="text-[var(--foreground)]/60 mb-6">
+            <p className="text-foreground/60 mb-6">
               No books match your filter. Try a different search term.
             </p>
             <Button

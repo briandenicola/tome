@@ -62,7 +62,7 @@ export default function SessionDetails({
               {formatDate(startedDate)}
             </span>
           ) : (
-            <span className="italic text-[var(--foreground)]/40 font-medium group-hover:underline">
+            <span className="italic text-foreground/40 font-medium group-hover:underline">
               Not set
             </span>
           )}

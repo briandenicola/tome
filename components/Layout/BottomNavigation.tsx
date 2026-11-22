@@ -48,7 +48,7 @@ export function BottomNavigation() {
         return (
           <div
             key={link.href}
-            className="flex flex-col items-center justify-center gap-1 text-[var(--foreground)]/60"
+            className="flex flex-col items-center justify-center gap-1 text-foreground/60"
           >
             <Icon className="w-6 h-6" />
             <span className="text-xs font-medium">{link.label}</span>
@@ -73,7 +73,7 @@ export function BottomNavigation() {
               "flex flex-col items-center justify-center gap-1 transition-colors",
               active
                 ? "text-[var(--accent)]"
-                : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
+                : "text-foreground/60 hover:text-[var(--foreground)]"
             )}
           >
             <Icon className="w-6 h-6" />
@@ -90,7 +90,7 @@ export function BottomNavigation() {
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--card-bg)] border-t border-[var(--border-color)] pb-safe">
         <div className="grid grid-cols-4 h-20">
           {skeletonNavItems}
-          <div className="flex flex-col items-center justify-center gap-1 text-[var(--foreground)]/60">
+          <div className="flex flex-col items-center justify-center gap-1 text-foreground/60">
             <MoreHorizontal className="w-6 h-6" />
             <span className="text-xs font-medium">More</span>
           </div>
@@ -112,7 +112,7 @@ export function BottomNavigation() {
               "flex flex-col items-center justify-center gap-1 transition-colors",
               isMoreOpen
                 ? "text-[var(--accent)]"
-                : "text-[var(--foreground)]/60 hover:text-[var(--foreground)]"
+                : "text-foreground/60 hover:text-[var(--foreground)]"
             )}
           >
             <MoreHorizontal className="w-6 h-6" />
@@ -141,7 +141,7 @@ export function BottomNavigation() {
                       "w-16 h-16 rounded-full flex items-center justify-center transition-colors",
                       active
                         ? "bg-[var(--accent)] text-white"
-                        : "bg-[var(--border-color)] text-[var(--foreground)] hover:bg-[var(--accent)]/20"
+                        : "bg-[var(--border-color)] text-[var(--foreground)] hover:bg-accent/20"
                     )}
                   >
                     <Icon className="w-7 h-7" />

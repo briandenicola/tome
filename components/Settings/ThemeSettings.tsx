@@ -26,14 +26,14 @@ export function ThemeSettings() {
 
       <div className="space-y-2">
         {/* Light Mode */}
-        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-[var(--border-color)]/30 transition-colors">
+        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-border/30 transition-colors">
           <input
             type="radio"
             name="theme"
             value="light"
             checked={preference === "light"}
             onChange={() => handleThemeChange("light")}
-            className="appearance-none w-4 h-4 border-2 border-[var(--foreground)]/40 rounded-full cursor-pointer
+            className="appearance-none w-4 h-4 border-2 border-foreground/40 rounded-full cursor-pointer
                      checked:border-[var(--accent)] checked:border-[6px]
                      focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2
                      transition-all duration-150"
@@ -45,14 +45,14 @@ export function ThemeSettings() {
         </label>
 
         {/* Dark Mode */}
-        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-[var(--border-color)]/30 transition-colors">
+        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-border/30 transition-colors">
           <input
             type="radio"
             name="theme"
             value="dark"
             checked={preference === "dark"}
             onChange={() => handleThemeChange("dark")}
-            className="appearance-none w-4 h-4 border-2 border-[var(--foreground)]/40 rounded-full cursor-pointer
+            className="appearance-none w-4 h-4 border-2 border-foreground/40 rounded-full cursor-pointer
                      checked:border-[var(--accent)] checked:border-[6px]
                      focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2
                      transition-all duration-150"
@@ -64,14 +64,14 @@ export function ThemeSettings() {
         </label>
 
         {/* Auto Mode */}
-        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-[var(--border-color)]/30 transition-colors">
+        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-md hover:bg-border/30 transition-colors">
           <input
             type="radio"
             name="theme"
             value="auto"
             checked={preference === "auto"}
             onChange={() => handleThemeChange("auto")}
-            className="appearance-none w-4 h-4 border-2 border-[var(--foreground)]/40 rounded-full cursor-pointer
+            className="appearance-none w-4 h-4 border-2 border-foreground/40 rounded-full cursor-pointer
                      checked:border-[var(--accent)] checked:border-[6px]
                      focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2
                      transition-all duration-150"

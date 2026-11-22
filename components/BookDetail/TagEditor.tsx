@@ -66,7 +66,7 @@ export default function TagEditor({
     <>
       {/* Subtitle - only show on mobile in BottomSheet */}
       {isMobile && (
-        <p className="text-sm text-[var(--foreground)]/70 font-medium mb-4">
+        <p className="text-sm text-foreground/70 font-medium mb-4">
           {bookTitle}
         </p>
       )}
@@ -84,7 +84,7 @@ export default function TagEditor({
           allowCreate={true}
           placeholder="Search or create tags..."
         />
-        <p className="text-xs text-[var(--foreground)]/50 mt-2">
+        <p className="text-xs text-foreground/50 mt-2">
           Click tags to select, or press Enter to add and continue typing
         </p>
       </div>
@@ -125,7 +125,7 @@ export default function TagEditor({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[var(--foreground)]/50">
+          <p className="text-sm text-foreground/50">
             No tags added yet
           </p>
         )}
@@ -197,14 +197,14 @@ export default function TagEditor({
             <h2 className="text-xl font-serif font-bold text-[var(--heading-text)] mb-1">
               Edit Tags
             </h2>
-            <p className="text-sm text-[var(--foreground)]/70 font-medium truncate">
+            <p className="text-sm text-foreground/70 font-medium truncate">
               {bookTitle}
             </p>
           </div>
           <button
             onClick={handleClose}
             disabled={saving}
-            className="text-[var(--foreground)]/50 hover:text-[var(--foreground)] transition-colors disabled:opacity-50 flex-shrink-0"
+            className="text-foreground/50 hover:text-[var(--foreground)] transition-colors disabled:opacity-50 flex-shrink-0"
             aria-label="Close"
           >
             <X className="w-5 h-5" />

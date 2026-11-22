@@ -146,7 +146,7 @@ export function ColorPicker({
               maxLength={7}
               className={cn(
                 "flex-1 px-3 py-2 bg-[var(--background)] border rounded-lg font-mono text-sm",
-                "text-[var(--foreground)] placeholder:text-[var(--foreground)]/50",
+                "text-[var(--foreground)] placeholder:text-foreground/50",
                 "focus:outline-none focus:ring-2 focus:ring-[var(--accent)]",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 error
@@ -171,7 +171,7 @@ export function ColorPicker({
 
           {/* Helper Text */}
           {!error && (
-            <p className="text-xs text-[var(--foreground)]/60 pl-11">
+            <p className="text-xs text-foreground/60 pl-11">
               Enter HEX color (e.g., #3b82f6 or #f00)
             </p>
           )}

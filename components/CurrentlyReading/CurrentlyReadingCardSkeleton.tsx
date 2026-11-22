@@ -15,7 +15,7 @@ export function CurrentlyReadingCardSkeleton() {
         {/* Book Cover Thumbnail - 16x24 with rounded corners */}
         <div className="w-16 h-24 bg-[var(--card-bg-emphasis)] rounded flex-shrink-0 flex items-center justify-center">
           {/* Book icon placeholder */}
-          <div className="w-8 h-8 bg-[var(--foreground)]/15 rounded" />
+          <div className="w-8 h-8 bg-foreground/15 rounded" />
         </div>
 
         {/* Book Info - matches flex-1 min-w-0 layout */}
@@ -33,7 +33,7 @@ export function CurrentlyReadingCardSkeleton() {
             
             {/* Progress bar - h-2 rounded-full */}
             <div className="flex-1 bg-[var(--card-bg-emphasis)] rounded-full h-2 shadow-inner">
-              <div className="h-2 bg-[var(--foreground)]/15 rounded-full w-[55%]" />
+              <div className="h-2 bg-foreground/15 rounded-full w-[55%]" />
             </div>
             
             {/* Update button placeholder - invisible to maintain spacing */}

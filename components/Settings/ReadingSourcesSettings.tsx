@@ -80,7 +80,7 @@ export function ReadingSourcesSettings() {
       </p>
 
       {isLoading && <div className="h-4 bg-[var(--border-color)] rounded animate-pulse w-48" />}
-      {error && <p className="text-sm text-[var(--foreground)]/70">The reading apps couldn&apos;t be loaded. Refresh to try again.</p>}
+      {error && <p className="text-sm text-foreground/70">The reading apps couldn&apos;t be loaded. Refresh to try again.</p>}
 
       <div className="space-y-6">
         {data?.sources.map((s) => (
@@ -88,7 +88,7 @@ export function ReadingSourcesSettings() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h4 className="font-semibold text-[var(--foreground)]">{s.name}</h4>
-                <p className="text-sm text-[var(--foreground)]/70">
+                <p className="text-sm text-foreground/70">
                   {!s.configured
                     ? `Not set up. Set ${SETUP[s.id]} in Tome's environment, then restart Tome.`
                     : s.sync?.lastRunAt
@@ -172,7 +172,7 @@ function LinkRow({ link }: { link: SourceLinkView }) {
           <p className="text-[var(--foreground)] truncate" title={link.title}>
             {link.title}
           </p>
-          <p className="text-[var(--foreground)]/70">
+          <p className="text-foreground/70">
             {link.needsPages ? "not logged yet" : link.lastFinished ? "finished" : `${Math.round(link.lastProgress)}%`} ·{" "}
             {link.bookId !== null ? (
               <>
@@ -230,7 +230,7 @@ function LinkRow({ link }: { link: SourceLinkView }) {
                     onClick={() => relink.mutate({ bookId: b.id })}
                   >
                     {b.title}
-                    {b.authors.length > 0 && <span className="text-[var(--foreground)]/70"> · {b.authors.join(", ")}</span>}
+                    {b.authors.length > 0 && <span className="text-foreground/70"> · {b.authors.join(", ")}</span>}
                   </button>
                 </li>
               ))}

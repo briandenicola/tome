@@ -177,7 +177,7 @@ export function AddBooksToShelfModal({
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
         <input
           type="text"
           placeholder="Search books by title, author, or series (min 2 characters)..."
@@ -185,7 +185,7 @@ export function AddBooksToShelfModal({
           onChange={(e) => setSearch(e.target.value)}
           disabled={submitting}
           autoFocus
-          className={`w-full pl-10 py-2.5 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder:text-[var(--foreground)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 ${
+          className={`w-full pl-10 py-2.5 bg-[var(--background)] border border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder:text-foreground/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 ${
             search ? "pr-10" : "pr-4"
           }`}
         />
@@ -194,7 +194,7 @@ export function AddBooksToShelfModal({
             type="button"
             onClick={() => setSearch("")}
             disabled={submitting}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-[var(--foreground)] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -218,15 +218,15 @@ export function AddBooksToShelfModal({
         ) : loading ? (
           <div className="text-center py-16">
             <Spinner size="md" />
-            <p className="mt-4 text-sm text-[var(--foreground)]/60">Searching...</p>
+            <p className="mt-4 text-sm text-foreground/60">Searching...</p>
           </div>
         ) : books.length === 0 ? (
           <div className="text-center py-16">
-            <LibraryIcon className="w-16 h-16 mx-auto text-[var(--foreground)]/30 mb-4" />
+            <LibraryIcon className="w-16 h-16 mx-auto text-foreground/30 mb-4" />
             <h3 className="text-lg font-semibold text-[var(--heading-text)] mb-2">
               No books found
             </h3>
-            <p className="text-sm text-[var(--foreground)]/60">
+            <p className="text-sm text-foreground/60">
               No books match your search. Try different keywords.
             </p>
           </div>
@@ -244,7 +244,7 @@ export function AddBooksToShelfModal({
                   ? "Deselect All"
                   : "Select All"}
               </button>
-              <span className="text-sm text-[var(--foreground)]/60">
+              <span className="text-sm text-foreground/60">
                 {books.length} {books.length === 1 ? "book" : "books"} found
               </span>
             </div>
@@ -263,8 +263,8 @@ export function AddBooksToShelfModal({
                     className={cn(
                       "w-full p-3 rounded-lg border text-left transition-all disabled:opacity-50 shadow-sm",
                       isSelected
-                        ? "border-[var(--accent)] bg-[var(--accent)]/10 shadow-md"
-                        : "border-[var(--border-color)] hover:border-[var(--accent)]/50 hover:shadow-md"
+                        ? "border-[var(--accent)] bg-accent/10 shadow-md"
+                        : "border-[var(--border-color)] hover:border-accent/50 hover:shadow-md"
                     )}
                   >
                     <div className="flex items-center gap-3">
@@ -274,7 +274,7 @@ export function AddBooksToShelfModal({
                           "w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0",
                           isSelected
                             ? "border-[var(--accent)] bg-[var(--accent)]"
-                            : "border-[var(--foreground)]/30"
+                            : "border-foreground/30"
                         )}
                       >
                         {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -294,7 +294,7 @@ export function AddBooksToShelfModal({
                         
                         {/* Series */}
                         {book.series && (
-                          <p className="text-xs text-[var(--foreground)]/60 mt-0.5 truncate">
+                          <p className="text-xs text-foreground/60 mt-0.5 truncate">
                             {book.series}
                           </p>
                         )}
@@ -346,11 +346,11 @@ export function AddBooksToShelfModal({
       >
         {/* Subtitle */}
         <div className="mb-4">
-          <p className="text-sm text-[var(--foreground)]/70 mb-3">
+          <p className="text-sm text-foreground/70 mb-3">
             {shelfName}
           </p>
           {selectedBookIds.size > 0 && (
-            <p className="text-sm text-[var(--foreground)]/70">
+            <p className="text-sm text-foreground/70">
               {selectedBookIds.size} {selectedBookIds.size === 1 ? "book" : "books"} selected
             </p>
           )}
@@ -373,7 +373,7 @@ export function AddBooksToShelfModal({
       allowBackdropClose={false}
       actions={
         <div className="flex gap-3 justify-between items-center w-full">
-          <div className="text-sm text-[var(--foreground)]/70">
+          <div className="text-sm text-foreground/70">
             {selectedBookIds.size > 0 && (
               <span>
                 {selectedBookIds.size} {selectedBookIds.size === 1 ? "book" : "books"} selected
@@ -414,7 +414,7 @@ function BookCoverThumbnail({ bookId, title, lastSynced }: { bookId: number; tit
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="w-12 h-16 bg-[var(--light-accent)]/30 rounded overflow-hidden flex items-center justify-center flex-shrink-0">
+    <div className="w-12 h-16 bg-light-accent/30 rounded overflow-hidden flex items-center justify-center flex-shrink-0">
       {!imageError ? (
         <Image
           src={getCoverUrl(bookId, lastSynced)}
@@ -425,7 +425,7 @@ function BookCoverThumbnail({ bookId, title, lastSynced }: { bookId: number; tit
           onError={() => setImageError(true)}
         />
       ) : (
-        <BookOpen className="w-6 h-6 text-[var(--accent)]/40" />
+        <BookOpen className="w-6 h-6 text-accent/40" />
       )}
     </div>
   );

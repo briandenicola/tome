@@ -201,9 +201,9 @@ export default function JournalPage() {
           <div key={i} className="space-y-4">
             {/* Date Header Skeleton */}
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 bg-[var(--foreground)]/10 rounded" />
-              <div className="w-5 h-5 bg-[var(--foreground)]/10 rounded" />
-              <div className="h-6 bg-[var(--foreground)]/10 rounded w-32" />
+              <div className="w-5 h-5 bg-foreground/10 rounded" />
+              <div className="w-5 h-5 bg-foreground/10 rounded" />
+              <div className="h-6 bg-foreground/10 rounded w-32" />
             </div>
 
             {/* Book Entry Skeleton */}
@@ -240,26 +240,26 @@ export default function JournalPage() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:divide-x divide-[var(--border-color)]">
                           {/* Column 1 */}
                           <div className="flex items-center gap-2 md:justify-center md:pr-4">
-                            <div className="w-8 h-8 bg-[var(--foreground)]/10 rounded-full" />
+                            <div className="w-8 h-8 bg-foreground/10 rounded-full" />
                             <div className="space-y-1">
-                              <div className="h-3 bg-[var(--foreground)]/10 rounded w-12" />
-                              <div className="h-4 bg-[var(--foreground)]/10 rounded w-10" />
+                              <div className="h-3 bg-foreground/10 rounded w-12" />
+                              <div className="h-4 bg-foreground/10 rounded w-10" />
                             </div>
                           </div>
                           {/* Column 2 */}
                           <div className="flex items-center gap-2 md:justify-center md:px-4">
-                            <div className="w-8 h-8 bg-[var(--foreground)]/10 rounded-full" />
+                            <div className="w-8 h-8 bg-foreground/10 rounded-full" />
                             <div className="space-y-1">
-                              <div className="h-3 bg-[var(--foreground)]/10 rounded w-12" />
-                              <div className="h-4 bg-[var(--foreground)]/10 rounded w-10" />
+                              <div className="h-3 bg-foreground/10 rounded w-12" />
+                              <div className="h-4 bg-foreground/10 rounded w-10" />
                             </div>
                           </div>
                           {/* Column 3 */}
                           <div className="flex items-center gap-2 md:justify-center md:pl-4">
-                            <div className="w-8 h-8 bg-[var(--foreground)]/10 rounded-full" />
+                            <div className="w-8 h-8 bg-foreground/10 rounded-full" />
                             <div className="space-y-1">
-                              <div className="h-3 bg-[var(--foreground)]/10 rounded w-16" />
-                              <div className="h-4 bg-[var(--foreground)]/10 rounded w-12" />
+                              <div className="h-3 bg-foreground/10 rounded w-16" />
+                              <div className="h-4 bg-foreground/10 rounded w-12" />
                             </div>
                           </div>
                         </div>
@@ -277,16 +277,16 @@ export default function JournalPage() {
       <div className="hidden xl:block">
         <div className="sticky top-5 mt-11 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-lg p-4 animate-pulse">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-5 h-5 bg-[var(--foreground)]/10 rounded" />
-            <div className="h-6 bg-[var(--foreground)]/10 rounded w-20" />
+            <div className="w-5 h-5 bg-foreground/10 rounded" />
+            <div className="h-6 bg-foreground/10 rounded w-20" />
           </div>
           <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="space-y-2">
-                <div className="h-5 bg-[var(--foreground)]/10 rounded w-16" />
+                <div className="h-5 bg-foreground/10 rounded w-16" />
                 <div className="ml-4 space-y-1">
-                  <div className="h-4 bg-[var(--foreground)]/10 rounded w-20" />
-                  <div className="h-4 bg-[var(--foreground)]/10 rounded w-20" />
+                  <div className="h-4 bg-foreground/10 rounded w-20" />
+                  <div className="h-4 bg-foreground/10 rounded w-20" />
                 </div>
               </div>
             ))}
@@ -317,7 +317,7 @@ export default function JournalPage() {
           subtitle="Your reading progress across all books"
           icon={BookOpen}
         />
-        <div className="text-center py-12 text-[var(--foreground)]/60">
+        <div className="text-center py-12 text-foreground/60">
           No journal entries yet. Start reading to build your journal!
         </div>
       </div>
@@ -418,7 +418,7 @@ export default function JournalPage() {
                       href={`/books/${bookGroup.bookId}`}
                       className="flex-shrink-0 hover:opacity-90 transition-opacity mx-auto xl:mx-0"
                     >
-                      <div className="w-24 h-36 bg-[var(--light-accent)]/30 rounded overflow-hidden relative">
+                      <div className="w-24 h-36 bg-light-accent/30 rounded overflow-hidden relative">
                         <Image
                           src={getCoverUrl(bookGroup.bookId, bookGroup.bookLastSynced)}
                           alt={bookGroup.bookTitle}
@@ -484,7 +484,7 @@ export default function JournalPage() {
 
           {/* End of results message */}
           {!hasNextPage && entries.length > 0 && (
-            <div className="text-center py-8 text-[var(--foreground)]/60">
+            <div className="text-center py-8 text-foreground/60">
               You&apos;ve reached the end of your journal entries ({total} total)
             </div>
           )}

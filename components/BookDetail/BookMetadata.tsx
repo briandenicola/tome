@@ -20,7 +20,7 @@ export default function BookMetadata({
 
   return (
     <div className="border-l-4 border-[var(--accent)] bg-[var(--card-bg)] pl-4 pr-4 py-3 max-w-md rounded-sm">
-      <p className="text-sm text-[var(--foreground)]/70 mb-3 font-medium">
+      <p className="text-sm text-foreground/70 mb-3 font-medium">
         Add page count to enable progress tracking
       </p>
       <form onSubmit={onTotalPagesSubmit} className="flex gap-2">

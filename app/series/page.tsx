@@ -89,9 +89,9 @@ export default function SeriesPage() {
           icon={BookMarked}
         />
         <div className="text-center py-16">
-          <Library className="w-16 h-16 mx-auto text-[var(--foreground)]/40 mb-4" />
-          <p className="text-[var(--foreground)]/60 font-medium text-lg">No series found in your library</p>
-          <p className="text-[var(--foreground)]/40 text-sm mt-2">
+          <Library className="w-16 h-16 mx-auto text-foreground/40 mb-4" />
+          <p className="text-foreground/60 font-medium text-lg">No series found in your library</p>
+          <p className="text-foreground/40 text-sm mt-2">
             Series information is synced from Calibre
           </p>
         </div>
@@ -110,18 +110,18 @@ export default function SeriesPage() {
       {/* Search Bar */}
       <div className="mt-6 mb-8">
         <div className="relative max-w-2xl">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
           <input
             type="text"
             placeholder="Search series..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-10 py-3 bg-[var(--card-bg)] border-2 border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder-[var(--foreground)]/50 focus:outline-none focus:border-[var(--accent)] transition-colors"
+            className="w-full pl-10 pr-10 py-3 bg-[var(--card-bg)] border-2 border-[var(--border-color)] rounded-lg text-[var(--foreground)] placeholder-foreground/50 focus:outline-none focus:border-[var(--accent)] transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--foreground)]/40 hover:text-[var(--foreground)] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40 hover:text-[var(--foreground)] transition-colors"
               aria-label="Clear search"
             >
               <X className="w-5 h-5" />
@@ -129,7 +129,7 @@ export default function SeriesPage() {
           )}
         </div>
         {searchQuery && (
-          <p className="mt-2 text-sm text-[var(--foreground)]/60">
+          <p className="mt-2 text-sm text-foreground/60">
             Found {filteredSeries.length} {filteredSeries.length === 1 ? "series" : "series"}
           </p>
         )}
@@ -138,8 +138,8 @@ export default function SeriesPage() {
       {/* Series Grid */}
       {filteredSeries.length === 0 ? (
         <div className="text-center py-16">
-          <Library className="w-16 h-16 mx-auto text-[var(--foreground)]/40 mb-4" />
-          <p className="text-[var(--foreground)]/60 font-medium text-lg">
+          <Library className="w-16 h-16 mx-auto text-foreground/40 mb-4" />
+          <p className="text-foreground/60 font-medium text-lg">
             No series found matching &ldquo;{searchQuery}&rdquo;
           </p>
           <button
