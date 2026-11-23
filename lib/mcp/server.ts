@@ -12,7 +12,7 @@ import { buildYearReview } from "@/lib/services/year-review.service";
  */
 
 export const PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26"];
-const SERVER_INFO = { name: "tome", title: "Tome", version: process.env.npm_package_version || "0.95.1" };
+const SERVER_INFO = { name: "tome", title: "Tome", version: process.env.npm_package_version || "0.95.2" };
 
 const INSTRUCTIONS =
   "Tome tracks the books a person reads. Use these tools to manage their backlog: books waiting to be read, either " +
