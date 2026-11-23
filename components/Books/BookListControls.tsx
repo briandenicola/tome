@@ -4,7 +4,8 @@
  * BookListControls Component
  * 
  * Shared filter and control UI for book list views (shelves, read-next, etc.)
- * Handles search/filter input, select mode toggle, and optional sort controls.
+ * Handles search/filter input and optional sort controls. Selecting books needs no button: each book shows a select
+ * circle on hover.
  * 
  * Extracts common UI patterns from /shelves/[id] and /read-next pages.
  */
@@ -20,10 +21,8 @@ interface BookListControlsProps {
   onClearFilter: () => void;
   filterPlaceholder?: string;
 
-  // Select mode props
-  isSelectMode: boolean;
-  onToggleSelectMode: () => void;
-  selectButtonText?: { active: string; inactive: string };
+  /** Whether any book is selected; the sort controls hide while it is. */
+  isSelectMode?: boolean;
 
   // Sort controls (optional - only for shelves)
   showSortControls?: boolean;
@@ -44,9 +43,7 @@ export function BookListControls({
   onFilterChange,
   onClearFilter,
   filterPlaceholder = "Filter by title, author, or series...",
-  isSelectMode,
-  onToggleSelectMode,
-  selectButtonText = { active: "Cancel", inactive: "Select" },
+  isSelectMode = false,
   showSortControls = false,
   sortBy,
   sortDirection = "asc",
@@ -61,7 +58,7 @@ export function BookListControls({
 
   return (
     <div className="mb-6">
-      {/* Filter Input with Select Button */}
+      {/* Filter Input */}
       <div className="flex gap-3 mb-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
@@ -89,13 +86,6 @@ export function BookListControls({
           )}
         </div>
 
-        {/* Select/Cancel Button */}
-        <Button
-          onClick={onToggleSelectMode}
-          variant={isSelectMode ? "secondary" : "primary"}
-        >
-          {isSelectMode ? selectButtonText.active : selectButtonText.inactive}
-        </Button>
       </div>
 
       {/* Sort Controls - Only show on mobile when NOT in select mode and when enabled */}

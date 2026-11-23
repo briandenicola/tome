@@ -9,20 +9,19 @@ interface LibraryBulkActionBarProps {
   /** How many books match the current filters; "Select all" picks every one, not only the ones loaded. */
   matchingCount: number;
   onSelectAllMatching: () => void;
-  onClearSelection: () => void;
   onTags: () => void;
   onAddToShelf: () => void;
   onDelete: () => void;
+  /** Clears the selection, which hides the bar. */
   onDone: () => void;
   loading?: boolean;
 }
 
-/** The bar along the bottom of the library in select mode: what's selected, and what to do to it. */
+/** The bar along the bottom of the library while books are selected: what's selected, and what to do to it. */
 export function LibraryBulkActionBar({
   selectedCount,
   matchingCount,
   onSelectAllMatching,
-  onClearSelection,
   onTags,
   onAddToShelf,
   onDelete,
@@ -57,16 +56,6 @@ export function LibraryBulkActionBar({
               Select all {matchingCount}
             </button>
           )}
-          {!none && (
-            <button
-              type="button"
-              onClick={onClearSelection}
-              disabled={loading}
-              className="text-foreground/70 hover:underline disabled:opacity-50"
-            >
-              Clear
-            </button>
-          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -87,7 +76,7 @@ export function LibraryBulkActionBar({
           <Button onClick={onDelete} disabled={loading || none} variant="danger" size="sm" icon={<Trash2 className="w-4 h-4" />} aria-label="Delete" title="Delete books">
             <span className="hidden sm:inline">Delete</span>
           </Button>
-          <Button onClick={onDone} disabled={loading} variant="secondary" size="sm">
+          <Button onClick={onDone} disabled={loading} variant="secondary" size="sm" title="Clear the selection">
             Done
           </Button>
         </div>

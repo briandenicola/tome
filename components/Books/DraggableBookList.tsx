@@ -193,8 +193,8 @@ export function DraggableBookList({
             actions={renderActions?.(book, index)}
             isSelectMode={isSelectMode}
             isSelected={selectedBookIds.has(book.id)}
-            onToggleSelection={() => onToggleSelection?.(book.id)}
-            onLongPress={() => onEnterSelectModeWithSelection?.(book.id)}
+            onToggleSelection={onToggleSelection ? () => onToggleSelection(book.id) : undefined}
+            onLongPress={onEnterSelectModeWithSelection ? () => onEnterSelectModeWithSelection(book.id) : undefined}
           />
         ))}
       </div>
@@ -218,8 +218,8 @@ export function DraggableBookList({
               actions={renderActions?.(book, index)}
               isSelectMode={isSelectMode}
               isSelected={selectedBookIds.has(book.id)}
-              onToggleSelection={() => onToggleSelection?.(book.id)}
-              onLongPress={() => onEnterSelectModeWithSelection?.(book.id)}
+              onToggleSelection={onToggleSelection ? () => onToggleSelection(book.id) : undefined}
+              onLongPress={onEnterSelectModeWithSelection ? () => onEnterSelectModeWithSelection(book.id) : undefined}
             />
           ))}
         </div>
