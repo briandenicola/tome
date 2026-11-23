@@ -24,10 +24,12 @@ export function LibraryHeader({
   loading = false,
 }: LibraryHeaderProps) {
   return (
-    <div className="flex items-start justify-between border-b border-[var(--border-color)] pb-6">
-      <div>
-        <h1 className="text-5xl font-serif font-bold text-[var(--heading-text)] flex items-center gap-3">
-          <LibraryIcon className="w-8 h-8" />
+    <div className="flex items-start justify-between gap-3 border-b border-[var(--border-color)] pb-6">
+      {/* On a phone the title is the same size as other pages' (see PageHeader) and the buttons are compact icons, so
+          the title and both buttons fit on one line. */}
+      <div className="min-w-0">
+        <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[var(--heading-text)] flex items-center gap-3">
+          <LibraryIcon className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0" />
           Library
         </h1>
         {loading ? (
@@ -41,7 +43,7 @@ export function LibraryHeader({
         )}
       </div>
 
-      <div className="flex gap-2 mt-3 sm:mt-2">
+      <div className="flex flex-shrink-0 gap-2 sm:mt-2">
         {onAddBook && (
           <Button
             onClick={onAddBook}
@@ -49,6 +51,8 @@ export function LibraryHeader({
             size="xl"
             icon={<Plus className="w-4 h-4" />}
             title="Add a book that isn't in Calibre"
+            aria-label="Add book"
+            className="px-3 sm:px-5"
           >
             <span className="hidden sm:inline">Add book</span>
           </Button>
@@ -61,6 +65,8 @@ export function LibraryHeader({
             size="xl"
             icon={<RefreshCw className={cn("w-4 h-4", syncing && "animate-spin")} />}
             title={syncing ? "Syncing..." : "Sync Calibre"}
+            aria-label={syncing ? "Syncing Calibre" : "Sync Calibre"}
+            className="px-3 sm:px-5"
           >
             <span className="hidden sm:inline">{syncing ? "Syncing..." : "Sync Calibre"}</span>
           </Button>
