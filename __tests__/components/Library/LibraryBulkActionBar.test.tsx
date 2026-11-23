@@ -10,7 +10,6 @@ const props = () => ({
   selectedCount: 2,
   matchingCount: 120,
   onSelectAllMatching: vi.fn(),
-  onClearSelection: vi.fn(),
   onTags: vi.fn(),
   onAddToShelf: vi.fn(),
   onDelete: vi.fn(),
@@ -42,24 +41,38 @@ describe("LibraryBulkActionBar", () => {
   });
 });
 
-describe("BookCard in select mode", () => {
-  test("a click selects the book instead of opening it", () => {
+describe("BookCard selection, without a select mode", () => {
+  test("a selectable card still opens the book, and its circle selects it", () => {
     const onToggleSelect = vi.fn();
-    const { rerender } = render(
-      <BookCard id="7" title="Circe" authors={["Madeline Miller"]} selectable onToggleSelect={onToggleSelect} />
+    render(<BookCard id="7" title="Circe" authors={["Madeline Miller"]} selectable onToggleSelect={onToggleSelect} />);
+    expect(screen.getByRole("link")).toHaveAttribute("href", "/books/7");
+    const circle = screen.getByRole("checkbox", { name: "Select Circe" });
+    expect(circle).toHaveAttribute("aria-checked", "false");
+    // Hidden until hover, so it doesn't clutter the covers
+    expect(circle.className).toContain("opacity-0");
+    fireEvent.click(circle);
+    expect(onToggleSelect).toHaveBeenCalledWith(7);
+  });
+
+  test("once anything is selected, a click on the card selects it instead of opening it", () => {
+    const onToggleSelect = vi.fn();
+    const { container } = render(
+      <BookCard id="7" title="Circe" authors={["Madeline Miller"]} selectable selecting onToggleSelect={onToggleSelect} />
     );
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
-    const box = screen.getByRole("checkbox", { name: "Select Circe" });
-    expect(box).toHaveAttribute("aria-checked", "false");
-    fireEvent.click(box);
+    expect(screen.getByRole("checkbox", { name: "Select Circe" }).className).toContain("opacity-100");
+    fireEvent.click(container.querySelector("h3")!);
     expect(onToggleSelect).toHaveBeenCalledWith(7);
+  });
 
-    rerender(<BookCard id="7" title="Circe" authors={["Madeline Miller"]} selectable selected onToggleSelect={onToggleSelect} />);
+  test("a selected card shows it", () => {
+    render(<BookCard id="7" title="Circe" authors={["Madeline Miller"]} selectable selecting selected onToggleSelect={vi.fn()} />);
     expect(screen.getByRole("checkbox", { name: "Select Circe" })).toHaveAttribute("aria-checked", "true");
   });
 
-  test("outside select mode it links to the book", () => {
+  test("a card that can't be selected has no circle", () => {
     render(<BookCard id="7" title="Circe" authors={["Madeline Miller"]} />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/books/7");
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   });
 });

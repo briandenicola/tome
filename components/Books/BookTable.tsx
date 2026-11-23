@@ -11,6 +11,7 @@ import { StarRating } from "@/components/Utilities/StarRating";
 import { type BookStatus } from "@/utils/statusConfig";
 import { getCoverUrl } from "@/lib/utils/cover-url";
 import { Button } from "@/components/Utilities/Button";
+import { SelectCircle } from "@/components/Books/SelectCircle";
 
 type SortDirection = "asc" | "desc";
 
@@ -61,6 +62,7 @@ export function BookTable({
   onToggleSelectAll,
   renderActions,
 }: BookTableProps) {
+  const selectable = !!onToggleSelection;
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
 
   const handleImageError = (bookId: number) => {
@@ -143,14 +145,13 @@ export function BookTable({
       <table className="w-full bg-[var(--card-bg)]">
         <thead className="bg-[var(--background)] border-b border-[var(--border-color)] sticky top-0 z-10">
           <tr>
-            {isSelectMode && (
+            {selectable && (
               <th className="px-4 py-3 text-left w-[60px]">
-                <input
-                  type="checkbox"
-                  checked={selectedBookIds.size === books.length && books.length > 0}
-                  onChange={onToggleSelectAll}
-                  className="w-5 h-5 rounded border-[var(--border-color)] text-[var(--accent)] focus:ring-[var(--accent)] focus:ring-offset-0 cursor-pointer"
-                  aria-label="Select all books"
+                <SelectCircle
+                  selected={selectedBookIds.size === books.length && books.length > 0}
+                  onToggle={() => onToggleSelectAll?.()}
+                  label="all books"
+                  revealed
                 />
               </th>
             )}
@@ -200,7 +201,7 @@ export function BookTable({
               <tr
                 key={book.id}
                 className={cn(
-                  "transition-colors",
+                  "group transition-colors",
                   isSelected && "bg-accent/10",
                   !isSelected && (index % 2 === 0 ? "bg-[var(--card-bg)]" : "bg-[var(--background)]"),
                   !isSelectMode && "hover:bg-[var(--hover-bg)]",
@@ -208,16 +209,14 @@ export function BookTable({
                 )}
                 onClick={isSelectMode && onToggleSelection ? () => onToggleSelection(book.id) : undefined}
               >
-                {/* Checkbox */}
-                {isSelectMode && (
+                {/* Select circle: shows on hover, or always once anything is selected */}
+                {selectable && (
                   <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => onToggleSelection?.(book.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-4 h-4 rounded border-[var(--border-color)] focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-0 cursor-pointer"
-                      style={{ accentColor: 'var(--accent)' }}
+                    <SelectCircle
+                      selected={isSelected}
+                      onToggle={() => onToggleSelection?.(book.id)}
+                      label={book.title}
+                      revealed={isSelectMode}
                     />
                   </td>
                 )}

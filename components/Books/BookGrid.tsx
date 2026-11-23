@@ -18,7 +18,7 @@ interface BookGridProps {
   loading?: boolean;
   loadingMore?: boolean;
   skeletonCount?: number; // Number of skeleton cards to show when loading
-  /** Select mode: clicking a card selects it instead of opening the book. */
+  /** Cards show a select circle on hover; once anything is selected, clicking a card selects it. */
   selectable?: boolean;
   selectedIds?: Set<number>;
   onToggleSelect?: (id: number) => void;
@@ -53,6 +53,7 @@ export function BookGrid({
                 status={book.status}
                 lastSynced={book.lastSynced}
                 selectable={selectable}
+                selecting={(selectedIds?.size ?? 0) > 0}
                 selected={selectedIds?.has(book.id) ?? false}
                 onToggleSelect={onToggleSelect}
               />

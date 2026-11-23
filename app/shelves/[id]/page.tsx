@@ -290,7 +290,6 @@ export default function ShelfDetailPage() {
               onFilterChange={listView.setFilterText}
               onClearFilter={() => listView.setFilterText("")}
               isSelectMode={listView.isSelectMode}
-              onToggleSelectMode={listView.toggleSelectMode}
               totalCount={books.length}
               filteredCount={listView.filteredBooks.length}
               showSortControls={listView.isMobile && !listView.isSelectMode}
@@ -525,7 +524,7 @@ export default function ShelfDetailPage() {
           selectedCount={listView.selectedBookIds.size}
           onMove={() => setShowMoveModal(true)}
           onCopy={() => setShowCopyModal(true)}
-          onCancel={listView.toggleSelectMode}
+          onCancel={listView.exitSelectMode}
           onDelete={bulkDelete.trigger}
           loading={bulkDelete.loading || moveLoading || copyLoading}
         />

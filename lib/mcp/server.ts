@@ -10,7 +10,7 @@ import { getLogger } from "@/lib/logger";
  */
 
 export const PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18", "2025-03-26"];
-const SERVER_INFO = { name: "tome", title: "Tome", version: process.env.npm_package_version || "0.7.0" };
+const SERVER_INFO = { name: "tome", title: "Tome", version: process.env.npm_package_version || "0.95.0" };
 
 const INSTRUCTIONS =
   "Tome tracks the books a person reads. Use these tools to manage their backlog: books waiting to be read, either " +

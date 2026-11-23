@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, Check } from "lucide-react";
+import { BookOpen } from "lucide-react";
+import { SelectCircle } from "@/components/Books/SelectCircle";
 import { cn } from "@/utils/cn";
 import { useState, memo } from "react";
 import { StatusBadge } from "@/components/Utilities/StatusBadge";
@@ -17,8 +18,10 @@ interface BookCardProps {
   currentProgress?: number;
   className?: string;
   lastSynced?: Date | string | null;
-  /** In select mode a click selects the book instead of opening it. */
+  /** Shows a select circle on hover, for bulk actions. */
   selectable?: boolean;
+  /** Something is already selected: a click anywhere on the card selects it instead of opening the book. */
+  selecting?: boolean;
   selected?: boolean;
   onToggleSelect?: (id: number) => void;
 }
@@ -32,6 +35,7 @@ export const BookCard = memo(function BookCard({
   className,
   lastSynced,
   selectable = false,
+  selecting = false,
   selected = false,
   onToggleSelect,
 }: BookCardProps) {
@@ -40,32 +44,19 @@ export const BookCard = memo(function BookCard({
   const card = (
       <div
         className={cn(
-          "bg-[var(--card-bg)] border border-[var(--border-color)] shadow-lg rounded-md hover:shadow-xl transition-shadow cursor-pointer overflow-hidden group",
+          "bg-[var(--card-bg)] border border-[var(--border-color)] shadow-lg rounded-md hover:shadow-xl transition-shadow cursor-pointer overflow-hidden",
           selectable && selected && "ring-2 ring-[var(--accent)] border-[var(--accent)]",
           className
         )}
       >
         <div className="aspect-[2/3] bg-light-accent/30 flex items-center justify-center overflow-hidden relative">
-          {selectable && (
-            <span
-              aria-hidden="true"
-              className={cn(
-                "absolute top-2 left-2 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow",
-                selected
-                  ? "bg-[var(--accent)] border-[var(--accent)] text-[var(--accent-ink)]"
-                  : "bg-card/80 border-foreground/40"
-              )}
-            >
-              {selected && <Check className="w-4 h-4" />}
-            </span>
-          )}
           {!imageError ? (
             <Image
               src={getCoverUrl(Number(id), lastSynced)}
               alt={title}
               fill
               loading="lazy"
-              className="object-cover group-hover:opacity-95 transition-opacity"
+              className="object-cover hover:opacity-95 transition-opacity"
               onError={() => setImageError(true)}
             />
           ) : (
@@ -105,22 +96,27 @@ export const BookCard = memo(function BookCard({
       </div>
   );
 
-  if (selectable) {
-    return (
-      <button
-        type="button"
-        role="checkbox"
-        aria-checked={selected}
-        aria-label={`Select ${title}`}
-        onClick={() => onToggleSelect?.(Number(id))}
-        className="block w-full text-left"
-      >
-        {card}
-      </button>
-    );
-  }
+  if (!selectable) return <Link href={`/books/${id}`}>{card}</Link>;
 
-  return <Link href={`/books/${id}`}>{card}</Link>;
+  const toggle = () => onToggleSelect?.(Number(id));
+  return (
+    <div className="relative group">
+      {selecting ? (
+        <button type="button" tabIndex={-1} aria-hidden="true" onClick={toggle} className="block w-full text-left">
+          {card}
+        </button>
+      ) : (
+        <Link href={`/books/${id}`}>{card}</Link>
+      )}
+      <SelectCircle
+        selected={selected}
+        onToggle={toggle}
+        label={title}
+        revealed={selecting}
+        className="absolute top-2 left-2 z-10"
+      />
+    </div>
+  );
 }, (prevProps, nextProps) => {
   // Custom comparison function for memo
   // Only re-render if these key props change
@@ -131,6 +127,7 @@ export const BookCard = memo(function BookCard({
     prevProps.currentProgress === nextProps.currentProgress &&
     prevProps.lastSynced === nextProps.lastSynced &&
     prevProps.selectable === nextProps.selectable &&
+    prevProps.selecting === nextProps.selecting &&
     prevProps.selected === nextProps.selected &&
     prevProps.onToggleSelect === nextProps.onToggleSelect
   );

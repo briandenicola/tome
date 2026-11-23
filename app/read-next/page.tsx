@@ -163,7 +163,6 @@ export default function ReadNextPage() {
             onFilterChange={listView.setFilterText}
             onClearFilter={() => listView.setFilterText("")}
             isSelectMode={listView.isSelectMode}
-            onToggleSelectMode={listView.toggleSelectMode}
             totalCount={sessions.length}
             filteredCount={listView.filteredBooks.length}
           />

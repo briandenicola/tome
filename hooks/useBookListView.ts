@@ -33,9 +33,11 @@ export function useBookListView({ books, initialFilter = "" }: UseBookListViewOp
   // Filter state
   const [filterText, setFilterText] = useState(initialFilter);
 
-  // Multi-select state
-  const [isSelectMode, setIsSelectMode] = useState(false);
+  // Multi-select state. There is no select mode to turn on: hovering a book shows its select circle, and selecting
+  // one puts the list in select mode (clicks select, dragging and per-book actions pause) until the selection is
+  // cleared.
   const [selectedBookIds, setSelectedBookIds] = useState<Set<number>>(new Set());
+  const isSelectMode = selectedBookIds.size > 0;
 
   // Filter books based on search text
   const filteredBooks = useMemo(() => {
@@ -52,12 +54,6 @@ export function useBookListView({ books, initialFilter = "" }: UseBookListViewOp
       return titleMatch || authorMatch || seriesMatch;
     });
   }, [books, filterText]);
-
-  // Toggle select mode (clears selection when toggling)
-  const toggleSelectMode = useCallback(() => {
-    setIsSelectMode((prev) => !prev);
-    setSelectedBookIds(new Set());
-  }, []);
 
   // Toggle selection for a single book
   const toggleBookSelection = useCallback((bookId: number) => {
@@ -88,16 +84,12 @@ export function useBookListView({ books, initialFilter = "" }: UseBookListViewOp
     setSelectedBookIds(new Set());
   }, []);
 
-  // Exit select mode and clear selection
-  const exitSelectMode = useCallback(() => {
-    setIsSelectMode(false);
-    setSelectedBookIds(new Set());
-  }, []);
+  // Exit select mode: the same as clearing the selection
+  const exitSelectMode = clearSelection;
 
-  // Enter select mode and select a specific book (for long-press to select)
+  // Select a book from a long-press on a touch screen
   const enterSelectModeWithSelection = useCallback((bookId: number) => {
-    setIsSelectMode(true);
-    setSelectedBookIds(new Set([bookId]));
+    setSelectedBookIds((prev) => (prev.has(bookId) ? prev : new Set(prev).add(bookId)));
   }, []);
 
   return {
@@ -112,7 +104,6 @@ export function useBookListView({ books, initialFilter = "" }: UseBookListViewOp
     // Selection state
     isSelectMode,
     selectedBookIds,
-    toggleSelectMode,
     toggleBookSelection,
     toggleSelectAll,
     clearSelection,

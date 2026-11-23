@@ -10,6 +10,7 @@ import { StarRating } from "@/components/Utilities/StarRating";
 import { type BookStatus } from "@/utils/statusConfig";
 import { getCoverUrl } from "@/lib/utils/cover-url";
 import { useLongPress } from "@/hooks/useLongPress";
+import { SelectCircle } from "@/components/Books/SelectCircle";
 
 interface BookListItemProps {
   book: {
@@ -88,7 +89,7 @@ export const BookListItem = memo(function BookListItem({
       aria-label={onLongPress && !isSelectMode ? `${book.title}. Press Enter or Space to select.` : undefined}
       tabIndex={onLongPress && !isSelectMode ? 0 : undefined}
       className={cn(
-        "bg-[var(--card-bg)] border rounded-lg p-4 transition-all",
+        "group bg-[var(--card-bg)] border rounded-lg p-4 transition-all",
         isSelectMode && "cursor-pointer hover:shadow-md",
         isSelected && "border-[var(--accent)] bg-accent/10",
         !isSelected && "border-[var(--border-color)]",
@@ -100,17 +101,10 @@ export const BookListItem = memo(function BookListItem({
       {...(!isSelectMode && onLongPress ? longPressHandlers : {})}
     >
       <div className="flex gap-4 items-start">
-        {/* Checkbox for select mode */}
-        {isSelectMode && (
+        {/* Select circle: shows on hover, or always once anything is selected */}
+        {onToggleSelection && (
           <div className="flex-shrink-0 h-24 flex items-center">
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={onToggleSelection}
-              onClick={(e) => e.stopPropagation()}
-              className="w-4 h-4 rounded border-[var(--border-color)] focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-0 cursor-pointer"
-              style={{ accentColor: 'var(--accent)' }}
-            />
+            <SelectCircle selected={isSelected} onToggle={onToggleSelection} label={book.title} revealed={isSelectMode} />
           </div>
         )}
 
@@ -241,6 +235,7 @@ export const BookListItem = memo(function BookListItem({
     prevProps.book.rating === nextProps.book.rating &&
     prevProps.showProgress === nextProps.showProgress &&
     prevProps.isSelectMode === nextProps.isSelectMode &&
-    prevProps.isSelected === nextProps.isSelected
+    prevProps.isSelected === nextProps.isSelected &&
+    !!prevProps.onToggleSelection === !!nextProps.onToggleSelection
   );
 });

@@ -11,6 +11,7 @@ import { StarRating } from "@/components/Utilities/StarRating";
 import { type BookStatus } from "@/utils/statusConfig";
 import { getCoverUrl } from "@/lib/utils/cover-url";
 import { Button } from "@/components/Utilities/Button";
+import { SelectCircle } from "@/components/Books/SelectCircle";
 import {
   DndContext,
   closestCenter,
@@ -105,7 +106,7 @@ function SortableRow({ book, index, imageErrors, onImageError, onRemoveBook, isD
       ref={setNodeRef}
       style={style}
       className={cn(
-        "transition-colors",
+        "group transition-colors",
         isSelectMode && "cursor-pointer",
         isSelectMode && isSelected && "bg-accent/10",
         !isSelectMode && "hover:bg-[var(--hover-bg)]",
@@ -114,18 +115,11 @@ function SortableRow({ book, index, imageErrors, onImageError, onRemoveBook, isD
       )}
       onClick={isSelectMode ? onToggleSelection : undefined}
     >
-      {/* Checkbox Column - Show in select mode */}
-      {isSelectMode && (
+      {/* Select circle: shows on hover, or always once anything is selected */}
+      {onToggleSelection && (
         <td className="px-4 py-3">
           <div className="flex items-center justify-center">
-            <input
-              type="checkbox"
-              checked={isSelected}
-              onChange={() => onToggleSelection?.()}
-              onClick={(e) => e.stopPropagation()}
-              className="w-4 h-4 rounded border-[var(--border-color)] focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-0 cursor-pointer"
-              style={{ accentColor: 'var(--accent)' }}
-            />
+            <SelectCircle selected={isSelected} onToggle={onToggleSelection} label={book.title} revealed={isSelectMode} />
           </div>
         </td>
       )}
@@ -306,6 +300,7 @@ export function DraggableBookTable({
 
   // Disable drag when in select mode
   const effectiveIsDragEnabled = isDragEnabled && !isSelectMode;
+  const selectable = !!onToggleSelection;
 
   // Update local state when books prop changes (but not during active drag)
   useEffect(() => {
@@ -413,7 +408,7 @@ export function DraggableBookTable({
   };
 
   if (loading) {
-    return <BookTableSkeleton isDragEnabled={effectiveIsDragEnabled} isSelectMode={isSelectMode} />;
+    return <BookTableSkeleton isDragEnabled={effectiveIsDragEnabled} isSelectMode={selectable} />;
   }
 
   if (books.length === 0) {
@@ -441,18 +436,10 @@ export function DraggableBookTable({
       <table className="w-full bg-[var(--card-bg)]">
         <thead className="bg-[var(--background)] border-b border-[var(--border-color)] sticky top-0 z-10">
           <tr>
-            {/* Checkbox Column Header - Show in select mode */}
-            {isSelectMode && (
+            {selectable && (
               <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--heading-text)] w-[60px]">
                 <div className="flex items-center justify-center">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={onToggleSelectAll}
-                    className="w-4 h-4 rounded border-[var(--border-color)] focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-0 cursor-pointer"
-                    style={{ accentColor: 'var(--accent)' }}
-                    aria-label="Select all books"
-                  />
+                  <SelectCircle selected={allSelected} onToggle={() => onToggleSelectAll?.()} label="all books" revealed />
                 </div>
               </th>
             )}
@@ -505,7 +492,7 @@ export function DraggableBookTable({
               isDragEnabled={effectiveIsDragEnabled}
               isSelectMode={isSelectMode}
               isSelected={selectedBookIds.has(book.id)}
-              onToggleSelection={() => onToggleSelection?.(book.id)}
+              onToggleSelection={onToggleSelection ? () => onToggleSelection(book.id) : undefined}
               renderActions={renderActions}
             />
           ))}

@@ -33,7 +33,7 @@ Currently, the *only way* to run Tome is through [Docker](https://www.docker.com
 
 The image is: `ghcr.io/briandenicola/tome:latest`. Fill in the volumes detailed above.
 
-**Image tags:** `latest` and the version (`0.7.0`, `0.7`) are built from `main`, for amd64 (x86) only.
+**Image tags:** `latest` and the version (`0.95.0`, `0.95`) are built from `main`, for amd64 (x86) only.
 
 ### 2. Docker CLI
 After replacing the host volume references, run this from the command line or terminal:
@@ -98,10 +98,10 @@ services:
 
 ## Reading apps
 
-Tome can log your progress from the apps you read in, so you don't type it in: **Audiobookshelf** for audiobooks (and its ebooks), and **Grimmory** for ebooks, which includes what your Kobo syncs to it. Set the variables above and restart Tome; **Settings → Reading apps** shows each app, its last sync, and a **Sync now** button.
+Tome can log your progress from the apps you read in, so you don't type it in: **Audiobookshelf** for audiobooks (and its ebooks), and **Grimmory** for ebooks, which includes what your Kobo syncs to it. Set the variables above and restart Tome; **More → Sync** (`/sync`) shows each app, its last sync, and a **Sync now** button.
 
 - **The first sync** only notes where every book is. Nothing from before is logged, so history you logged by hand isn't doubled. After that, every sync logs the reading since the last one, as a percentage, with the note "Synced from Audiobookshelf" (or Grimmory). Several syncs on one day move that day's entry on rather than adding more.
-- **Matching.** Each app book is matched to a Tome book by ISBN, else by title and an author's surname. A book Tome doesn't have is added, with its cover, once there's new reading on it. **Settings → Reading apps** lists every match; **Change** points one at another Tome book or adds it as a new book.
+- **Matching.** Each app book is matched to a Tome book by ISBN, else by title and an author's surname. A book Tome doesn't have is added, with its cover, once there's new reading on it. **More → Sync** lists every match; **Change** points one at another Tome book or adds it as a new book.
 - **Finished** in the app marks the book read in Tome, on the day it was finished. Reading it again in the app starts a re-read.
 - **Never backwards.** If Tome is already further on (you logged by hand, or the other app is ahead), nothing is logged.
 - **Page counts.** Tome needs a book's page count to start it, and counts pages for streaks and stats. Grimmory's books bring theirs. For an audiobook without one, Tome looks up the print edition's page count on Open Library by ISBN, and failing that estimates one from the audiobook's length (about 30 pages an hour), shown as "≈ 412 pages (estimated)". Set the real count on the book's page at any time: the logged progress keeps its percentages and its pages are recounted. A book Tome knows neither the ISBN nor the length of waits ("needs a page count" in Settings) until you set one; its reading is logged on the next sync.

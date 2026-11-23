@@ -1,4 +1,4 @@
-import { BookOpen, Library, Target, Flame, Settings, BarChart3, BookMarked, ScrollText, Tag, FolderOpen, Clock } from "lucide-react";
+import { BookOpen, Library, Target, Flame, Settings, BarChart3, BookMarked, ScrollText, Tag, FolderOpen, Clock, RefreshCw } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export interface NavLink {
@@ -33,6 +33,7 @@ export const SHELVES_LINK: NavLink = { href: "/shelves", label: "Shelves", icon:
 export const MORE_MENU_LINKS: NavLink[] = [
   { href: "/goals", label: "Goals", icon: Target },
   { href: "/stats", label: "Stats", icon: BarChart3 },
+  { href: "/sync", label: "Sync", icon: RefreshCw },
 ];
 
 // Bottom utility link (shown in bottom section of desktop sidebar)

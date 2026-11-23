@@ -514,10 +514,11 @@ function LibraryPageContent() {
     router.replace('/library');
   }
 
-  // Select mode, for bulk actions: the ids of the selected books, which "Select all" fills with every book that
-  // matches the filters, loaded or not.
-  const [selecting, setSelecting] = useState(false);
+  // Bulk actions: the ids of the selected books, which "Select all" fills with every book that matches the filters,
+  // loaded or not. There is no select mode to turn on: hovering a cover shows its select circle, and once anything is
+  // selected, a click on any cover selects it and the action bar shows.
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const selecting = selectedIds.size > 0;
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkModal, setBulkModal] = useState<"tags" | "shelf" | "delete" | null>(null);
 
@@ -528,10 +529,7 @@ function LibraryPageContent() {
     setSelectedIds(new Set());
   }, [filterKey]);
 
-  const toggleSelectMode = useCallback(() => {
-    setSelecting((on) => !on);
-    setSelectedIds(new Set());
-  }, []);
+  const clearSelection = useCallback(() => setSelectedIds(new Set()), []);
 
   const toggleBookSelection = useCallback((id: number) => {
     setSelectedIds((prev) => {
@@ -629,8 +627,6 @@ function LibraryPageContent() {
         onAddBook={() => setAddingBook(true)}
         calibreConfigured={calibreConfigured}
         loading={isInitialLoading}
-        onToggleSelect={toggleSelectMode}
-        selecting={selecting}
       />
 
       <ManualBookModal
@@ -674,12 +670,12 @@ function LibraryPageContent() {
         books={books}
         loading={isInitialLoading}
         loadingMore={loadingMore}
-        selectable={selecting}
+        selectable
         selectedIds={selectedIds}
         onToggleSelect={toggleBookSelection}
       />
 
-      {/* Infinite scroll trigger; in select mode, room for the action bar too */}
+      {/* Infinite scroll trigger; while books are selected, room for the action bar too */}
       <div ref={observerTarget} className={selecting ? "pb-32 pt-8" : "py-8"} />
 
       {selecting && (
@@ -687,11 +683,10 @@ function LibraryPageContent() {
           selectedCount={selectedIds.size}
           matchingCount={total}
           onSelectAllMatching={handleSelectAllMatching}
-          onClearSelection={() => setSelectedIds(new Set())}
           onTags={() => setBulkModal("tags")}
           onAddToShelf={() => setBulkModal("shelf")}
           onDelete={() => setBulkModal("delete")}
-          onDone={toggleSelectMode}
+          onDone={clearSelection}
           loading={bulkBusy}
         />
       )}
