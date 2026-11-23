@@ -115,7 +115,7 @@ The [life store](https://github.com/briandenicola/lifestore) reads Tome through 
 
 ## AI agents (MCP)
 
-Tome is an [MCP](https://modelcontextprotocol.io) server at `/api/mcp`, so an AI assistant or your own agent can manage your backlog. Its tools:
+Tome is an [MCP](https://modelcontextprotocol.io) server at `/api/mcp`, so an AI assistant or your own agent can manage your backlog and look back on what you've read. Its tools:
 
 | Tool | Does | Needs |
 |------|------|-------|
@@ -125,6 +125,8 @@ Tome is an [MCP](https://modelcontextprotocol.io) server at `/api/mcp`, so an AI
 | `lookup_isbn` | A book's details from Open Library, ready for `add_book` | read |
 | `add_book` | Adds a book to to-read (or `status: "read-next"`), with an optional cover URL. If Tome already has a book with that ISBN, or that title by that author, it adds nothing and returns the matches | write |
 | `queue_book` | Puts a book Tome has into to-read or read-next. Books being read, finished or dropped are left alone; change those in Tome | write |
+| `books_read` | The books finished in a year (`year`, default this year), with start and finish dates, days taken, rating, pages, format and tags, and a summary. The same as the reading report | read |
+| `year_review` | A year summed up (`year`, default this year), as on the Year in review page: totals, books per month, highlights, favourites, top authors and tags, formats | read |
 
 Make a token under **Settings → API tokens** (Write to add books, Read to only look) and give the client the URL and the header. For Claude Code:
 
