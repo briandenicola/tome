@@ -74,7 +74,10 @@ describe("the MCP handshake", () => {
   test("lists the backlog tools, marking which ones only read", async () => {
     const { body } = await rpc("tools/list");
     const tools = Object.fromEntries(body.result.tools.map((t: { name: string; annotations: { readOnlyHint: boolean } }) => [t.name, t.annotations.readOnlyHint]));
-    expect(tools).toEqual({ search_books: true, list_backlog: true, list_reading: true, lookup_isbn: true, add_book: false, queue_book: false });
+    expect(tools).toEqual({
+      search_books: true, list_backlog: true, list_reading: true, lookup_isbn: true, add_book: false, queue_book: false,
+      books_read: true, year_review: true,
+    });
   });
 
   test("unknown methods, bad JSON and GET are refused", async () => {
@@ -247,5 +250,63 @@ describe("the backlog tools", () => {
   test("an unknown tool is a JSON-RPC error", async () => {
     const { body } = await rpc("tools/call", { name: "delete_everything", arguments: {} });
     expect(body.error.code).toBe(-32602);
+  });
+});
+
+describe("the year's reading", () => {
+  async function finished(title: string, started: string, completed: string, extra: { pages?: number; rating?: number; authors?: string[] } = {}) {
+    const b = await bookRepository.create({
+      source: "manual", path: "", title, authors: extra.authors ?? ["Someone"], totalPages: extra.pages ?? 300, rating: extra.rating ?? null,
+    });
+    await sessionRepository.create({ bookId: b.id, status: "read", sessionNumber: 1, isActive: false, startedDate: started, completedDate: completed });
+    return b;
+  }
+
+  test("books_read lists the year's finished books with dates and ratings, and a summary", async () => {
+    await finished("Ravenna", "2026-01-02", "2026-01-20", { pages: 608, rating: 5, authors: ["Judith Herrin"] });
+    await finished("Circe", "2026-03-01", "2026-03-04", { pages: 400, rating: 4 });
+    await finished("Last Year", "2025-12-01", "2025-12-20");
+
+    const { isError, data } = await call("books_read", { year: 2026 });
+    expect(isError).toBe(false);
+    expect(data.books.map((b: { title: string }) => b.title)).toEqual(["Ravenna", "Circe"]);
+    expect(data.books[0]).toMatchObject({ authors: ["Judith Herrin"], startedDate: "2026-01-02", finishedDate: "2026-01-20", days: 19, rating: 5, pages: 608 });
+    expect(data.books[0]).not.toHaveProperty("lastSynced");
+    expect(data.summary).toMatchObject({ count: 2, pages: 1008, averageRating: 4.5 });
+
+    // A year given as text works too
+    expect((await call("books_read", { year: "2025" })).data.books.map((b: { title: string }) => b.title)).toEqual(["Last Year"]);
+  });
+
+  test("year_review sums the year up, with books per month as counts", async () => {
+    await finished("Ravenna", "2026-01-02", "2026-01-20", { pages: 608, rating: 5 });
+    await finished("Circe", "2026-03-01", "2026-03-04", { pages: 400, rating: 5 });
+    await finished("Byzantium", "2026-03-05", "2026-03-30", { pages: 150, rating: 3 });
+
+    const { isError, data } = await call("year_review", { year: 2026 });
+    expect(isError).toBe(false);
+    expect(data.totals).toMatchObject({ books: 3, pages: 1158 });
+    expect(data.months).toHaveLength(12);
+    expect(data.months[2]).toEqual({ month: 3, books: 2 });
+    expect(data.highlights.busiestMonth).toEqual({ month: 3, books: 2 });
+    expect(data.highlights.longest).toMatchObject({ title: "Ravenna" });
+    expect(data.highlights.longest).not.toHaveProperty("lastSynced");
+  });
+
+  test("the year defaults to this year, and a bad year is the tool's error", async () => {
+    const thisYear = new Date().getFullYear();
+    expect((await call("year_review")).data.year).toBe(thisYear);
+    expect((await call("books_read")).data.year).toBe(thisYear);
+
+    const bad = await call("books_read", { year: 26 });
+    expect(bad.isError).toBe(true);
+    expect(bad.text).toMatch(/between 1900 and 2100/);
+  });
+
+  test("a read token can use both", async () => {
+    const { token } = await apiTokenService.create("agent", "read");
+    const auth = { authorization: `Bearer ${token}` };
+    expect((await call("books_read", { year: 2026 }, auth)).isError).toBe(false);
+    expect((await call("year_review", { year: 2026 }, auth)).isError).toBe(false);
   });
 });

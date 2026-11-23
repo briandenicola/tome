@@ -2,9 +2,11 @@ import type { TokenAccess } from "@/lib/auth";
 import { backlogService, BacklogError, ManualBookError } from "@/lib/services/backlog.service";
 import { lookupIsbn } from "@/lib/services/isbn-lookup.service";
 import { getLogger } from "@/lib/logger";
+import { buildReadingReport } from "@/lib/services/reading-report.service";
+import { buildYearReview } from "@/lib/services/year-review.service";
 
 /**
- * Tome's MCP server: the backlog tools, spoken over JSON-RPC as the Model Context Protocol's Streamable HTTP transport
+ * Tome's MCP server: the backlog tools and the year's reading, spoken over JSON-RPC as the Model Context Protocol's Streamable HTTP transport
  * describes, without sessions or streaming (every answer is a single JSON response). Tools that change anything need
  * write access; a read API token can search and list.
  */
@@ -17,7 +19,8 @@ const INSTRUCTIONS =
   '"to-read" (the pile) or "read-next" (the ordered queue of what is next). Before adding a book, search_books to see ' +
   "whether Tome already has it (Calibre books are in Tome already); if it does, queue_book it instead of adding a copy. " +
   "lookup_isbn fills in a book's details from Open Library. list_reading shows what is being read now and how far " +
-  "along each book is; search_books shows the same progress for any book being read.";
+  "along each book is; search_books shows the same progress for any book being read. For what has been read, " +
+  "books_read lists the books finished in a year and year_review sums the year up.";
 
 type Json = Record<string, unknown>;
 
@@ -35,6 +38,31 @@ const status = {
   enum: ["to-read", "read-next"],
   description: '"to-read" puts the book on the pile; "read-next" puts it at the end of the read-next queue.',
 };
+
+/** A tool's input that can't be used: the message goes back to the assistant as the tool's error. */
+class ToolInputError extends Error {}
+
+const yearInput = {
+  type: "integer",
+  minimum: 1900,
+  maximum: 2100,
+  description: "The calendar year, e.g. 2026. Default this year.",
+};
+
+function yearArg(a: Json): number {
+  if (a.year === undefined || a.year === null) return new Date().getFullYear();
+  const year = typeof a.year === "string" && /^\d{4}$/.test(a.year) ? Number(a.year) : a.year;
+  if (typeof year !== "number" || !Number.isInteger(year) || year < 1900 || year > 2100) {
+    throw new ToolInputError("year must be a year between 1900 and 2100, like 2026.");
+  }
+  return year;
+}
+
+/** A finished book as the tools show it: without lastSynced, which only exists to refresh cover images. */
+function withoutCoverKey<T extends { lastSynced?: unknown }>(book: T): Omit<T, "lastSynced"> {
+  const { lastSynced: _lastSynced, ...rest } = book;
+  return rest;
+}
 
 const TOOLS: Tool[] = [
   {
@@ -137,6 +165,49 @@ const TOOLS: Tool[] = [
     write: true,
     run: async (a) => ({ book: await backlogService.queue(a.bookId, a.status) }),
   },
+  {
+    name: "books_read",
+    title: "List the books read in a year",
+    description:
+      "Lists the books finished in a year, oldest finish first: title, authors, series, tags, start and finish dates, " +
+      "days taken, rating, pages, format (ebook, audiobook or print) and whether it was a re-read, with a summary " +
+      "(count, pages, average rating and days, books per format). The same as Tome's reading report.",
+    inputSchema: { type: "object", properties: { year: yearInput } },
+    write: false,
+    run: async (a) => {
+      const report = await buildReadingReport(yearArg(a));
+      return { ...report, books: report.books.map(withoutCoverKey) };
+    },
+  },
+  {
+    name: "year_review",
+    title: "Sum up a year's reading",
+    description:
+      "Sums up a year's reading, as Tome's Year in review page does: totals (books, pages, reading days, longest run " +
+      "of days in a row, average rating, re-reads, authors), books finished each month, highlights (first, last, " +
+      "longest, shortest and fastest book, favourites, busiest month), top authors and tags, and books per format. " +
+      "Use books_read for the full list of books.",
+    inputSchema: { type: "object", properties: { year: yearInput } },
+    write: false,
+    run: async (a) => {
+      const review = await buildYearReview(yearArg(a));
+      const book = <T extends { lastSynced?: unknown } | null>(b: T) => (b ? withoutCoverKey(b) : null);
+      return {
+        ...review,
+        // The books are listed by books_read; per month the count is enough here.
+        months: review.months.map((m) => ({ month: m.month, books: m.books.length })),
+        highlights: {
+          ...review.highlights,
+          first: book(review.highlights.first),
+          last: book(review.highlights.last),
+          longest: book(review.highlights.longest),
+          shortest: book(review.highlights.shortest),
+          fastest: book(review.highlights.fastest),
+          favourites: review.highlights.favourites.map(withoutCoverKey),
+        },
+      };
+    },
+  },
 ];
 
 /** A JSON-RPC message, as far as this server reads one. */
@@ -165,7 +236,7 @@ async function callTool(params: Json, access: TokenAccess) {
   try {
     return { value: toolResult(await tool.run(args)) };
   } catch (error) {
-    if (error instanceof BacklogError || error instanceof ManualBookError) return { value: toolResult(error.message, true) };
+    if (error instanceof BacklogError || error instanceof ManualBookError || error instanceof ToolInputError) return { value: toolResult(error.message, true) };
     getLogger().error({ err: error, tool: tool.name }, "MCP tool failed");
     return { value: toolResult(`${tool.name} failed. Tome's log says why.`, true) };
   }
