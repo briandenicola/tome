@@ -33,15 +33,17 @@ export function PageHeader({
           {backLink.label}
         </Link>
       )}
-      <div className="flex items-start justify-between gap-6">
+      {/* On a phone the actions go under the title: beside it, they squeeze the title until a word overflows. The gap
+          is a margin on the actions themselves, so an action hidden on phones leaves no empty space. */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="flex-1 min-w-0">
-          <h1 className="text-4xl font-serif font-bold flex items-center gap-3 sm:gap-4">
+          <h1 className="text-3xl sm:text-4xl font-serif font-bold flex items-center gap-3 sm:gap-4">
             {customIcon ? (
               customIcon
             ) : Icon ? (
               <Icon className="w-8 h-8 text-[var(--subheading-text)] flex-shrink-0" />
             ) : null}
-            <span className="text-[var(--heading-text)] min-w-0">{title}</span>
+            <span className="text-[var(--heading-text)] min-w-0 break-words">{title}</span>
           </h1>
           {subtitle && (
             <p className="text-base text-[var(--subheading-text)] mt-2 font-medium">
@@ -49,7 +51,7 @@ export function PageHeader({
             </p>
           )}
         </div>
-        {actions && <div className="flex-shrink-0 self-center">{actions}</div>}
+        {actions && <div className="flex-shrink-0 sm:self-center [&>*]:mt-4 sm:[&>*]:mt-0">{actions}</div>}
       </div>
     </div>
   );

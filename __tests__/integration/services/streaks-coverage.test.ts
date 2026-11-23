@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import { streakService } from "@/lib/services/streak.service";
 import { bookRepository, sessionRepository, progressRepository, streakRepository } from "@/lib/repositories";
 import { setupTestDatabase, teardownTestDatabase, clearTestDatabase } from "@/__tests__/helpers/db-setup";
@@ -29,7 +29,16 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
+  // The streak service counts "today" in the user's timezone (America/New_York by default), while these tests date
+  // their progress by the machine's clock. Between midnight UTC and midnight in New York those are different days,
+  // so pin the clock to midday UTC, when they agree. Only Date is faked; timers still run, for the database.
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-06-15T12:00:00Z"));
   await clearTestDatabase(__filename);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("StreakService - Coverage Improvement", () => {
