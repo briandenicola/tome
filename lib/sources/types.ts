@@ -37,6 +37,17 @@ export interface ReadingSource {
   details(item: SourceItem): Promise<SourceItem>;
   /** The item's cover image, or null. */
   cover(item: SourceItem): Promise<Buffer | null>;
+  /**
+   * Books the person has set aside to read in the app (Grimmory's Kobo shelf), for Tome's backlog. Absent when the
+   * app has no such thing or it's turned off.
+   */
+  backlog?: {
+    /** As people know it, for the sync summary: "the Kobo shelf". */
+    name: string;
+    /** Where queued books go: the to-read pile or the end of the read-next queue. */
+    status: "to-read" | "read-next";
+    items(): Promise<SourceItem[]>;
+  };
 }
 
 /** An app that couldn't be read: the message says what to check. Shown in Settings as is. */

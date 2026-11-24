@@ -26,6 +26,11 @@ export const sourceLinks = sqliteTable(
     lastProgress: real("last_progress").notNull().default(0),
     lastFinished: integer("last_finished", { mode: "boolean" }).notNull().default(false),
     lastSeenAt: integer("last_seen_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+    /**
+     * When the item was put in Tome's backlog from a shelf in the app (Grimmory's Kobo shelf). Each item is queued
+     * once: taking it off the shelf, or out of Tome, later doesn't undo or redo it.
+     */
+    queuedAt: integer("queued_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
   },
   (table) => ({

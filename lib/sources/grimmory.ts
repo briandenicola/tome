@@ -23,19 +23,32 @@ export interface GrimmoryBookSummary {
   isPhysical?: boolean | null;
 }
 
+/** The shelf Grimmory syncs to a Kobo: one per user, always named this (Grimmory's ShelfType.KOBO). */
+export const KOBO_SHELF_NAME = "Kobo";
+
+/**
+ * Where books on the Kobo shelf go in Tome, from GRIMMORY_KOBO_SHELF: "to-read" (the default), "read-next", or "off"
+ * to leave the shelf alone.
+ */
+export function koboShelfStatus(raw = process.env.GRIMMORY_KOBO_SHELF): "to-read" | "read-next" | null {
+  const v = (raw ?? "").trim().toLowerCase();
+  if (v === "off" || v === "false" || v === "no" || v === "none") return null;
+  return v === "read-next" ? "read-next" : "to-read";
+}
+
 /** Statuses with reading on them; unread and won't-read books are left out. */
 export const GRIMMORY_STATUSES = ["READING", "RE_READING", "READ", "PARTIALLY_READ", "PAUSED", "ABANDONED"];
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 50;
 
 /** Maps Grimmory books to items. Physical books are left out: those are logged in Tome by hand. Pure, for tests. */
-export function mapGrimmoryBooks(books: GrimmoryBookSummary[]): SourceItem[] {
+export function mapGrimmoryBooks(books: GrimmoryBookSummary[], { withoutReading = false } = {}): SourceItem[] {
   const out: SourceItem[] = [];
   for (const b of books) {
     if (b.isPhysical) continue;
     const finished = b.readStatus === "READ";
     const raw = typeof b.readProgress === "number" && Number.isFinite(b.readProgress) ? b.readProgress : 0;
     const progress = finished ? 100 : Math.max(0, Math.min(100, Math.round(raw * 10) / 10));
-    if (progress <= 0 && !finished) continue;
+    if (progress <= 0 && !finished && !withoutReading) continue;
     const last = b.lastReadTime ? new Date(b.lastReadTime) : undefined;
     const lastUpdate = last && !isNaN(last.getTime()) ? last : undefined;
     out.push({
@@ -88,6 +101,26 @@ async function get<T>(path: string): Promise<T> {
   }
 }
 
+/** Every page of a GET /api/v1/app/books query. Grimmory serves at most 50 a page, whatever is asked. */
+async function allBooks(query: string): Promise<GrimmoryBookSummary[]> {
+  const books: GrimmoryBookSummary[] = [];
+  for (let page = 0; page < 400; page++) {
+    const body = await get<{ content?: GrimmoryBookSummary[]; hasNext?: boolean }>(`/api/v1/app/books?${query}&page=${page}&size=${PAGE_SIZE}`);
+    books.push(...(body.content ?? []));
+    if (!body.hasNext) break;
+  }
+  return books;
+}
+
+/** The books on the person's Kobo shelf, read or not; none when there's no Kobo shelf. */
+export async function koboShelfBooks(): Promise<SourceItem[]> {
+  const shelves = await get<Array<{ id: number; name?: string }>>("/api/v1/app/shelves");
+  const kobo =
+    (shelves ?? []).find((s) => s.name === KOBO_SHELF_NAME) ?? (shelves ?? []).find((s) => s.name?.trim().toLowerCase() === KOBO_SHELF_NAME.toLowerCase());
+  if (!kobo) return [];
+  return mapGrimmoryBooks(await allBooks(`shelfId=${encodeURIComponent(String(kobo.id))}`), { withoutReading: true });
+}
+
 export const grimmory: ReadingSource = {
   id: "grimmory",
   name: "Grimmory",
@@ -95,16 +128,12 @@ export const grimmory: ReadingSource = {
     !!baseUrl(process.env.GRIMMORY_URL) && !!process.env.GRIMMORY_USERNAME?.trim() && !!process.env.GRIMMORY_PASSWORD,
 
   async items() {
-    const books: GrimmoryBookSummary[] = [];
-    const status = GRIMMORY_STATUSES.map((s) => `status=${s}`).join("&");
-    for (let page = 0; page < 200; page++) {
-      const body = await get<{ content?: GrimmoryBookSummary[]; hasNext?: boolean }>(
-        `/api/v1/app/books?${status}&page=${page}&size=${PAGE_SIZE}`
-      );
-      books.push(...(body.content ?? []));
-      if (!body.hasNext) break;
-    }
-    return mapGrimmoryBooks(books);
+    return mapGrimmoryBooks(await allBooks(GRIMMORY_STATUSES.map((s) => `status=${s}`).join("&")));
+  },
+
+  get backlog() {
+    const status = koboShelfStatus();
+    return status ? { name: "the Kobo shelf", status, items: koboShelfBooks } : undefined;
   },
 
   // The list already carries ISBN, pages and series.

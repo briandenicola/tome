@@ -36,6 +36,8 @@ export interface SourceSyncResult {
   /** Books that can't be logged until they have a page count (Tome needs one to start or finish a book). */
   needPages: number;
   failed: number;
+  /** Books put in the backlog from the app's to-read shelf (Grimmory's Kobo shelf), this sync. */
+  queued: number;
   summary: string;
 }
 
@@ -142,7 +144,7 @@ export class SourceSyncService {
       const items = await source.items();
       const index = new BookIndex(await bookRepository.findAll());
       const today = formatInTimeZone(new Date(), await getCurrentUserTimezone(), "yyyy-MM-dd");
-      const result: SourceSyncResult = { source: id, baseline, items: items.length, updated: 0, added: 0, finished: 0, needPages: 0, failed: 0, summary: "" };
+      const result: SourceSyncResult = { source: id, baseline, items: items.length, updated: 0, added: 0, finished: 0, needPages: 0, failed: 0, queued: 0, summary: "" };
 
       for (const item of items) {
         try {
@@ -153,7 +155,20 @@ export class SourceSyncService {
         }
       }
 
-      result.summary = summarize(result);
+      // After progress, so a book being read on the shelf is already marked as read in Tome and is left alone.
+      const backlog = source.backlog;
+      if (backlog) {
+        for (const item of await backlog.items()) {
+          try {
+            await this.queueItem(source, backlog.status, item, index, result);
+          } catch (error) {
+            result.failed++;
+            log.warn({ err: error, source: id, externalId: item.externalId }, `Couldn't queue a book from ${backlog.name}`);
+          }
+        }
+      }
+
+      result.summary = summarize(result, backlog?.name);
       await sourceLinkRepository.saveSync(id, {
         ...(baseline && { baselinedAt: startedAt }),
         lastRunAt: startedAt,
@@ -235,6 +250,73 @@ export class SourceSyncService {
     if (outcome === "needs-pages") result.needPages++;
     if (outcome === "finished") result.finished++;
     if (outcome === "finished" || outcome === "logged") result.updated++;
+  }
+
+  /**
+   * Puts a book from the app's to-read shelf in Tome's backlog: the Tome book it is, or a new one, goes to the pile
+   * (or read-next). Each item is queued once, ever: taking it off the shelf doesn't take it out of Tome, and a book
+   * removed from Tome isn't brought back while it's still on the shelf. Books being read, finished or dropped, and
+   * books already in the backlog, are left where they are.
+   */
+  private async queueItem(
+    source: ReadingSource,
+    status: "to-read" | "read-next",
+    item: SourceItem,
+    index: BookIndex,
+    result: SourceSyncResult
+  ): Promise<void> {
+    const link = await sourceLinkRepository.findItem(source.id, item.externalId);
+    if (link?.queuedAt) return;
+
+    let bookId = link?.bookId ?? null;
+    let matchedBy: SourceLink["matchedBy"] = link?.matchedBy ?? null;
+    let added = false;
+    if (bookId === null) {
+      const detailed = await this.detailed(source, item);
+      const match = index.match(detailed);
+      if (match) {
+        bookId = match.book.id;
+        matchedBy = match.by;
+      } else {
+        const book = await this.addBook(source, detailed);
+        index.add(book);
+        bookId = book.id;
+        matchedBy = "added";
+        added = true;
+        result.added++;
+      }
+    }
+
+    const active = await sessionRepository.findActiveByBookId(bookId);
+    const finished =
+      !active && ((await sessionRepository.hasCompletedReads(bookId)) || (await sessionRepository.findLatestByBookId(bookId))?.status === "dnf");
+    const reading = active && active.status !== "to-read" && active.status !== "read-next";
+    if (!reading && !finished) {
+      if (!active) {
+        await sessionService.updateStatus(bookId, { status });
+        result.queued++;
+      } else if (added) {
+        // A book just added starts on the pile; read-next moves it to the end of the queue.
+        if (status === "read-next") await sessionService.updateStatus(bookId, { status });
+        result.queued++;
+      }
+      // A book already in the backlog stays where it is, pile or queue.
+    }
+
+    const queuedAt = new Date();
+    if (link) await sourceLinkRepository.update(link.id, { bookId, matchedBy, queuedAt });
+    else
+      await sourceLinkRepository.create({
+        source: source.id,
+        externalId: item.externalId,
+        title: item.title,
+        bookId,
+        matchedBy,
+        lastProgress: item.progress,
+        lastFinished: item.finished,
+        lastSeenAt: queuedAt,
+        queuedAt,
+      });
   }
 
   private async detailed(source: ReadingSource, item: SourceItem): Promise<SourceItem> {
@@ -391,12 +473,14 @@ export class SourceSyncService {
   }
 }
 
-function summarize(r: SourceSyncResult): string {
-  if (r.baseline) return `First sync: found ${r.items} book(s) with reading on them. From now on, new reading is logged.`;
+function summarize(r: SourceSyncResult, backlogName?: string): string {
+  const queued = r.queued && backlogName ? `; ${r.queued} book(s) from ${backlogName} put in the backlog` : "";
+  if (r.baseline) return `First sync: found ${r.items} book(s) with reading on them. From now on, new reading is logged${queued}.`;
   const parts = [`${r.updated} updated`];
   if (r.finished) parts.push(`${r.finished} finished`);
   if (r.added) parts.push(`${r.added} added to Tome`);
   if (r.needPages) parts.push(`${r.needPages} waiting for a page count`);
+  if (r.queued && backlogName) parts.push(`${r.queued} from ${backlogName} put in the backlog`);
   if (r.failed) parts.push(`${r.failed} failed`);
   return parts.join(", ");
 }
