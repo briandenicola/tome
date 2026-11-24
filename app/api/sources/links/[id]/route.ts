@@ -5,14 +5,26 @@ import { getLogger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
-/** Points a reading-app item at another Tome book (`{ "bookId": 12 }`) or adds it as a new one (`{ "addAsNew": true }`). */
+/**
+ * Points a reading-app item at another Tome book (`{ "bookId": 12 }`), adds it as a new one (`{ "addAsNew": true }`),
+ * or, for a book waiting on the app's to-read shelf, leaves it out of Tome (`{ "ignore": true }`). Matching or adding a
+ * shelf book also puts it in the backlog.
+ */
 export async function PATCH(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const raw = (await props.params).id;
   if (!/^\d+$/.test(raw)) return NextResponse.json({ error: "Invalid link ID format" }, { status: 400 });
   const body = await request.json().catch(() => null);
   const target =
-    body?.addAsNew === true ? ("new" as const) : Number.isInteger(body?.bookId) ? { bookId: body.bookId as number } : null;
-  if (!target) return NextResponse.json({ error: 'Send { "bookId": <Tome book id> } or { "addAsNew": true }.' }, { status: 400 });
+    body?.addAsNew === true
+      ? ("new" as const)
+      : body?.ignore === true
+        ? ("ignore" as const)
+        : Number.isInteger(body?.bookId)
+          ? { bookId: body.bookId as number }
+          : null;
+  if (!target) {
+    return NextResponse.json({ error: 'Send { "bookId": <Tome book id> }, { "addAsNew": true } or { "ignore": true }.' }, { status: 400 });
+  }
   try {
     return NextResponse.json(await sourceSyncService.relink(Number(raw), target));
   } catch (error) {

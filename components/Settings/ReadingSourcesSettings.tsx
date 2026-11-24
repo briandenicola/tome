@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw, Headphones, Link2 } from "lucide-react";
+import { RefreshCw, Headphones, Link2, Tablet, EyeOff } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/Utilities/Button";
 import { toast } from "@/utils/toast";
@@ -19,12 +19,14 @@ interface SourceLinkView {
   lastProgress: number;
   lastFinished: boolean;
   lastSeenAt: string;
+  onShelf: boolean;
 }
 
 interface SourceView {
   id: "audiobookshelf" | "grimmory";
   name: string;
   configured: boolean;
+  shelf: string | null;
   sync: { baselinedAt: string | null; lastRunAt: string | null; lastSuccessAt: string | null; lastError: string | null; lastSummary: string | null } | null;
   links: SourceLinkView[];
 }
@@ -76,7 +78,8 @@ export function ReadingSourcesSettings() {
       </div>
       <p className="text-sm text-[var(--subheading-text)] mb-4 font-medium">
         Tome logs your progress from these apps{data ? ` every ${data.intervalMinutes} minutes` : ""}, as a percentage. The
-        first sync only notes where each book is; reading after that is logged. A book Tome doesn&apos;t have is added.
+        first sync only notes where each book is; reading after that is logged. A book Tome doesn&apos;t have is added
+        once there&apos;s reading on it.
       </p>
 
       {isLoading && <div className="h-4 bg-[var(--border-color)] rounded animate-pulse w-48" />}
@@ -113,15 +116,19 @@ export function ReadingSourcesSettings() {
               )}
             </div>
 
-            {s.links.length > 0 && (
+            {s.shelf && <ShelfToMatch shelf={s.shelf} links={s.links.filter((l) => l.onShelf)} />}
+
+            {s.links.some((l) => !l.onShelf) && (
               <details className="mt-3">
                 <summary className="cursor-pointer text-sm font-semibold text-[var(--accent)]">
-                  {s.links.length} {s.links.length === 1 ? "book" : "books"} from {s.name}
+                  {s.links.filter((l) => !l.onShelf).length} {s.links.filter((l) => !l.onShelf).length === 1 ? "book" : "books"} from {s.name}
                 </summary>
                 <ul className="divide-y divide-[var(--border-color)] mt-2">
-                  {s.links.map((l) => (
-                    <LinkRow key={l.id} link={l} />
-                  ))}
+                  {s.links
+                    .filter((l) => !l.onShelf)
+                    .map((l) => (
+                      <LinkRow key={l.id} link={l} />
+                    ))}
                 </ul>
               </details>
             )}
@@ -132,21 +139,58 @@ export function ReadingSourcesSettings() {
   );
 }
 
-function LinkRow({ link }: { link: SourceLinkView }) {
+/**
+ * Books on the app's to-read shelf (Grimmory's Kobo shelf) that Tome couldn't match to one of its own. Tome only
+ * queues books it can match, so a near-miss never makes a copy; these wait here to be matched, added or ignored.
+ */
+function ShelfToMatch({ shelf, links }: { shelf: string; links: SourceLinkView[] }) {
+  if (links.length === 0) {
+    return (
+      <p className="mt-3 text-sm text-foreground/70 flex items-center gap-2">
+        <Tablet className="w-4 h-4 text-[var(--accent)]" />
+        Books on {shelf} go to your backlog when Tome has them.
+      </p>
+    );
+  }
+  return (
+    <div className="mt-3 rounded-md border border-amber-600/40 bg-amber-500/10 p-3">
+      <p className="text-sm font-semibold text-[var(--foreground)] flex items-center gap-2">
+        <Tablet className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+        {links.length} {links.length === 1 ? "book" : "books"} on {shelf} Tome couldn&apos;t match
+      </p>
+      <p className="text-sm text-foreground/70 mt-1">
+        Find each one&apos;s Tome book, add it as a new book, or ignore it. Matched or added books go in your backlog.
+      </p>
+      <ul className="divide-y divide-[var(--border-color)] mt-2">
+        {links.map((l) => (
+          <LinkRow key={l.id} link={l} shelf={shelf} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function LinkRow({ link, shelf }: { link: SourceLinkView; shelf?: string }) {
   const queryClient = useQueryClient();
   const [changing, setChanging] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<Array<{ id: number; title: string; authors: string[] }>>([]);
 
   const relink = useMutation({
-    mutationFn: (body: { bookId: number } | { addAsNew: true }) =>
+    mutationFn: (body: { bookId: number } | { addAsNew: true } | { ignore: true }) =>
       call(`/api/sources/links/${link.id}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),
       }),
-    onSuccess: () => {
-      toast.success("Linked. New progress from it goes to that book.");
+    onSuccess: (_res, body) => {
+      toast.success(
+        "ignore" in body
+          ? "Ignored. Tome won't ask about it again."
+          : shelf
+            ? "Linked and put in your backlog."
+            : "Linked. New progress from it goes to that book."
+      );
       setChanging(false);
       void queryClient.invalidateQueries({ queryKey: KEY });
     },
@@ -172,6 +216,9 @@ function LinkRow({ link }: { link: SourceLinkView }) {
           <p className="text-[var(--foreground)] truncate" title={link.title}>
             {link.title}
           </p>
+          {shelf ? (
+            <p className="text-foreground/70">on {shelf} · no Tome book found</p>
+          ) : (
           <p className="text-foreground/70">
             {link.needsPages ? "not logged yet" : link.lastFinished ? "finished" : `${Math.round(link.lastProgress)}%`} ·{" "}
             {link.bookId !== null ? (
@@ -191,10 +238,25 @@ function LinkRow({ link }: { link: SourceLinkView }) {
               "not in Tome yet: added when there's new reading"
             )}
           </p>
+          )}
         </div>
-        <Button type="button" variant="ghost" size="sm" onClick={() => setChanging((c) => !c)} icon={<Link2 className="w-4 h-4" />}>
-          {changing ? "Cancel" : "Change"}
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button type="button" variant="ghost" size="sm" onClick={() => setChanging((c) => !c)} icon={<Link2 className="w-4 h-4" />}>
+            {changing ? "Cancel" : shelf ? "Match" : "Change"}
+          </Button>
+          {shelf && !changing && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={relink.isPending}
+              onClick={() => relink.mutate({ ignore: true })}
+              icon={<EyeOff className="w-4 h-4" />}
+            >
+              Ignore
+            </Button>
+          )}
+        </div>
       </div>
       {changing && (
         <div className="mt-2 space-y-2">

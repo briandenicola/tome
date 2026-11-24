@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNotNull, isNull, notInArray } from "drizzle-orm";
 import { BaseRepository } from "./base.repository";
 import { sourceLinks, sourceSyncs, SourceLink, NewSourceLink, SourceSync, type ReadingSourceId } from "@/lib/db/schema/source-links";
 
@@ -23,6 +23,22 @@ export class SourceLinkRepository extends BaseRepository<SourceLink, NewSourceLi
   /** The app items that count toward a Tome book. */
   async findByBookId(bookId: number): Promise<SourceLink[]> {
     return this.getDatabase().select().from(sourceLinks).where(eq(sourceLinks.bookId, bookId)).orderBy(asc(sourceLinks.id)).all();
+  }
+
+  /** Forgets that items no longer on the app's shelf were waiting there to be matched. */
+  async clearShelvedExcept(source: ReadingSourceId, onShelf: string[]): Promise<void> {
+    this.getDatabase()
+      .update(sourceLinks)
+      .set({ shelvedAt: null })
+      .where(
+        and(
+          eq(sourceLinks.source, source),
+          isNotNull(sourceLinks.shelvedAt),
+          isNull(sourceLinks.queuedAt),
+          ...(onShelf.length ? [notInArray(sourceLinks.externalId, onShelf)] : [])
+        )
+      )
+      .run();
   }
 
   async getSync(source: ReadingSourceId): Promise<SourceSync | undefined> {

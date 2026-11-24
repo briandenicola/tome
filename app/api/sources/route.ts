@@ -16,6 +16,8 @@ export async function GET() {
       id: source.id,
       name: source.name,
       configured: source.configured(),
+      /** The app's to-read shelf Tome fills the backlog from, e.g. "the Kobo shelf"; null when there's none. */
+      shelf: source.configured() ? (source.backlog?.name ?? null) : null,
       sync: (await sourceLinkRepository.getSync(source.id)) ?? null,
       links: links.map((l) => ({
         id: l.id,
@@ -28,6 +30,8 @@ export async function GET() {
         lastProgress: l.lastProgress,
         lastFinished: l.lastFinished,
         lastSeenAt: l.lastSeenAt,
+        /** On the app's to-read shelf, but Tome couldn't tell which of its books it is. */
+        onShelf: !!l.shelvedAt && !l.queuedAt,
       })),
     });
   }

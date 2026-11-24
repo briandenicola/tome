@@ -81,37 +81,63 @@ async function tomeBook(title: string, authors: string[], status?: "to-read" | "
 
 const statusOf = async (bookId: number) => (await sessionRepository.findActiveByBookId(bookId))?.status ?? null;
 
+async function handAdded(title: string, authors: string[]) {
+  const book = await bookRepository.create({ calibreId: null, source: "manual", path: "", title, authors, totalPages: 250 });
+  return book;
+}
+
+const titles = async () => (await bookRepository.findAll()).map((b) => b.title).sort();
+const shelfLink = (id: string) => sourceLinkRepository.findItem("grimmory", id);
+
 describe("the Kobo shelf", () => {
-  test("puts the shelf's books in the backlog: Tome's own book if it has it, else a new one with its cover", async () => {
+  test("queues the books Tome has; lists the ones it can't match, and adds nothing", async () => {
     const dune = await tomeBook("Dune", ["Frank Herbert"]); // in Tome with no reading yet
     const source = shelfSource();
     const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
     source.shelve([
-      onShelf("1", "Dune", ["Frank Herbert"]),
+      onShelf("1", "Dune: Deluxe Edition", ["Herbert, Frank"]),
       onShelf("2", "Piranesi", ["Susanna Clarke"], { isbn: "9781635575637", totalPages: 272 }),
     ]);
 
     const result = await service.sync("grimmory");
-    expect(result).toMatchObject({ queued: 2, added: 1 });
-    expect(result.summary).toContain("2 book(s) from the Kobo shelf put in the backlog");
+    expect(result).toMatchObject({ queued: 1, unmatched: 1, added: 0 });
+    expect(result.summary).toContain("1 book(s) from the Kobo shelf put in the backlog; 1 on the Kobo shelf to match");
     expect(await statusOf(dune.id)).toBe("to-read");
-
-    const piranesi = (await bookRepository.findAll()).find((b) => b.title === "Piranesi")!;
-    expect(piranesi).toMatchObject({ source: "grimmory", isbn: "9781635575637", totalPages: 272 });
-    expect(piranesi.coverFile).toBeTruthy();
-    expect(await statusOf(piranesi.id)).toBe("to-read");
+    expect(await titles()).toEqual(["Dune"]);
+    expect(await shelfLink("2")).toMatchObject({ bookId: null, queuedAt: null, shelvedAt: expect.any(Date) });
   });
 
-  test("with read-next, new books join the end of the queue; books already in the backlog stay put", async () => {
+  test("an unmatched book is tried again each sync, and queued once Tome has it", async () => {
+    const source = shelfSource();
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    source.shelve([onShelf("2", "Piranesi", ["Susanna Clarke"])]);
+    expect(await service.sync("grimmory")).toMatchObject({ unmatched: 1 });
+
+    const piranesi = await tomeBook("Piranesi", ["Susanna Clarke"]); // e.g. it reached Calibre
+    expect(await service.sync("grimmory")).toMatchObject({ queued: 1, unmatched: 0 });
+    expect(await statusOf(piranesi.id)).toBe("to-read");
+    expect(await shelfLink("2")).toMatchObject({ bookId: piranesi.id, shelvedAt: null, queuedAt: expect.any(Date) });
+  });
+
+  test("an unmatched book that leaves the shelf drops off the list", async () => {
+    const source = shelfSource();
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    source.shelve([onShelf("2", "Piranesi", ["Susanna Clarke"])]);
+    await service.sync("grimmory");
+    source.shelve([]);
+    await service.sync("grimmory");
+    expect((await shelfLink("2"))?.shelvedAt).toBeNull();
+  });
+
+  test("with read-next, a matched book with no reading joins the queue; one already in the pile stays", async () => {
     const pile = await tomeBook("Dune", ["Frank Herbert"], "to-read");
+    const fresh = await tomeBook("Hyperion", ["Dan Simmons"]);
     const source = shelfSource("read-next");
     const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
     source.shelve([onShelf("1", "Dune", ["Frank Herbert"]), onShelf("2", "Hyperion", ["Dan Simmons"])]);
-    expect(await service.sync("grimmory")).toMatchObject({ queued: 1, added: 1 });
-
+    expect(await service.sync("grimmory")).toMatchObject({ queued: 1 });
     expect(await statusOf(pile.id)).toBe("to-read");
-    const hyperion = (await bookRepository.findAll()).find((b) => b.title === "Hyperion")!;
-    expect(await statusOf(hyperion.id)).toBe("read-next");
+    expect(await statusOf(fresh.id)).toBe("read-next");
   });
 
   test("books being read, finished or dropped are left alone", async () => {
@@ -122,32 +148,28 @@ describe("the Kobo shelf", () => {
     const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
     source.shelve([onShelf("1", "Dune", ["Frank Herbert"]), onShelf("2", "Circe", ["Madeline Miller"]), onShelf("3", "Ulysses", ["James Joyce"])]);
 
-    expect(await service.sync("grimmory")).toMatchObject({ queued: 0, added: 0 });
+    expect(await service.sync("grimmory")).toMatchObject({ queued: 0, added: 0, unmatched: 0 });
     expect(await statusOf(reading.id)).toBe("reading");
     expect(await sessionRepository.findActiveByBookId(read.id)).toBeUndefined();
     expect(await sessionRepository.findActiveByBookId(dropped.id)).toBeUndefined();
   });
 
-  test("taking a book off the shelf leaves it in Tome; a book removed from Tome isn't brought back", async () => {
+  test("taking a book off the shelf leaves it in Tome; a book removed from Tome isn't asked about again", async () => {
+    const p = await handAdded("Piranesi", ["Susanna Clarke"]);
+    const h = await handAdded("Hyperion", ["Dan Simmons"]);
     const source = shelfSource();
     const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
     source.shelve([onShelf("1", "Piranesi", ["Susanna Clarke"]), onShelf("2", "Hyperion", ["Dan Simmons"])]);
-    await service.sync("grimmory");
-    const [piranesi, hyperion] = ["Piranesi", "Hyperion"].map((t) => t);
-    const books = await bookRepository.findAll();
-    const p = books.find((b) => b.title === piranesi)!;
-    const h = books.find((b) => b.title === hyperion)!;
+    expect(await service.sync("grimmory")).toMatchObject({ queued: 2 });
 
-    // Piranesi comes off the Kobo shelf: it stays in Tome's pile.
     source.shelve([onShelf("2", "Hyperion", ["Dan Simmons"])]);
-    expect(await service.sync("grimmory")).toMatchObject({ queued: 0, added: 0 });
+    await service.sync("grimmory");
     expect(await statusOf(p.id)).toBe("to-read");
 
-    // Hyperion is removed from Tome while still on the shelf: the next syncs don't add it back.
     await manualBookService.remove(h.id);
-    expect(await service.sync("grimmory")).toMatchObject({ queued: 0, added: 0 });
-    expect((await bookRepository.findAll()).map((b) => b.title)).toEqual(["Piranesi"]);
-    expect((await sourceLinkRepository.findItem("grimmory", "2"))?.queuedAt).toBeInstanceOf(Date);
+    expect(await service.sync("grimmory")).toMatchObject({ queued: 0, added: 0, unmatched: 0 });
+    expect(await titles()).toEqual(["Piranesi"]);
+    expect((await shelfLink("2"))?.shelvedAt).toBeNull();
   });
 
   test("a book read on the Kobo and on the shelf is logged as reading, not queued", async () => {
@@ -162,6 +184,42 @@ describe("the Kobo shelf", () => {
     source.shelve([onShelf("1", "Dune", ["Frank Herbert"], { progress: 20 })]);
     expect(await service.sync("grimmory")).toMatchObject({ updated: 1, queued: 0 });
     expect(await statusOf(dune.id)).toBe("reading");
+  });
+});
+
+describe("matching a shelf book by hand", () => {
+  async function waiting(status: "to-read" | "read-next" = "to-read") {
+    const source = shelfSource(status);
+    const service = new SourceSyncService({ audiobookshelf: source, grimmory: source });
+    source.shelve([onShelf("2", "Piranesi (Unabridged)", ["S. Clarke"], { isbn: "9781635575637", totalPages: 272 })]);
+    await service.sync("grimmory");
+    const link = (await shelfLink("2"))!;
+    expect(link.bookId).toBeNull();
+    return { service, link };
+  }
+
+  test("pointing it at a Tome book queues that book", async () => {
+    const { service, link } = await waiting();
+    const mine = await tomeBook("Piranesi", ["Susanna Clarke"]);
+    await service.relink(link.id, { bookId: mine.id });
+    expect(await statusOf(mine.id)).toBe("to-read");
+    expect(await shelfLink("2")).toMatchObject({ bookId: mine.id, matchedBy: "person", shelvedAt: null, queuedAt: expect.any(Date) });
+  });
+
+  test("adding it as a new book uses the shelf's details and queues it (read-next here)", async () => {
+    const { service, link } = await waiting("read-next");
+    await service.relink(link.id, "new");
+    const added = (await bookRepository.findAll()).find((b) => b.isbn === "9781635575637")!;
+    expect(added).toMatchObject({ source: "grimmory", authors: ["S. Clarke"], totalPages: 272 });
+    expect(await statusOf(added.id)).toBe("read-next");
+  });
+
+  test("ignoring it leaves it out of Tome, and later syncs don't ask again", async () => {
+    const { service, link } = await waiting();
+    await service.relink(link.id, "ignore");
+    expect(await service.sync("grimmory")).toMatchObject({ unmatched: 0, queued: 0 });
+    expect(await titles()).toEqual([]);
+    expect(await shelfLink("2")).toMatchObject({ bookId: null, shelvedAt: null, queuedAt: expect.any(Date) });
   });
 });
 
@@ -236,5 +294,24 @@ describe("reading the Kobo shelf from Grimmory", () => {
       delete process.env.GRIMMORY_USERNAME;
       delete process.env.GRIMMORY_PASSWORD;
     }
+  });
+});
+
+describe("PATCH /api/sources/links/:id", () => {
+  test("takes a book id, addAsNew or ignore, and refuses anything else", async () => {
+    const { PATCH } = await import("@/app/api/sources/links/[id]/route");
+    const { NextRequest } = await import("next/server");
+    const link = await sourceLinkRepository.create({ source: "grimmory", externalId: "9", title: "Piranesi", bookId: null, shelvedAt: new Date() });
+    const patch = (body: unknown, id = String(link.id)) =>
+      PATCH(new NextRequest(`http://localhost/api/sources/links/${id}`, { method: "PATCH", body: JSON.stringify(body) }), {
+        params: Promise.resolve({ id }),
+      });
+
+    expect((await patch({ nothing: true })).status).toBe(400);
+    expect((await patch({ ignore: true }, "abc")).status).toBe(400);
+    const res = await patch({ ignore: true });
+    expect(res.status).toBe(200);
+    expect(await sourceLinkRepository.findById(link.id)).toMatchObject({ shelvedAt: null, queuedAt: expect.any(Date) });
+    expect((await patch({ ignore: true }, "99999")).status).toBe(404);
   });
 });

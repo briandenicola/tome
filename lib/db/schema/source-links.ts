@@ -31,6 +31,11 @@ export const sourceLinks = sqliteTable(
      * once: taking it off the shelf, or out of Tome, later doesn't undo or redo it.
      */
     queuedAt: integer("queued_at", { mode: "timestamp" }),
+    /**
+     * When the item was last seen on that shelf without a Tome book to queue: Tome doesn't add shelf books itself, so
+     * it lists these for the person to match, add or ignore. Cleared once they do, or when it leaves the shelf.
+     */
+    shelvedAt: integer("shelved_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
   },
   (table) => ({
